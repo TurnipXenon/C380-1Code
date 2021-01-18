@@ -1,0 +1,16 @@
+CC=gcc
+CFLAGS=-Wall -Wextra -std=c99
+DEPS=memlayout.h
+
+.PHONY: all
+all: mem_1
+
+%.o: %.c $(DEPS)
+	$(CC) -c -o $@ $< $(CFLAGS)
+
+mem_1: memlayout.o mem_1.c
+	$(CC) $(CFLAGS) -o mem_1 memlayout.o mem_1.c
+
+.PHONY: clean
+clean:
+	rm -f *.o mem_1

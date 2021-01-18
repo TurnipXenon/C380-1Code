@@ -1,0 +1,9 @@
+*.bin
+*.out
+*.o
+*.idea
+
+# executables
+mem_1
+mem_2
+mem_3
