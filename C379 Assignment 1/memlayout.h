@@ -8,7 +8,6 @@
 #include <setjmp.h>
 #include <stdlib.h>
 #include <signal.h>
-#include <stdio.h>
 #include <unistd.h>
 
 extern const unsigned int PAGE_SIZE;

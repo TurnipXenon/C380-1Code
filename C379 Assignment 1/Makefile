@@ -1,6 +1,6 @@
 CC=gcc
 # todo: delete -g
-CFLAGS=-Wall -Wextra -std=gnu99 -g
+CFLAGS=-Wall -Wextra -std=gnu99 -g -m32
 DEPS=memlayout.h
 
 .PHONY: all
