@@ -1,16 +1,30 @@
 #include <stdlib.h>
+#include <stdio.h>
 #include "memlayout.h"
 
 /* todo: better document */
 
-void print_mem_layout(struct memregion *regions, unsigned int size) {
+const char* mode_to_string(unsigned char mode) {
+    switch(mode) {
+        case MEM_RW:
+            return "RW";
+        case MEM_RO:
+            return "RO";
+        case MEM_NO:
+            return "NO";
+        default:
+            return "Unknown";
+    }
+}
+
+void print_mem_layout(struct memregion *regions, unsigned int size, int region_count) {
     if (regions == NULL) {
         return;
     }
 
     // todo: print memlayout
-    for(unsigned int i = 0; i < size; ++i) {
-        printf("%p\n", regions[i].from);
+    for(unsigned int i = 0; i < size && i < (unsigned int)region_count; ++i) {
+        printf("%p-%p %s\n", regions[i].from, regions[i].to, mode_to_string(regions[i].mode));
     }
 }
 
@@ -18,23 +32,21 @@ void print_mem_layout(struct memregion *regions, unsigned int size) {
  * Allocate a massive array with malloc and initialize it
  */
 int main() {
-    unsigned int size = 10;
-    struct memregion *regions = (struct memregion*) malloc(size * sizeof(struct memregion));
+    unsigned int size = 30;
+    struct memregion regions[size];
+    int region_count = 0;
 
-    printf("mem1: %p\n", regions);
-    // get_mem_layout(&regions, size);
+    region_count = get_mem_layout(regions, size);
+    printf("Before (%d regions):\n", region_count);
+    print_mem_layout(regions, size, region_count);
     
-    printf("Stacking time\n");
     int *large_array = (int*) malloc(sizeof(int) * 1000000);
     
-    // todo: do another get mem layout
-    int region_count = get_mem_layout(&regions, size);
-    printf("Done get mem layout\n");
-    // print_mem_layout(&regions, size);
+    region_count = get_mem_layout(regions, size);
+    printf("After (%d regions):\n", region_count);
+    print_mem_layout(regions, size, region_count);
 
-    printf("mem1: %p\n", regions);
     free(large_array);
-    free(regions);
 
     return 0;
 }

@@ -20,7 +20,7 @@ struct memregion* new_memregion(void *from, unsigned char mode) {
    return m;
 }
 
-void handle_segfault(int sig) {
+void handle_segfault(__attribute__((unused)) int sig) {
     (void) signal(SIGSEGV, SIG_IGN);
     siglongjmp(no_env, 1);
 }
@@ -71,17 +71,24 @@ int get_mem_layout(struct memregion *regions, unsigned int size) {
 
        if (check_val != curr_region_mode) {
            if (curr_index < size) {
-            //    regions[curr_index].from = (void*) region_from;
-            //    regions[curr_index].to = (void*) curr_add;
+               regions[curr_index].from = (void*) region_from;
+               regions[curr_index].to = (void*) curr_add;
                regions[curr_index].mode = curr_region_mode;
                ++curr_index;
            }
 
            // todo: increase size
-        //    printf("%u: %x-%x %d\n", curr_add, region_from, curr_add-1, check_val);
+        //    printf("%d: %x-%x %d\n", curr_index, region_from, curr_add-1, check_val);
            region_from = curr_add;
            curr_region_mode = check_val;
        }
    }
-    return 0;
+
+   if (curr_index < size) {
+        regions[curr_index].from = (void*) region_from;
+        regions[curr_index].to = (void*) 0xffffffff;
+        regions[curr_index].mode = curr_region_mode;
+   }
+
+    return curr_index + 1;
 }
