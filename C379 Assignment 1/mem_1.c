@@ -17,17 +17,6 @@ const char* mode_to_string(unsigned char mode) {
     }
 }
 
-void print_mem_layout(struct memregion *regions, unsigned int size, int region_count) {
-    if (regions == NULL) {
-        return;
-    }
-
-    // todo: print memlayout
-    for(unsigned int i = 0; i < size && i < (unsigned int)region_count; ++i) {
-        printf("%p-%p %s\n", regions[i].from, regions[i].to, mode_to_string(regions[i].mode));
-    }
-}
-
 /**
  * Allocate a massive array with malloc and initialize it
  */

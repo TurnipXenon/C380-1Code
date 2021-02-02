@@ -36,7 +36,6 @@ int get_mem_layout(struct memregion *regions, unsigned int size) {
 
    // assume first address is NO
    int no_jump_val;
-   int ro_jump_val;
    int check_val;
    int curr_index = 0;
    int mem_layout_size = 1;
@@ -91,4 +90,15 @@ int get_mem_layout(struct memregion *regions, unsigned int size) {
    }
 
     return curr_index + 1;
+}
+
+void print_mem_layout(struct memregion *regions, unsigned int size, int region_count) {
+    if (regions == NULL) {
+        return;
+    }
+
+    // todo: print memlayout
+    for(unsigned int i = 0; i < size && i < (unsigned int)region_count; ++i) {
+        printf("%p-%p %s\n", regions[i].from, regions[i].to, mode_to_string(regions[i].mode));
+    }
 }

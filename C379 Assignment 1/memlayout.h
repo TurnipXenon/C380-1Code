@@ -27,4 +27,6 @@ int PAGE_SIZE. Usingpre-processor directives memlayout.h should
 check if USER_PAGE_SIZE is set and to use it as PAGE_SIZE,and 
 if not defined to set PAGE_SIZE to 4096. */
 
+void print_mem_layout(struct memregion *regions, unsigned int size, int region_count);
+
 #endif /* MEM_LAYOUT_H_ */
