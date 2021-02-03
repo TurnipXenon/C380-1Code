@@ -5,19 +5,6 @@
 
 /* todo: better document */
 
-const char* mode_to_string(unsigned char mode) {
-    switch(mode) {
-        case MEM_RW:
-            return "RW";
-        case MEM_RO:
-            return "RO";
-        case MEM_NO:
-            return "NO";
-        default:
-            return "Unknown";
-    }
-}
-
 /**
  * Load math library
  */
