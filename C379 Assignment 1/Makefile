@@ -32,6 +32,6 @@ test_2: mem_2
 test_3: mem_3
 	$(EXRANOFF) ./mem_3
 
-.PHONY: all_tests
-all_tests:
+.PHONY: test_all
+test_all:
 	make test_1 && make test_2 && make test_3
