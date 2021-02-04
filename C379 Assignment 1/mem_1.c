@@ -7,7 +7,7 @@
  * (from Assignment description)
  */
 int main() {
-    const int LARGE_ARRAY_SIZE = 1000000;
+    const int LARGE_ARRAY_SIZE = 100000000;
     const unsigned int SIZE = 30;
     struct memregion regions_before[SIZE];
     struct memregion regions_after[SIZE];
@@ -27,7 +27,7 @@ int main() {
     printf("After (%d regions):\n", regions_after_count);
     print_mem_layout(regions_after, SIZE, regions_after_count);
 
-    free(large_array);
+    // free(large_array);
 
     return 0;
 }
