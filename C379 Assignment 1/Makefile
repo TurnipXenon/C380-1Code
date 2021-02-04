@@ -1,5 +1,4 @@
-CC=gcc -Wall -Wextra -std=gnu99 -g -m32 $(CFLAGS)
-# todo: delete -g
+CC=gcc -Wall -Wextra -std=gnu99 -m32 $(CFLAGS)
 EXRANOFF=setarch `uname -m` -R
 
 .PHONY: all

@@ -44,14 +44,17 @@ void handle_signal(int sig)
  */
 int get_mem_layout(struct memregion *regions, unsigned int size)
 {
+    const unsigned int REGION_START = 0x0u;
+    const unsigned int REGION_END = 0xffffffffu;
+
     int jump_val;
     int check_val; // where we decide what accessibility is for the current pafe
     unsigned int curr_index = 0u; // current index we're writing on regions
-    unsigned int region_from = 0x0u;
+    unsigned int region_from = REGION_START;
     int curr_region_mode = MEM_NO; // current region mode
     bool is_first_loop = true;
 
-    for (unsigned int curr_add = region_from; curr_add < 0xffffffff; curr_add += PAGE_SIZE)
+    for (unsigned int curr_add = region_from; curr_add < REGION_END; curr_add += PAGE_SIZE)
     {
         /*
          * Hacky solution:
@@ -124,7 +127,7 @@ int get_mem_layout(struct memregion *regions, unsigned int size)
     if (curr_index < size)
     {
         regions[curr_index].from = (void *)region_from;
-        regions[curr_index].to = (void *)0xffffffff;
+        regions[curr_index].to = (void *)REGION_END;
         regions[curr_index].mode = curr_region_mode;
     }
 
