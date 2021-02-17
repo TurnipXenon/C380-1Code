@@ -1,0 +1,11 @@
+*.bin
+*.out
+*.o
+*.idea
+*.tar.gz
+
+# executables
+notapp
+
+#
+extras/
