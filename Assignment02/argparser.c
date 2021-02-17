@@ -4,29 +4,32 @@ notapp_args init_notapp_args() {
     notapp_args ret = {
         UNKNOWN, // role
         5.0f, // interval
-        "127.0.0.1", // server port
-        "logfile.txt" // logfile
+        "127.0.0.1", // sport
+        "logfile.txt", // logfile
+        "127.0.0.1", // saddr
+        "randomfile.txt" // fileordir
     };
     return ret;
 }
 
 // todo: private
 notapp_args parse_args_server(int argc, char *argv[]) {
+    notapp_args ret = init_notapp_args();
+
 // todo: put assumptions
     if (argc < 3) {
         // todo: error message here
-        return init_notapp_args();
+        printf("Not enough args todo\n");
+        return ret;
     }
 
-    notapp_args ret = init_notapp_args();
     int index = 2;
-
     bool interval_flag = false;
 
     while (index < argc) {
         if (index + 1 == argc) {
             printf("todo: handle no args value\n");
-            return init_notapp_args();
+            return ret;
         }
 
         if (strcmp(argv[index], "-t") == 0) {
@@ -41,7 +44,7 @@ notapp_args parse_args_server(int argc, char *argv[]) {
             ret.logfile = argv[index + 1];
         } else {
             printf("todo: handle unknown flag\n");
-            return init_notapp_args();
+            return ret;
         }
 
         index += 2;
@@ -49,22 +52,46 @@ notapp_args parse_args_server(int argc, char *argv[]) {
 
     if (!interval_flag) {
         printf("todo: required flag not present\n");
-        return init_notapp_args();
+        return ret;
     }
+
+    ret.role = SERVER;
 
     return ret;
 }
 
 // todo: private
 notapp_args parse_args_observer_client(int argc, char *argv[]) {
-    // todo
-    return init_notapp_args();
+    notapp_args ret = init_notapp_args();
+
+    if (argc != 5) {
+        printf("Not enough args todo\n");
+        return ret;
+    }
+
+    ret.role = SERVER;
+    ret.saddr = argv[2];
+    ret.sport = argv[3];
+    ret.fileordir = argv[4];
+
+    return ret;
 }
 
 // todo: private
 notapp_args parse_args_user_client(int argc, char *argv[]) {
     // todo
-    return init_notapp_args();
+    notapp_args ret = init_notapp_args();
+
+    if (argc != 4) {
+        printf("Not equal args in user client\n");
+        return ret;
+    }
+
+    ret.role = USER_CLIENT;
+    ret.saddr = argv[2];
+    ret.sport = argv[3];
+
+    return ret;
 }
 
 notapp_args parse_args(int argc, char *argv[])

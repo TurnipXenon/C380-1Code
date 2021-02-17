@@ -34,6 +34,7 @@
 #define _ARG_PARSER_H_
 
 #include <stdio.h>
+#include <string.h>
 #include <stdlib.h>
 #include <stdbool.h>
 
@@ -51,6 +52,8 @@ typedef struct notapp_args {
     float interval;
     char *sport;
     char *logfile;
+    char *saddr;
+    char *fileordir;
 } notapp_args;
 
 notapp_args init_notapp_args();
