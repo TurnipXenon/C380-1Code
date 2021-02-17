@@ -7,8 +7,11 @@ all: notapp
 %.o: %.c %.h
 	$(CC) -c -o $@ $<
 
-notapp: argumentparser.o notapp.c
-	$(CC) -o notapp argumentparser.o notapp.c
+notapp: argparser.o notapp.c
+	$(CC) -o notapp argparser.o notapp.c
+
+test: argparser.o test.c
+	$(CC) -o test argparser.o test.c
 
 # mem_1: memlayout.o mem_1.c
 # 	$(CC) -o mem_1 memlayout.o mem_1.c
@@ -22,6 +25,10 @@ notapp: argumentparser.o notapp.c
 .PHONY: clean
 clean:
 	rm -f *.o notapp
+
+.PHONY: run_test
+run_test: test
+	./test
 
 # .PHONY notapp.time
 # notapp.time:

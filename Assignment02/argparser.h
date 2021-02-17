@@ -1,5 +1,5 @@
 /**
- * @file argumentparser.h
+ * @file argparser.h
  * @author Allan Manuba (manuba@ualberta.ca)
  * @brief Identifies the role and arguments passed to notapp.
  * 
@@ -30,21 +30,31 @@
  * @date 2021-02-17
  */
 
-#ifndef _ARGUMENT_PARSER_H_
-#define _ARGUMENT_PARSER_H_
+#ifndef _ARG_PARSER_H_
+#define _ARG_PARSER_H_
 
 #include <stdio.h>
+#include <stdlib.h>
+#include <stdbool.h>
+
+#define MIN_ARG_COUNT 3
 
 enum role {
+    UNKNOWN,
     SERVER,
     OBSERVER_CLIENT,
     USER_CLIENT
 };
 
-struct notapp_arguments {
+typedef struct notapp_args {
     enum role role;
     float interval;
+    char *sport;
     char *logfile;
-};
+} notapp_args;
 
-#endif /* _ARGUMENT_PARSER_H_ */
+notapp_args init_notapp_args();
+
+notapp_args parse_args(int argc, char *argv[]);
+
+#endif /* _ARG_PARSER_H_ */
