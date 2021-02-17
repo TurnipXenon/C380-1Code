@@ -27,7 +27,11 @@
  * 
  * Modify PAGE_SIZE by setting by defining USER_PAGE_SIZE in CFLAGS.
  */
-extern const unsigned int PAGE_SIZE;
+
+#ifndef PPPP
+#define PPPP
+const unsigned int PAGE_SIZE = 4096;
+#endif
 
 /**
  * @brief Stores context during sigsetjumps in @see get_mem_layout

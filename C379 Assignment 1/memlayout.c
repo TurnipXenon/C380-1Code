@@ -4,11 +4,11 @@
  * If USER_PAGE_SIZE is defined, PAGE_SIZE is equal to USER_PAGE_SIZE.
  * Otherwise, PAGE_SIZE is 4096.
  */
-#ifdef USER_PAGE_SIZE
-const unsigned int PAGE_SIZE = USER_PAGE_SIZE;
-#else
-const unsigned int PAGE_SIZE = 4096;
-#endif
+// #ifdef USER_PAGE_SIZE
+// const unsigned int PAGE_SIZE = USER_PAGE_SIZE;
+// #else
+// const unsigned int PAGE_SIZE = 4096;
+// #endif
 
 /**
  * @brief Used by get_mem_layout to test to what extent can we access a page

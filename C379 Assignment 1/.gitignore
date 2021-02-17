@@ -2,9 +2,13 @@
 *.out
 *.o
 *.idea
+*.tar.gz
 
 # executables
 mem_1
 mem_2
 mem_3
 mem_4
+
+#
+extras/
