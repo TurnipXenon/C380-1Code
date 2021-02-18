@@ -69,7 +69,7 @@ notapp_args parse_args_observer_client(int argc, char *argv[]) {
         return ret;
     }
 
-    ret.role = SERVER;
+    ret.role = OBSERVER_CLIENT;
     ret.saddr = argv[2];
     ret.sport = argv[3];
     ret.fileordir = argv[4];

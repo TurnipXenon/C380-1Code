@@ -30,6 +30,10 @@ clean:
 run_test: test
 	./test
 
+.PHONY: observer1
+observer1: notapp
+	./notapp -o 111.111.111.111 222.222.22.2 test_folder1
+
 # .PHONY notapp.time
 # notapp.time:
 # 	ls
