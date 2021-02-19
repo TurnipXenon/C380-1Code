@@ -32,7 +32,7 @@ run_test: test
 
 .PHONY: observer1
 observer1: notapp
-	./notapp -o 111.111.111.111 222.222.22.2 test_folder1
+	./notapp -o 127.0.0.1 8080 test_folder1
 
 # .PHONY notapp.time
 # notapp.time:

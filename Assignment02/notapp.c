@@ -10,7 +10,8 @@
  */
 
 // todo: replace poll with epoll
-
+#include <sys/socket.h>
+#include <arpa/inet.h>
 #include <errno.h>
 #include <poll.h>
 #include <stdio.h>
@@ -58,6 +59,8 @@ static void handle_events(int file_desc, int *watch_desc) {
             
             event = (const struct inotify_event *) ptr;
 
+            // this is where we send our stuff out
+
             /* Identify event type here */
             if (event->mask & IN_OPEN)
                 printf("IN_OPEN: ");
@@ -81,17 +84,53 @@ static void handle_events(int file_desc, int *watch_desc) {
     }
 }
 
-void do_observer_client(notapp_args arg) {
-    // todo attach a sigint handle here
+static void do_observer_client(notapp_args arg) {
+    // region Set up socket
+    /* Code based on https://www.geeksforgeeks.org/socket-programming-cc/ */
+    int sock = 0, valread;
+    struct sockaddr_in serv_addr;
+    char *hello = "Hello from client";
+    char buffer[1024] = {0};  
 
+    printf("Creating socket\n");
+    if ((sock = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
+        perror("Socket creation error");
+        return;
+    }
+
+    serv_addr.sin_family = AF_INET;
+    serv_addr.sin_port = htons(arg.sport);
+
+    
+    printf("Converting to binary\n");
+    // Convert address to binary form
+    if (inet_pton(AF_INET, arg.saddr, &serv_addr.sin_addr) <= 0) {
+        perror("Invalid address / Address not supported");
+        return;
+    }
+
+    printf("Connecting..\n");
+    if (connect(sock, (struct sockaddr *) &serv_addr, sizeof(serv_addr))) {
+        perror("Connection failed");
+        return;
+    }
+    
+    printf("Sending message\n");
+    send(sock , hello , strlen(hello) , 0); 
+    printf("Hello message sent\n");
+    // valread = read( sock , buffer, 1024); 
+    // printf("%s\n",buffer ); 
+
+    return;
+    // endregion
+
+    // todo attach a sigint handle here
     // code base 'man inotify'
     char buf;
     int file_desc, poll_num;
     int watch_desc;
     nfds_t nfds = 1;
     struct pollfd fds[1];
-
-    close(file_desc);
 
     // Initialize inotify
     file_desc = inotify_init();
@@ -121,7 +160,7 @@ void do_observer_client(notapp_args arg) {
                 continue;
             }
 
-            // else
+            /* else */
             perror(poll);
             // todo: notify disconnection + clean up
             return;
