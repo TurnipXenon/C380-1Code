@@ -1,4 +1,4 @@
-CC=gcc -Wall -Wextra -std=c99 $(CFLAGS)
+CC=gcc -Wall -Wextra -std=c99 -pthread $(CFLAGS)
 EXRANOFF=setarch `uname -m` -R
 
 .PHONY: all
@@ -33,6 +33,14 @@ run_test: test
 .PHONY: observer1
 observer1: notapp
 	./notapp -o 127.0.0.1 8080 test_folder1
+
+.PHONY: user1
+user1: notapp
+	./notapp -u 127.0.0.1 8080 test_folder1
+
+.PHONY: server1
+server1: notapp
+	./notapp -s -t 2.5 -l server1_test.txt
 
 # .PHONY notapp.time
 # notapp.time:

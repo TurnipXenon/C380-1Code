@@ -4,7 +4,7 @@ notapp_args init_notapp_args() {
     notapp_args ret = {
         UNKNOWN, // role
         5.0f, // interval
-        "127.0.0.1", // sport
+        "0", // sport
         "logfile.txt", // logfile
         "127.0.0.1", // saddr
         "randomfile.txt" // fileordir
