@@ -32,7 +32,7 @@ run_test: test
 
 .PHONY: observer1
 observer1: notapp
-	./notapp -o 127.0.0.1 8080 test_folder1
+	./notapp -o 127.0.0.1 34057 test_folder1
 
 .PHONY: user1
 user1: notapp

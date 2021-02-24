@@ -21,6 +21,7 @@
 #include <sys/inotify.h>
 #include <unistd.h>
 #include <string.h>
+#include <pthread.h>
 
 #include "argparser.h"
 
@@ -116,9 +117,9 @@ static void do_observer_client(notapp_args arg) {
         return;
     }
 
+    int sport = atoi(arg.sport);
     serv_addr.sin_family = AF_INET;
-    serv_addr.sin_port = htons(arg.sport);
-
+    serv_addr.sin_port = htons(sport);
     
     printf("Converting to binary\n");
     // Convert address to binary form
@@ -133,13 +134,15 @@ static void do_observer_client(notapp_args arg) {
         return;
     }
     
+
+    struct notapp_msg init_message;
+    init_message.type = CONNECTION_OBSERVER;
     printf("Sending message\n");
-    send(sock , hello , strlen(hello) , 0); 
-    printf("Hello message sent\n");
+    send(sock , &init_message, sizeof(init_message) , 0); 
+    // printf("Hello message sent\n");
     // valread = read( sock , buffer, 1024); 
     // printf("%s\n",buffer ); 
 
-    return;
     // endregion
 
     // todo attach a sigint handle here
@@ -212,14 +215,15 @@ void do_user_client(notapp_args arg) {
 
 /* region server */
 
-void observer_thread() {
+void observer_thread(void *arg) {
     /* it collects, as quickly as possible, data received from the observerclients and 
     updates a common data structure which stores the most recent event that came from 
     each observer. If a logfile was specified, the server also dumps the received events 
     to the log file, in the order they are received. */
+    printf("Hey! we are here at observer thread!\n");
 }
 
-void user_thread() {
+void user_thread(void *arg) {
     /* The threads serving the user clients are periodically (with <interval> period) 
     sending the updated information of this common data structure to their 
     corresponding user clients, so that it can be rendered. It is expected that if
@@ -227,10 +231,20 @@ void user_thread() {
     all M clients receiveconsistent, i.e., identical, information. In other words, 
     the threads serving the user clients "broadcast" the currentstate of most recent 
     events to all simultaneously connected user clients. */
+    printf("User client time!\n");
+}
+
+pthread_t create_thread(int new_socket) {
+
+    // printf("%s\n", buffer); 
+    // send(new_socket , hello , strlen(hello) , 0 ); 
+    // printf("Hello message sent\n"); 
+
+    /* todo: determine what kind of thread here */
 }
 
 void do_server(notapp_args arg) {
-
+    // sock stream time
 
     // based on https://www.geeksforgeeks.org/socket-programming-cc/
     int server_fd, new_socket, valread; 
@@ -239,6 +253,7 @@ void do_server(notapp_args arg) {
     int addrlen = sizeof(address); 
     char buffer[1024] = {0}; 
     char *hello = "Hello from server"; 
+    int is_parent = 1; /* or not yet daemonized */
 
     // todo: bind to port
     if ((server_fd = socket(AF_INET, SOCK_STREAM, 0)) == 0) 
@@ -248,17 +263,17 @@ void do_server(notapp_args arg) {
     }
 
     // Forcefully attaching socket to the port 8080 
-    if (setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT, 
-                                                  &opt, sizeof(opt))) 
-    { 
-        perror("setsockopt"); 
-        exit(EXIT_FAILURE); 
-    } 
+    // if (setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT, 
+    //                                               &opt, sizeof(opt))) 
+    // { 
+    //     perror("setsockopt"); 
+    //     exit(EXIT_FAILURE); 
+    // } 
 
     int sport = atoi(arg.sport);
     address.sin_family = AF_INET; 
     address.sin_addr.s_addr = INADDR_ANY; 
-    address.sin_port = htons( sport ); 
+    address.sin_port = htons(sport); 
        
     // Forcefully attaching socket to the port 8080 
     if (bind(server_fd, (struct sockaddr *)&address, sizeof(address))<0) 
@@ -267,40 +282,70 @@ void do_server(notapp_args arg) {
         exit(EXIT_FAILURE); 
     } 
 
-    // if (listen(server_fd, 3) < 0) 
-    // { 
-    //     perror("listen"); 
-    //     exit(EXIT_FAILURE); 
-    // } 
-
-    // if ((new_socket = accept(server_fd, (struct sockaddr *)&address, (socklen_t*)&addrlen))<0) 
-    // { 
-    //     perror("accept"); 
-    //     exit(EXIT_FAILURE); 
-    // } 
-
-    // if (sport == 0) {
-    //     // from: https://stackoverflow.com/a/4047837/10024566
-    //     socklen_t len = sizeof(address);
-    //     if (getsockname(server_fd, (struct sockaddr *)&address, &len) == -1)
-    //         perror("getsockname");
-    //     else
-    //         printf("port number %d\n", ntohs(address.sin_port));
-    // }
-
-    printf("Success\n");
-
-    // todo: become daemon
-    int i = fork();
-
-    if (i < 0) exit(1); /* fork error */
-    if (i > 0) exit(0); /* kill parent */
-
     while(1) {
-        /* evil thoughts */
+        if (listen(server_fd, 3) < 0) 
+        { 
+            perror("listen"); 
+            exit(EXIT_FAILURE); 
+        } 
+
+        if ((new_socket = accept(server_fd, (struct sockaddr *)&address, (socklen_t*)&addrlen))<0) 
+        { 
+            perror("accept"); 
+            exit(EXIT_FAILURE); 
+        } 
+
+        /* todo: create thread for new connection */
+        struct notapp_msg init_message;
+        int valread = read(new_socket, &init_message, sizeof(init_message)); 
+        pthread_t thread;
+
+        switch(init_message.type) {
+            case CONNECTION_OBSERVER:
+                pthread_create(&thread, NULL, observer_thread, NULL);
+                pthread_join(thread, NULL);
+                break;
+            case CONNECTION_USER:
+                pthread_create(&thread, NULL, user_thread, NULL);
+                pthread_join(thread, NULL);
+                break;
+            default:
+                printf("Unknown T.T\n");
+                break;
+        }
+
+        printf("Are we going here???\n");
+
+        if (is_parent) {
+            /* Print port */
+            if (sport == 0) {
+                // from: https://stackoverflow.com/a/4047837/10024566
+                socklen_t len = sizeof(address);
+                if (getsockname(server_fd, (struct sockaddr *)&address, &len) == -1)
+                    perror("getsockname");
+                else
+                    printf("port number %d\n", ntohs(address.sin_port));
+            }
+
+            /* todo: daemonize here */
+
+            is_parent = 0;
+        }
+
+        printf("Success\n");
     }
 
+    // todo: become daemon
+    // int i = fork();
+
+    // if (i < 0) exit(1); /* fork error */
+    // if (i > 0) exit(0); /* kill parent */
+
     /* daemon time >:)c */
+
+    // while(1) {
+
+    // }
 
     // wait for clients and keep track of them
 }
