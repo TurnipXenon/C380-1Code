@@ -16,6 +16,11 @@
  * and clients share a space. There might be a case where
  * the server and client are not on the same machine. So,
  * I have to be very careful.
+ * 
+ * Most of my errors are from whether I should pass a pointer or not. Aaaaaah!
+ * So always pass a pointer in send and read...
+ * 
+ * Rule: if we can cast it to -1, then it's a failure or disconnect
  */
 
 // send said struct
@@ -23,6 +28,9 @@
 #include <sys/time.h>
 #include <sys/socket.h>
 #include <arpa/inet.h>
+#include <netinet/in.h> /* To get host ip */
+#include <netdb.h>
+
 #include <errno.h>
 #include <poll.h>
 #include <stdio.h>
@@ -31,11 +39,12 @@
 #include <unistd.h>
 #include <string.h>
 #include <pthread.h>
+#include <stdbool.h>
 
 #include "argparser.h"
 
 // region todo DELETE
-#define BUF_SIZE 500
+#define BUF_SIZE 1024
 
 /* size of the event structure, not counting name */
 #define EVENT_SIZE (sizeof (struct inotify_event))
@@ -49,7 +58,9 @@ enum msg_type {
     CONNECTION_USER,
     NOTIFICATION,
     DISCONNECTION_OBSERVER,
-    DISCONNECTION_USER
+    DISCONNECTION_USER,
+    SIZE_NOTIF,
+    DYNAMIC_NOTIF
 };
 
 typedef struct notapp_msg {
@@ -69,11 +80,60 @@ typedef struct observer_init {
     char* monitored;
 } observer_init;
 
-/* todo: delete */
-struct string_msg {
-    uint32_t len;
-    char* value[];
-} string_msg;
+typedef struct dynamic_msg {
+    enum msg_type type;
+    size_t size;
+    void *body;
+} dynamic_msg;
+
+
+
+bool is_disconnect(void* val) {
+    if (*((int*)val) == -1) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+#define SIZE_MSG_SIZE (sizeof(dynamic_msg) + sizeof(size_t))
+
+size_t get_dynamic_msg_size(size_t msg_size) {
+    return msg_size + sizeof(dynamic_msg); // body + base
+}
+
+/* todo: handle error */
+dynamic_msg *read_dynamic_file(int sock) {
+    /* Read the body size first */
+    size_t body_size;
+    int valread1 = read(sock, &body_size, sizeof(size_t));
+    printf("Size of body read is %zu\n", body_size);
+    size_t overall_size = get_dynamic_msg_size(body_size);
+    dynamic_msg *msg = malloc(overall_size);
+    msg->size = body_size;
+    printf("Base size: %zu\n", sizeof(dynamic_msg));
+    printf("Dybamic size: %zu\n", overall_size);
+    int valread2 = read(sock, msg, overall_size);
+    char *uwu = (char*) msg->body;
+    printf("Received size: %zu\n", msg->size);
+    printf("Received: %c\n", uwu[0]);
+    return msg;
+}
+
+/* todo: handle error */
+void send_dynamic_file(int sock, void *body, size_t size) {
+    /* Send the body size first */
+    printf("Size of body sent is %zu\n", size);
+    send(sock, &size, sizeof(size_t), 0);
+
+    /* Send the message */
+    size_t overall_size = get_dynamic_msg_size(size);
+    dynamic_msg *msg = malloc(overall_size);
+    msg->size = size;
+    msg->body = &body;
+    send(sock, msg, overall_size, 0);
+    free(msg);
+}
 
 typedef struct thread_arg {
     int sock;
@@ -81,6 +141,49 @@ typedef struct thread_arg {
 } thread_arg;
 
 #define THREAD_ARG_SIZE (sizeof (thread_arg))
+
+
+
+/* todo: transfer to different header */
+void send_string(int sock, char *string) {
+    size_t str_size = strlen(string) + 1;
+    printf("Sending size: %zu\n", str_size);
+
+    /* Send the size first */
+    send(sock, &str_size, sizeof(size_t), 0);
+
+    /* Send the string */
+    send(sock, string, str_size, 0);
+}
+
+char *read_string(int sock) {
+    int valread1;
+    char *str;
+    size_t str_size;
+
+    /* Read size */
+    {
+        int valread = read(sock, &str_size, sizeof(size_t));
+
+        if (valread == -1 || is_disconnect(&str_size)) {
+            return NULL;
+        }
+    }
+
+    /* Read string */
+    str = malloc(str_size);
+    {
+        printf("str_size: %zu\n", str_size);
+        int valread = read(sock, str, str_size);
+        
+        if (valread == -1 || is_disconnect(str)) {
+            return NULL;
+        }
+    }
+
+    return str;
+}
+
 
 static void handle_events(int file_desc, int *watch_desc, int sock, char* monitored) {
     // code based on 'man inotify'
@@ -143,9 +246,8 @@ static void handle_events(int file_desc, int *watch_desc, int sock, char* monito
     }
 }
 
+
 static void do_observer_client(notapp_args arg) {
-
-
     // region Set up socket
     /* Code based on https://www.geeksforgeeks.org/socket-programming-cc/ */
     int sock = 0, valread;
@@ -192,18 +294,52 @@ static void do_observer_client(notapp_args arg) {
     enum msg_identity id = INTRO_OBSERVER;
     printf("Sending identity\n");
     send(sock , &id, sizeof(id), 0);
+    printf("Finish sending id\n");
 
-    /* Send monitored file size then name */
-    printf("Sending monitored");
-    size_t size = strlen(arg.fileordir) + 1;
-    send(sock, size, sizeof(size_t), 0);
 
-    while(1) {
+    /* Send monitored file size */
+    send_string(sock, arg.fileordir);
+    // send(sock, arg.fileordir, strlen(arg.fileordir), 0);
 
+    /* Send host ip todo */
+    /* Code from https://www.geeksforgeeks.org/c-program-display-hostname-ip-address/ */
+    {
+        char hostbuffer[256]; 
+        char *IPbuffer; 
+        struct hostent *host_entry; 
+        int hostname; 
+    
+        // To retrieve hostname 
+        hostname = gethostname(hostbuffer, sizeof(hostbuffer)); 
+        // checkHostName(hostname); 
+    
+        // To retrieve host information 
+        host_entry = gethostbyname(hostbuffer); 
+        // checkHostEntry(host_entry); 
+    
+        // To convert an Internet network 
+        // address into ASCII string 
+        IPbuffer = inet_ntoa(*((struct in_addr*) 
+                            host_entry->h_addr_list[0])); 
+    
+        // printf("Hostname: %s\n", hostbuffer); 
+        printf("Host IP: %s\n", IPbuffer); 
+        send_string(sock, IPbuffer);
+        // send(sock, IPbuffer, strlen(IPbuffer), 0);
     }
 
-    // here in do_observer
     exit(0);
+
+    {
+        
+        // size_t size = strlen(arg.fileordir) + 1;
+        // printf("Sending monitored: %zu\n", size);
+        // send(sock, &size, sizeof(size_t), 0);
+        // printf("Sending file %s\n", arg.fileordir);
+        // send(sock, arg.fileordir, size, 0);
+    }
+
+    // // here in do_observer
 
     // struct notapp_msg init_message;
     // init_message.type = CONNECTION_OBSERVER;
@@ -286,17 +422,64 @@ void observer_thread(void *arg) {
     updates a common data structure which stores the most recent event that came from 
     each observer. If a logfile was specified, the server also dumps the received events 
     to the log file, in the order they are received. */
+    char *monitored = NULL;
+    char *ip_host = NULL;
     thread_arg *t_arg = (thread_arg*)arg;
-    printf("Hey! we are here at observer thread!\n");
+
+    // {
+    //     printf("Staring thread\n");
+    //     int valread = read(t_arg->sock, monitored, BUF_SIZE);
+    //     if (valread == -1) {
+    //         printf("Oh no!\n");
+    //         return;
+    //     }
+    //     if (is_disconnect(monitored)) {
+    //         /* todo: clean up??? */
+    //         return;
+    //     }
+    //     printf("Read monitored\n");
+    // }
+
+    // {
+    //     int valread = read(t_arg->sock, ip_buffer, BUF_SIZE);
+    //     if (valread == -1) {
+    //         printf("Oh no!\n");
+    //         return;
+    //     }
+    //     if (is_disconnect(ip_buffer)) {
+    //         /* todo: clean up??? */
+    //         return;
+    //     }
+        
+    //     printf("Read monitored\n");
+    // }
+
+    monitored = read_string(t_arg->sock);
+    ip_host = read_string(t_arg->sock);
+
+    printf("Monitored stuff: %s\n", monitored);
+    printf("From stuff: %s\n", ip_host);
+
+    free(ip_host);
+    free(monitored);
+
+    return;
 
     /* Get init information from observer */
     /* Get monitored file size then name */
-    {
-        printf("WAiting for monitore file size\n");
-        size_t size;
-        int valread = read(t_arg->sock, &size, sizeof(size_t));
-        printf("Size of string %zu\n", size);
-    }
+    // printf("Monitor: %s\n", (char*)msg_monitor->body);
+    // free(msg_monitor);
+    // {
+    //     // size_t size;
+    //     // int valread = read(t_arg->sock, &size, sizeof(size_t));
+    //     // monitored = malloc(size);
+    //     // valread = read(t_arg->sock, monitored, size);
+    // }
+
+    /* In case of break! */
+    // if (0) {
+        
+    // }
 
     return;
 

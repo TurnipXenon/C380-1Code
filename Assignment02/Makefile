@@ -32,7 +32,7 @@ run_test: test
 
 .PHONY: observer1
 observer1: notapp
-	./notapp -o 127.0.0.1 38771 test_folder1
+	./notapp -o 127.0.0.1 57427 test_folder1
 
 .PHONY: user1
 user1: notapp
@@ -40,7 +40,7 @@ user1: notapp
 
 .PHONY: server1
 server1: notapp
-	./notapp -s -t 2.5 -l server1_test.txt # valgrind ./notapp -s -t 2.5 -l server1_test.txt
+	valgrind ./notapp -s -t 2.5 -l server1_test.txt -p 57427 # valgrind ./notapp -s -t 2.5 -l server1_test.txt
 
 # .PHONY notapp.time
 # notapp.time:
