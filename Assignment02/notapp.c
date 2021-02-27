@@ -42,9 +42,9 @@
 #include <stdbool.h>
 
 #include "argparser.h"
+#include "socket_helper.h"
 
 // region todo DELETE
-#define BUF_SIZE 1024
 
 /* size of the event structure, not counting name */
 #define EVENT_SIZE (sizeof (struct inotify_event))
@@ -85,16 +85,6 @@ typedef struct dynamic_msg {
     size_t size;
     void *body;
 } dynamic_msg;
-
-
-
-bool is_disconnect(void* val) {
-    if (*((int*)val) == -1) {
-        return true;
-    } else {
-        return false;
-    }
-}
 
 #define SIZE_MSG_SIZE (sizeof(dynamic_msg) + sizeof(size_t))
 
@@ -141,49 +131,6 @@ typedef struct thread_arg {
 } thread_arg;
 
 #define THREAD_ARG_SIZE (sizeof (thread_arg))
-
-
-
-/* todo: transfer to different header */
-void send_string(int sock, char *string) {
-    size_t str_size = strlen(string) + 1;
-    printf("Sending size: %zu\n", str_size);
-
-    /* Send the size first */
-    send(sock, &str_size, sizeof(size_t), 0);
-
-    /* Send the string */
-    send(sock, string, str_size, 0);
-}
-
-char *read_string(int sock) {
-    int valread1;
-    char *str;
-    size_t str_size;
-
-    /* Read size */
-    {
-        int valread = read(sock, &str_size, sizeof(size_t));
-
-        if (valread == -1 || is_disconnect(&str_size)) {
-            return NULL;
-        }
-    }
-
-    /* Read string */
-    str = malloc(str_size);
-    {
-        printf("str_size: %zu\n", str_size);
-        int valread = read(sock, str, str_size);
-        
-        if (valread == -1 || is_disconnect(str)) {
-            return NULL;
-        }
-    }
-
-    return str;
-}
-
 
 static void handle_events(int file_desc, int *watch_desc, int sock, char* monitored) {
     // code based on 'man inotify'

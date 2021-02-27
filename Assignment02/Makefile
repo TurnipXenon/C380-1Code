@@ -7,8 +7,8 @@ all: notapp
 %.o: %.c %.h
 	$(CC) -c -o $@ $<
 
-notapp: argparser.o notapp.c
-	$(CC) -o notapp argparser.o notapp.c
+notapp: argparser.o socket_helper.o notapp.c
+	$(CC) -o notapp argparser.o socket_helper.o notapp.c
 
 test: argparser.o test.c
 	$(CC) -o test argparser.o test.c
