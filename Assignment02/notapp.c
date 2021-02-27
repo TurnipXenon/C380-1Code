@@ -9,6 +9,15 @@
  * 
  */
 
+/**
+ * Notes to self:
+ * @remark 21 02 26 Fri
+ * I have been focusing too much on the fact that servers
+ * and clients share a space. There might be a case where
+ * the server and client are not on the same machine. So,
+ * I have to be very careful.
+ */
+
 // send said struct
 // todo: replace poll with epoll
 #include <sys/time.h>
@@ -49,11 +58,35 @@ typedef struct notapp_msg {
     struct timeval tv;
 } notapp_msg;
 
-static void handle_events(int file_desc, int *watch_desc) {
+enum msg_identity {
+    INTRO_OBSERVER,
+    INTRO_USER
+};
+
+
+typedef struct observer_init {
+    char* host;
+    char* monitored;
+} observer_init;
+
+/* todo: delete */
+struct string_msg {
+    uint32_t len;
+    char* value[];
+} string_msg;
+
+typedef struct thread_arg {
+    int sock;
+    int interval;
+} thread_arg;
+
+#define THREAD_ARG_SIZE (sizeof (thread_arg))
+
+static void handle_events(int file_desc, int *watch_desc, int sock, char* monitored) {
     // code based on 'man inotify'
     char buf[4096]
                __attribute__ ((aligned(__alignof__(struct inotify_event))));
-    const struct inotify_event *event;
+    struct inotify_event *event;
     ssize_t len;
 
     while(1) {
@@ -78,38 +111,59 @@ static void handle_events(int file_desc, int *watch_desc) {
             
             event = (const struct inotify_event *) ptr;
 
+            struct notapp_msg event_message;
+            event_message.type = NOTIFICATION;
+            event_message.event = *event;
+            gettimeofday(&event_message.tv, NULL);
+
+            send(sock, &event_message, sizeof(event_message) , 0); 
+
             // this is where we send our stuff out
 
             /* Identify event type here */
-            if (event->mask & IN_OPEN)
-                printf("IN_OPEN: ");
-            if (event->mask & IN_CLOSE_NOWRITE)
-                printf("IN_CLOSE_NOWRITE: ");
-            if (event->mask & IN_CLOSE_WRITE)
-                printf("IN_CLOSE_WRITE: ");
+            // if (event->mask & IN_OPEN)
+            //     printf("IN_OPEN: ");
+            // if (event->mask & IN_CLOSE_NOWRITE)
+            //     printf("IN_CLOSE_NOWRITE: ");
+            // if (event->mask & IN_CLOSE_WRITE)
+            //     printf("IN_CLOSE_WRITE: ");
 
-            /* Print the name of the watched directory */
+            // /* Print the name of the watched directory */
 
-            /* Print the name of the file */
-            if (event->len)
-                printf("%s", event->name);
+            // /* Print the name of the file */
+            // if (event->len)
+            //     printf("%s", event->name);
 
-            /* Print type of filesystem object */
-            if (event->mask & IN_ISDIR)
-                printf(" [directory]\n");
-            else
-                printf(" [file]\n");
+            // /* Print type of filesystem object */
+            // if (event->mask & IN_ISDIR)
+            //     printf(" [directory]\n");
+            // else
+            //     printf(" [file]\n");
         }
     }
 }
 
 static void do_observer_client(notapp_args arg) {
+
+
     // region Set up socket
     /* Code based on https://www.geeksforgeeks.org/socket-programming-cc/ */
     int sock = 0, valread;
     struct sockaddr_in serv_addr;
-    char *hello = "Hello from client";
+    observer_init init;
+    init.host = strdup("???");
+    init.monitored = strdup(arg.fileordir);
+    printf("host: %s\n", init.host);
+    printf("host po: %p\n", &init.host);
+    char* testing = "Tomato";
     char buffer[1024] = {0};  
+    
+    /* Set up sig int here */
+    if (0) {
+        free(init.host);
+        free(init.monitored);
+        exit(0);
+    }
 
     printf("Creating socket\n");
     if ((sock = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
@@ -133,12 +187,31 @@ static void do_observer_client(notapp_args arg) {
         perror("Connection failed");
         return;
     }
-    
 
-    struct notapp_msg init_message;
-    init_message.type = CONNECTION_OBSERVER;
-    printf("Sending message\n");
-    send(sock , &init_message, sizeof(init_message) , 0); 
+    /* Send identity */
+    enum msg_identity id = INTRO_OBSERVER;
+    printf("Sending identity\n");
+    send(sock , &id, sizeof(id), 0);
+
+    /* Send monitored file size then name */
+    printf("Sending monitored");
+    size_t size = strlen(arg.fileordir) + 1;
+    send(sock, size, sizeof(size_t), 0);
+
+    while(1) {
+
+    }
+
+    // here in do_observer
+    exit(0);
+
+    // struct notapp_msg init_message;
+    // init_message.type = CONNECTION_OBSERVER;
+    // printf("Sending message\n");
+    // send(sock , &init_message, sizeof(init_message) , 0); 
+
+    /* establish connection */
+
     // printf("Hello message sent\n");
     // valread = read( sock , buffer, 1024); 
     // printf("%s\n",buffer ); 
@@ -189,19 +262,12 @@ static void do_observer_client(notapp_args arg) {
 
         if (poll_num > 0) {
             if (fds[0].revents & POLLIN) {
-                handle_events(file_desc, watch_desc);
+                printf("f1 Sending monitored: %p\n", arg.fileordir);
+                handle_events(file_desc, watch_desc, sock, arg.fileordir);
             }
         }
-
-        break;
     }
 
-    printf("Event size: %d\n", EVENT_SIZE);
-    printf("Buf len: %d\n", BUF_LEN);
-
-    printf("Success!\n");
-
-    // todo: how to clean up after sigint???
     close(file_desc);
 }
 
@@ -220,7 +286,49 @@ void observer_thread(void *arg) {
     updates a common data structure which stores the most recent event that came from 
     each observer. If a logfile was specified, the server also dumps the received events 
     to the log file, in the order they are received. */
+    thread_arg *t_arg = (thread_arg*)arg;
     printf("Hey! we are here at observer thread!\n");
+
+    /* Get init information from observer */
+    /* Get monitored file size then name */
+    {
+        printf("WAiting for monitore file size\n");
+        size_t size;
+        int valread = read(t_arg->sock, &size, sizeof(size_t));
+        printf("Size of string %zu\n", size);
+    }
+
+    return;
+
+    while(1) {
+        struct notapp_msg notification;
+        int valread = read(t_arg->sock, &notification, sizeof(notification)); 
+        struct inotify_event event = notification.event;
+
+        // printf("Monitored: %s\n", notification.monitored);
+
+        /* Identify event type here */
+        if (event.mask & IN_OPEN)
+            printf("IN_OPEN: ");
+        if (event.mask & IN_CLOSE_NOWRITE)
+            printf("IN_CLOSE_NOWRITE: ");
+        if (event.mask & IN_CLOSE_WRITE)
+            printf("IN_CLOSE_WRITE: ");
+
+        /* Print the name of the watched directory */
+
+        /* Print the name of the file */
+        if (event.len)
+            printf("%s", event.name);
+
+        /* Print type of filesystem object */
+        if (event.mask & IN_ISDIR)
+            printf(" [directory]\n");
+        else
+            printf(" [file]\n");
+    }
+
+    /* todo: receive message here! */
 }
 
 void user_thread(void *arg) {
@@ -296,16 +404,21 @@ void do_server(notapp_args arg) {
         } 
 
         /* todo: create thread for new connection */
-        struct notapp_msg init_message;
-        int valread = read(new_socket, &init_message, sizeof(init_message)); 
+        enum msg_identity client_id;
+        int valread = read(new_socket, &client_id, sizeof(client_id)); 
         pthread_t thread;
+        thread_arg t_arg;
+        t_arg.sock = new_socket;
 
-        switch(init_message.type) {
-            case CONNECTION_OBSERVER:
-                pthread_create(&thread, NULL, observer_thread, NULL);
+        switch(client_id) {
+            case INTRO_OBSERVER:
+                printf("Creating observer thread\n");
+                pthread_create(&thread, NULL, observer_thread, &t_arg);
+                printf("Created observer thread\n");
                 pthread_join(thread, NULL);
+                printf("Thread joined\n");
                 break;
-            case CONNECTION_USER:
+            case INTRO_USER:
                 pthread_create(&thread, NULL, user_thread, NULL);
                 pthread_join(thread, NULL);
                 break;
@@ -313,8 +426,6 @@ void do_server(notapp_args arg) {
                 printf("Unknown T.T\n");
                 break;
         }
-
-        printf("Are we going here???\n");
 
         if (is_parent) {
             /* Print port */
@@ -332,7 +443,7 @@ void do_server(notapp_args arg) {
             is_parent = 0;
         }
 
-        printf("Success\n");
+        printf("Connection success\n");
     }
 
     // todo: become daemon
