@@ -38,23 +38,9 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
+#include "notapp_base.h"
+
 #define MIN_ARG_COUNT 3
-
-enum role {
-    UNKNOWN,
-    SERVER,
-    OBSERVER_CLIENT,
-    USER_CLIENT
-};
-
-typedef struct notapp_args {
-    enum role role;
-    float interval;
-    char *sport;
-    char *logfile;
-    char *saddr;
-    char *fileordir;
-} notapp_args;
 
 notapp_args init_notapp_args();
 

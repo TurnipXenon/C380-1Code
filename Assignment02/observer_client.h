@@ -1,0 +1,3 @@
+#ifndef _OBSERVER_CLIENT_H_
+#define _OBSERVER_CLIENT_H_
+#endif /* _OBSERVER_CLIENT_H_ */
