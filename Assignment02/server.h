@@ -20,9 +20,19 @@ typedef struct thread_arg {
 
 #define THREAD_ARG_SIZE (sizeof (thread_arg))
 
-void observer_thread(void *arg);
+/**
+ * @brief 
+ * 
+ * @param buf 
+ * @param mask
+ * @remark Make sure that buf is empty
+ * To play safe keep buf 200 chars 
+ */
+void translate_masks(char *buf, uint32_t mask);
 
-void user_thread(void *arg);
+void *observer_thread(void *arg);
+
+void *user_thread(void *arg);
 
 void do_server(notapp_args arg);
 

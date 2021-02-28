@@ -1,7 +1,53 @@
 #include "server.h"
 
+/**
+ * @brief 
+ * 
+ * @param buf 
+ * @param mask
+ * @remark Make sure that buf is empty
+ * To play safe keep buf 200 chars 
+ */
+void translate_masks(char *buf, uint32_t mask) {
+    if (mask & IN_ACCESS) {
+        strcat(buf, " IN_ACCESS");
+    }
+    if (mask & IN_ATTRIB) {
+        strcat(buf, " IN_ATTRIB");
+    }
+    if (mask & IN_CLOSE_WRITE) {
+        strcat(buf, " IN_CLOSE_WRITE");
+    }
+    if (mask & IN_CLOSE_NOWRITE) {
+        strcat(buf, " IN_CLOSE_NO_WRITE");
+    }
+    if (mask & IN_CREATE) {
+        strcat(buf, " IN_CREATE");
+    }
+    if (mask & IN_DELETE) {
+        strcat(buf, " IN_DELETE");
+    }
+    if (mask & IN_DELETE_SELF) {
+        strcat(buf, " IN_DELETE_SELF");
+    }
+    if (mask & IN_MODIFY) {
+        strcat(buf, " IN_MODIFY");
+    }
+    if (mask & IN_MOVE_SELF) {
+        strcat(buf, " IN_MOVE_SELF");
+    }
+    if (mask & IN_MOVED_FROM) {
+        strcat(buf, " IN_MOVED_FROM");
+    }
+    if (mask & IN_MOVED_TO) {
+        strcat(buf, " IN_MOVED_TO");
+    }
+    if (mask & IN_OPEN) {
+        strcat(buf, " IN_OPEN");
+    }
+}
 
-void observer_thread(void *arg) {
+void *observer_thread(void *arg) {
     /* it collects, as quickly as possible, data received from the observerclients and 
     updates a common data structure which stores the most recent event that came from 
     each observer. If a logfile was specified, the server also dumps the received events 
@@ -85,9 +131,13 @@ void observer_thread(void *arg) {
 
     /* todo: gracefully disconnecting! */
     printf("Client disconnected!\n");
+
+    /* https://stackoverflow.com/a/36568809/10024566 */
+    static const long ok_return = 1;
+    return (void*)&ok_return;
 }
 
-void user_thread(void *arg) {
+void *user_thread(void *arg) {
     /* The threads serving the user clients are periodically (with <interval> period) 
     sending the updated information of this common data structure to their 
     corresponding user clients, so that it can be rendered. It is expected that if
@@ -96,18 +146,19 @@ void user_thread(void *arg) {
     the threads serving the user clients "broadcast" the currentstate of most recent 
     events to all simultaneously connected user clients. */
     printf("User client time!\n");
+
+    /* https://stackoverflow.com/a/36568809/10024566 */
+    static const long ok_return = 1;
+    return (void*)&ok_return;
 }
 
 void do_server(notapp_args arg) {
     // sock stream time
 
     // based on https://www.geeksforgeeks.org/socket-programming-cc/
-    int server_fd, new_socket, valread; 
+    int server_fd, new_socket; 
     struct sockaddr_in address; 
-    int opt = 1; 
     int addrlen = sizeof(address); 
-    char buffer[1024] = {0}; 
-    char *hello = "Hello from server"; 
     int is_parent = 1; /* or not yet daemonized */
 
     // todo: bind to port
@@ -153,6 +204,10 @@ void do_server(notapp_args arg) {
         /* todo: create thread for new connection */
         enum msg_identity client_id;
         int valread = read(new_socket, &client_id, sizeof(client_id)); 
+        if (valread == 0) {
+            continue;
+        }
+        
         pthread_t thread;
         thread_arg t_arg;
         t_arg.sock = new_socket;
