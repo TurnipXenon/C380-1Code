@@ -1,5 +1,13 @@
 #include "server.h"
 
+bool timer_expired = false;
+pthread_mutex_t timer_expired_mutex = PTHREAD_MUTEX_INITIALIZER;
+
+enum server_state server_state = DONE;
+pthread_mutex_t server_state_mutex = PTHREAD_MUTEX_INITIALIZER;
+
+int output_array_size = 0;
+
 /**
  * @brief 
  * 
@@ -145,17 +153,73 @@ void *user_thread(void *arg) {
     all M clients receiveconsistent, i.e., identical, information. In other words, 
     the threads serving the user clients "broadcast" the currentstate of most recent 
     events to all simultaneously connected user clients. */
-    printf("User client time!\n");
+    thread_arg *t_arg = (thread_arg*)arg;
+
+    while(1) {
+        break;
+    }
+
+    /* todo: gracefully disconnecting! */
+    printf("Client disconnected!\n");
 
     /* https://stackoverflow.com/a/36568809/10024566 */
     static const long ok_return = 1;
     return (void*)&ok_return;
 }
 
+static void *output_sorter(void *arg) {
+    while(1) {
+        pthread_yield();
+
+        /* I'm not modifying the timer so it's okay to read it */
+        if (timer_expired) {
+            /* Now, I need to access it */
+            pthread_mutex_lock(&timer_expired_mutex);
+            timer_expired = false;
+            pthread_mutex_unlock(&timer_expired_mutex);
+            printf("Timer reset\n");
+
+            /* the server state must be DONE to transition to SORTING */
+            while (server_state != DONE) {
+                pthread_yield();
+            }
+
+            printf("Flipping state\n");
+            pthread_mutex_lock(&server_state_mutex);
+            server_state = SORTING;
+            pthread_mutex_unlock(&server_state_mutex);
+
+            /* todo: wait for all observers to finish writing */
+
+            /* todo: reset reading users */
+
+            /* todo: now we are sorting */
+            pthread_mutex_lock(&server_state_mutex);
+            server_state = READING;
+            pthread_mutex_unlock(&server_state_mutex);
+            printf("Sorting\n");
+        }
+    }
+}
+
+static void *server_timer(void *arg) {
+    /* todo: set up timer */
+    struct timespec delay = {5, 0};
+    while(1) {
+        nanosleep(&delay, NULL);
+        /* flip switch being watched by threads */
+        printf("Timer expired\n");
+        pthread_mutex_lock(&timer_expired_mutex);
+        timer_expired = true;
+        pthread_mutex_unlock(&timer_expired_mutex);
+    }
+}
+
 void do_server(notapp_args arg) {
     // sock stream time
 
     // based on https://www.geeksforgeeks.org/socket-programming-cc/
+    int jump_val;
     int server_fd, new_socket; 
     struct sockaddr_in address; 
     int addrlen = sizeof(address); 
@@ -181,12 +245,34 @@ void do_server(notapp_args arg) {
     address.sin_addr.s_addr = INADDR_ANY; 
     address.sin_port = htons(sport); 
        
-    // Forcefully attaching socket to the port 8080 
     if (bind(server_fd, (struct sockaddr *)&address, sizeof(address))<0) 
     { 
         perror("bind failed"); 
         exit(EXIT_FAILURE); 
-    } 
+    }
+
+    (void)signal(SIGINT, handle_signal);
+    jump_val = sigsetjmp(env, 1);
+
+    /* Clean up */
+    if (jump_val != 0) {
+        close(server_fd);
+        exit(0);
+    }
+
+    /* Start timer */
+    {
+        pthread_t thread;
+        pthread_create(&thread, NULL, server_timer, NULL);
+        pthread_detach(thread);
+    }
+
+    /* Start sorter */
+    {
+        pthread_t thread;
+        pthread_create(&thread, NULL, output_sorter, NULL);
+        pthread_detach(thread);
+    }
 
     while(1) {
         if (listen(server_fd, 3) < 0) 
@@ -215,9 +301,11 @@ void do_server(notapp_args arg) {
         switch(client_id) {
             case INTRO_OBSERVER:
                 pthread_create(&thread, NULL, observer_thread, &t_arg);
+                pthread_detach(thread);
                 break;
             case INTRO_USER:
                 pthread_create(&thread, NULL, user_thread, NULL);
+                pthread_detach(thread);
                 break;
             default:
                 perror("Unknown client connected\n");

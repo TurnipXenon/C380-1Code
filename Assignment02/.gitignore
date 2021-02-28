@@ -3,6 +3,7 @@
 *.o
 *.idea
 *.tar.gz
+.nfs*
 
 # executables
 notapp

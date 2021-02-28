@@ -52,7 +52,8 @@ void do_observer_client(notapp_args arg) {
     
     // todo attach a sigint handle here
     // code base 'man inotify'
-    int file_desc, poll_num;
+    int file_desc = -1;
+    int poll_num;
     nfds_t nfds = 1;
     struct pollfd fds[1]; 
     int jump_val;
@@ -84,6 +85,11 @@ void do_observer_client(notapp_args arg) {
     if (jump_val != 0) {
         int dummy_val = 1;
         send(sock, &dummy_val, sizeof(dummy_val),0);
+        close(sock);
+
+        if (file_desc > 0) {
+            close(file_desc);
+        }
         return;
     }
 
@@ -158,7 +164,4 @@ void do_observer_client(notapp_args arg) {
             }
         }
     }
-
-    /* Clean up */
-    close(file_desc);
 }

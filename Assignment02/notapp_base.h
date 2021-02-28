@@ -3,6 +3,9 @@
 
 /* todo: clean up */
 #include <sys/socket.h>
+#include <arpa/inet.h>
+#include <netinet/in.h> /* To get host ip */
+
 #include <string.h>
 #include <stdbool.h>
 #include <stdio.h>
@@ -24,6 +27,8 @@
 // endregion todo DELETE
 
 #define BUF_SIZE 1024
+
+#define USER_SERVE_OUTPUT 1
 
 enum msg_type {
     CONNECTION_OBSERVER,
@@ -83,5 +88,7 @@ bool is_disconnect(void* val);
 void send_string(int sock, char *string);
 
 char *read_string(int sock);
+
+int notapp_connect(notapp_args arg, enum msg_identity id);
 
 #endif /* _NOTAPP_BASE_H_ */
