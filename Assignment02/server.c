@@ -1,13 +1,5 @@
 #include "server.h"
 
-bool timer_expired = false;
-pthread_mutex_t timer_expired_mutex = PTHREAD_MUTEX_INITIALIZER;
-
-enum server_state server_state = DONE;
-pthread_mutex_t server_state_mutex = PTHREAD_MUTEX_INITIALIZER;
-
-int output_array_size = 0;
-
 /**
  * @brief 
  * 
@@ -172,32 +164,31 @@ static void *output_sorter(void *arg) {
         pthread_yield();
 
         /* I'm not modifying the timer so it's okay to read it */
-        if (timer_expired) {
+        if (get_timer_expired()) {
             /* Now, I need to access it */
-            pthread_mutex_lock(&timer_expired_mutex);
-            timer_expired = false;
-            pthread_mutex_unlock(&timer_expired_mutex);
+            set_timer_expired(false);
             printf("Timer reset\n");
 
             /* the server state must be DONE to transition to SORTING */
-            while (server_state != DONE) {
+            while (get_server_state() != DONE) {
                 pthread_yield();
             }
 
             printf("Flipping state\n");
-            pthread_mutex_lock(&server_state_mutex);
-            server_state = SORTING;
-            pthread_mutex_unlock(&server_state_mutex);
+            set_server_state(SORTING);
 
             /* todo: wait for all observers to finish writing */
 
             /* todo: reset reading users */
 
             /* todo: now we are sorting */
-            pthread_mutex_lock(&server_state_mutex);
-            server_state = READING;
-            pthread_mutex_unlock(&server_state_mutex);
             printf("Sorting\n");
+
+            set_server_state(READING);
+
+            /* watch for readers */
+
+            set_server_state(DONE);
         }
     }
 }
@@ -209,9 +200,7 @@ static void *server_timer(void *arg) {
         nanosleep(&delay, NULL);
         /* flip switch being watched by threads */
         printf("Timer expired\n");
-        pthread_mutex_lock(&timer_expired_mutex);
-        timer_expired = true;
-        pthread_mutex_unlock(&timer_expired_mutex);
+        set_timer_expired(true);
     }
 }
 
