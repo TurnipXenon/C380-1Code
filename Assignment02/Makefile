@@ -1,4 +1,4 @@
-CC=gcc -Wall -Wextra -std=c99 -g -pthread $(CFLAGS)
+CC=gcc -Wall -Wextra -std=gnu99 -g -pthread $(CFLAGS)
 EXRANOFF=setarch `uname -m` -R
 
 .PHONY: all
@@ -7,8 +7,8 @@ all: notapp
 %.o: %.c %.h
 	$(CC) -c -o $@ $<
 
-notapp: argparser.o socket_helper.o notapp.c
-	$(CC) -o notapp argparser.o socket_helper.o notapp.c
+notapp: argparser.o socket_helper.o notapp_base.o notapp.c
+	$(CC) -o $@ $^
 
 test: argparser.o test.c
 	$(CC) -o test argparser.o test.c
@@ -32,7 +32,7 @@ run_test: test
 
 .PHONY: observer1
 observer1: notapp
-	./notapp -o 127.0.0.1 46477 test_folder1
+	valgrind ./notapp -o 127.0.0.1 46477 test_folder1
 
 .PHONY: user1
 user1: notapp

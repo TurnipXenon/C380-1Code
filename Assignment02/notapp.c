@@ -41,6 +41,7 @@
 #include <pthread.h>
 #include <stdbool.h>
 
+#include "notapp_base.h"
 #include "argparser.h"
 #include "socket_helper.h"
 
@@ -230,13 +231,14 @@ static void handle_events(int file_desc, int *watch_desc, int sock, char* monito
     }
 }
 
+
+
 /* todo: clean up lol */
 static void do_observer_client(notapp_args arg) {
     // region Set up socket
     /* Code based on https://www.geeksforgeeks.org/socket-programming-cc/ */
     int sock = 0, valread;
     struct sockaddr_in serv_addr;
-    observer_init init;
     char buffer[1024] = {0}; 
     
     // todo attach a sigint handle here
@@ -246,13 +248,7 @@ static void do_observer_client(notapp_args arg) {
     int watch_desc;
     nfds_t nfds = 1;
     struct pollfd fds[1]; 
-    
-    /* Set up sig int here */
-    if (0) {
-        free(init.host);
-        free(init.monitored);
-        exit(0);
-    }
+    int jump_val;
 
     if ((sock = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
         perror("Socket creation error");
@@ -271,6 +267,16 @@ static void do_observer_client(notapp_args arg) {
 
     if (connect(sock, (struct sockaddr *) &serv_addr, sizeof(serv_addr))) {
         perror("Connection failed");
+        return;
+    }
+
+    (void)signal(SIGINT, handle_signal);
+    jump_val = sigsetjmp(env, 1);
+
+    /* Notify server about leaving */
+    if (jump_val != 0) {
+        int dummy_val = 1;
+        send(sock, &dummy_val, sizeof(dummy_val),0);
         return;
     }
 
@@ -444,6 +450,7 @@ void observer_thread(void *arg) {
     }
 
     /* todo: gracefully disconnecting! */
+    printf("Client disconnected!\n");
 }
 
 void user_thread(void *arg) {
