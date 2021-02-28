@@ -63,6 +63,14 @@ enum msg_type {
     DYNAMIC_NOTIF
 };
 
+typedef struct user_msg {
+    struct timeval tv;
+    char host[17];
+    char monitored[BUF_SIZE];
+    char event_loc[BUF_SIZE];
+    uint32_t mask;
+} user_msg;
+
 typedef struct notapp_msg {
     enum msg_type type;
     struct inotify_event event;
@@ -87,6 +95,53 @@ typedef struct dynamic_msg {
 } dynamic_msg;
 
 #define SIZE_MSG_SIZE (sizeof(dynamic_msg) + sizeof(size_t))
+
+/**
+ * @brief 
+ * 
+ * @param buf 
+ * @param mask
+ * @remark Make sure that buf is empty
+ * To play safe keep buf 200 chars 
+ */
+void translate_masks(char *buf, uint32_t mask) {
+    if (mask & IN_ACCESS) {
+        strcat(buf, " IN_ACCESS");
+    }
+    if (mask & IN_ATTRIB) {
+        strcat(buf, " IN_ATTRIB");
+    }
+    if (mask & IN_CLOSE_WRITE) {
+        strcat(buf, " IN_CLOSE_WRITE");
+    }
+    if (mask & IN_CLOSE_NOWRITE) {
+        strcat(buf, " IN_CLOSE_NO_WRITE");
+    }
+    if (mask & IN_CREATE) {
+        strcat(buf, " IN_CREATE");
+    }
+    if (mask & IN_DELETE) {
+        strcat(buf, " IN_DELETE");
+    }
+    if (mask & IN_DELETE_SELF) {
+        strcat(buf, " IN_DELETE_SELF");
+    }
+    if (mask & IN_MODIFY) {
+        strcat(buf, " IN_MODIFY");
+    }
+    if (mask & IN_MOVE_SELF) {
+        strcat(buf, " IN_MOVE_SELF");
+    }
+    if (mask & IN_MOVED_FROM) {
+        strcat(buf, " IN_MOVED_FROM");
+    }
+    if (mask & IN_MOVED_TO) {
+        strcat(buf, " IN_MOVED_TO");
+    }
+    if (mask & IN_OPEN) {
+        strcat(buf, " IN_OPEN");
+    }
+}
 
 size_t get_dynamic_msg_size(size_t msg_size) {
     return msg_size + sizeof(dynamic_msg); // body + base
@@ -168,44 +223,29 @@ static void handle_events(int file_desc, int *watch_desc, int sock, char* monito
 
             send(sock, &event_message, sizeof(event_message) , 0); 
 
-            // this is where we send our stuff out
-
-            /* Identify event type here */
-            // if (event->mask & IN_OPEN)
-            //     printf("IN_OPEN: ");
-            // if (event->mask & IN_CLOSE_NOWRITE)
-            //     printf("IN_CLOSE_NOWRITE: ");
-            // if (event->mask & IN_CLOSE_WRITE)
-            //     printf("IN_CLOSE_WRITE: ");
-
-            // /* Print the name of the watched directory */
-
-            // /* Print the name of the file */
-            // if (event->len)
-            //     printf("%s", event->name);
-
-            // /* Print type of filesystem object */
-            // if (event->mask & IN_ISDIR)
-            //     printf(" [directory]\n");
-            // else
-            //     printf(" [file]\n");
+            if (event->len) {
+                send(sock, event->name, event->len + 1, 0);
+            }
         }
     }
 }
 
-
+/* todo: clean up lol */
 static void do_observer_client(notapp_args arg) {
     // region Set up socket
     /* Code based on https://www.geeksforgeeks.org/socket-programming-cc/ */
     int sock = 0, valread;
     struct sockaddr_in serv_addr;
     observer_init init;
-    init.host = strdup("???");
-    init.monitored = strdup(arg.fileordir);
-    printf("host: %s\n", init.host);
-    printf("host po: %p\n", &init.host);
-    char* testing = "Tomato";
-    char buffer[1024] = {0};  
+    char buffer[1024] = {0}; 
+    
+    // todo attach a sigint handle here
+    // code base 'man inotify'
+    char buf;
+    int file_desc, poll_num;
+    int watch_desc;
+    nfds_t nfds = 1;
+    struct pollfd fds[1]; 
     
     /* Set up sig int here */
     if (0) {
@@ -214,7 +254,6 @@ static void do_observer_client(notapp_args arg) {
         exit(0);
     }
 
-    printf("Creating socket\n");
     if ((sock = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
         perror("Socket creation error");
         return;
@@ -224,14 +263,12 @@ static void do_observer_client(notapp_args arg) {
     serv_addr.sin_family = AF_INET;
     serv_addr.sin_port = htons(sport);
     
-    printf("Converting to binary\n");
     // Convert address to binary form
     if (inet_pton(AF_INET, arg.saddr, &serv_addr.sin_addr) <= 0) {
         perror("Invalid address / Address not supported");
         return;
     }
 
-    printf("Connecting..\n");
     if (connect(sock, (struct sockaddr *) &serv_addr, sizeof(serv_addr))) {
         perror("Connection failed");
         return;
@@ -239,16 +276,12 @@ static void do_observer_client(notapp_args arg) {
 
     /* Send identity */
     enum msg_identity id = INTRO_OBSERVER;
-    printf("Sending identity\n");
     send(sock , &id, sizeof(id), 0);
-    printf("Finish sending id\n");
-
 
     /* Send monitored file size */
     send_string(sock, arg.fileordir);
-    // send(sock, arg.fileordir, strlen(arg.fileordir), 0);
 
-    /* Send host ip todo */
+    /* Send host ip todo
     /* Code from https://www.geeksforgeeks.org/c-program-display-hostname-ip-address/ */
     {
         char hostbuffer[256]; 
@@ -269,45 +302,10 @@ static void do_observer_client(notapp_args arg) {
         IPbuffer = inet_ntoa(*((struct in_addr*) 
                             host_entry->h_addr_list[0])); 
     
-        // printf("Hostname: %s\n", hostbuffer); 
         printf("Host IP: %s\n", IPbuffer); 
         send_string(sock, IPbuffer);
-        // send(sock, IPbuffer, strlen(IPbuffer), 0);
     }
 
-    exit(0);
-
-    {
-        
-        // size_t size = strlen(arg.fileordir) + 1;
-        // printf("Sending monitored: %zu\n", size);
-        // send(sock, &size, sizeof(size_t), 0);
-        // printf("Sending file %s\n", arg.fileordir);
-        // send(sock, arg.fileordir, size, 0);
-    }
-
-    // // here in do_observer
-
-    // struct notapp_msg init_message;
-    // init_message.type = CONNECTION_OBSERVER;
-    // printf("Sending message\n");
-    // send(sock , &init_message, sizeof(init_message) , 0); 
-
-    /* establish connection */
-
-    // printf("Hello message sent\n");
-    // valread = read( sock , buffer, 1024); 
-    // printf("%s\n",buffer ); 
-
-    // endregion
-
-    // todo attach a sigint handle here
-    // code base 'man inotify'
-    char buf;
-    int file_desc, poll_num;
-    int watch_desc;
-    nfds_t nfds = 1;
-    struct pollfd fds[1];
 
     // Initialize inotify
     file_desc = inotify_init();
@@ -339,18 +337,17 @@ static void do_observer_client(notapp_args arg) {
 
             /* else */
             perror(poll);
-            // todo: notify disconnection + clean up
-            return;
+            break;
         }
 
         if (poll_num > 0) {
             if (fds[0].revents & POLLIN) {
-                printf("f1 Sending monitored: %p\n", arg.fileordir);
                 handle_events(file_desc, watch_desc, sock, arg.fileordir);
             }
         }
     }
 
+    /* Clean up */
     close(file_desc);
 }
 
@@ -372,93 +369,81 @@ void observer_thread(void *arg) {
     char *monitored = NULL;
     char *ip_host = NULL;
     thread_arg *t_arg = (thread_arg*)arg;
-
-    // {
-    //     printf("Staring thread\n");
-    //     int valread = read(t_arg->sock, monitored, BUF_SIZE);
-    //     if (valread == -1) {
-    //         printf("Oh no!\n");
-    //         return;
-    //     }
-    //     if (is_disconnect(monitored)) {
-    //         /* todo: clean up??? */
-    //         return;
-    //     }
-    //     printf("Read monitored\n");
-    // }
-
-    // {
-    //     int valread = read(t_arg->sock, ip_buffer, BUF_SIZE);
-    //     if (valread == -1) {
-    //         printf("Oh no!\n");
-    //         return;
-    //     }
-    //     if (is_disconnect(ip_buffer)) {
-    //         /* todo: clean up??? */
-    //         return;
-    //     }
-        
-    //     printf("Read monitored\n");
-    // }
+    user_msg msg; /* to be sent to user client */
 
     monitored = read_string(t_arg->sock);
-    ip_host = read_string(t_arg->sock);
-
-    printf("Monitored stuff: %s\n", monitored);
-    printf("From stuff: %s\n", ip_host);
-
-    free(ip_host);
+    strcpy(msg.monitored, monitored);
     free(monitored);
 
-    return;
-
-    /* Get init information from observer */
-    /* Get monitored file size then name */
-    // printf("Monitor: %s\n", (char*)msg_monitor->body);
-    // free(msg_monitor);
-    // {
-    //     // size_t size;
-    //     // int valread = read(t_arg->sock, &size, sizeof(size_t));
-    //     // monitored = malloc(size);
-    //     // valread = read(t_arg->sock, monitored, size);
-    // }
-
-    /* In case of break! */
-    // if (0) {
-        
-    // }
-
-    return;
+    ip_host = read_string(t_arg->sock);
+    strcpy(msg.host, ip_host);
+    free(ip_host);
 
     while(1) {
         struct notapp_msg notification;
+        /* todo: notification size may not be enough */
         int valread = read(t_arg->sock, &notification, sizeof(notification)); 
+
+        if (is_disconnect(&notification) || valread == 0) {
+            break;
+        }
+
         struct inotify_event event = notification.event;
 
-        // printf("Monitored: %s\n", notification.monitored);
+        if (event.len) {
+            valread = read(t_arg->sock, msg.event_loc, event.len + 1);
+            printf("Received: %s\n", msg.event_loc);
+        } else {
+            msg.event_loc[0] = '\0';
+        }
+
+        /* Process events to formattable thing for user client */
+        msg.tv = notification.tv;
+        msg.mask = event.mask;
 
         /* Identify event type here */
-        if (event.mask & IN_OPEN)
-            printf("IN_OPEN: ");
-        if (event.mask & IN_CLOSE_NOWRITE)
-            printf("IN_CLOSE_NOWRITE: ");
-        if (event.mask & IN_CLOSE_WRITE)
-            printf("IN_CLOSE_WRITE: ");
+        // if (event.mask & IN_OPEN)
+        //     printf("IN_OPEN: ");
+        // if (event.mask & IN_CLOSE_NOWRITE)
+        //     printf("IN_CLOSE_NOWRITE: ");
+        // if (event.mask & IN_CLOSE_WRITE)
+        //     printf("IN_CLOSE_WRITE: ");
 
         /* Print the name of the watched directory */
 
         /* Print the name of the file */
-        if (event.len)
-            printf("%s", event.name);
+        if (event.len) {
+            strcpy(msg.event_loc, msg.event_loc);
+        } else {
+            msg.event_loc[0] = '\0';
+        }
 
-        /* Print type of filesystem object */
-        if (event.mask & IN_ISDIR)
-            printf(" [directory]\n");
-        else
-            printf(" [file]\n");
+        printf("Testing read\n");
+        char msg_buf[BUF_SIZE] = {0};
+        char tmp_buf[BUF_SIZE] = {0};
+        snprintf(msg_buf, BUF_SIZE - 1, "%ld.%06ld\t", msg.tv.tv_sec, msg.tv.tv_usec);
+        snprintf(tmp_buf, BUF_SIZE - 1, "%s\t", msg.host);
+        printf("Host: %s\n", msg.host);
+        strcat(msg_buf, tmp_buf);
+        snprintf(tmp_buf, BUF_SIZE - 1, "%s\t", msg.monitored);
+        strcat(msg_buf, tmp_buf);
+
+        if (event.len) {
+            strcat(msg_buf, msg.event_loc);
+        }
+
+        translate_masks(msg_buf, msg.mask);
+        
+        printf("%s\n", msg_buf);
+
+        // mask_buffer();
+        /* todo: print masks here */
+
+        printf("\n");
+        printf("==============\n");
     }
 
-    /* todo: receive message here! */
+    /* todo: gracefully disconnecting! */
 }
 
 void user_thread(void *arg) {
