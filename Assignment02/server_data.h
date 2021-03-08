@@ -50,10 +50,18 @@ void set_server_state(enum server_state server_state);
 void increment_user_count();
 void decrement_user_count();
 
-void reset_reading_user_count();
+int are_readers_done();
+int get_reading_user_count();
+void reset_reader_done_count();
 void increment_reading_user_count();
 void decrement_reading_user_count();
 
+/**
+ * @brief Get the writing state object
+ * 
+ * @return
+ */
+int get_entry_writer_count();
 void reset_entry_array();
 void sort_entry_array();
 /* https://www.tutorialspoint.com/c_standard_library/c_function_qsort.htm */

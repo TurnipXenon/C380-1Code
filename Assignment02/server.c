@@ -178,17 +178,30 @@ static void *output_sorter(void *arg) {
             set_server_state(SORTING);
 
             /* todo: wait for all observers to finish writing */
-
-            /* todo: reset reading users */
+            /* make sure that the writer count is 0 */
+            while (get_entry_writer_count() != 0) {
+                pthread_yield();
+            }
 
             /* todo: now we are sorting */
+            sort_entry_array(); /* might need the reader count here??? */
             printf("Sorting\n");
 
+
+            // cut off for readers to join
             set_server_state(READING);
 
             /* watch for readers */
+            while (!are_readers_done()) {
+                pthread_yield();
+            }
+
+            // reset reader done count
+            reset_reader_done_count();
 
             set_server_state(DONE);
+            /* At this point, readers can now proceed to waiting back to sorting */
+            printf("Done: let observers observe\n");
         }
     }
 }

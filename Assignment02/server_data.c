@@ -44,18 +44,60 @@ void decrement_user_count() {
     pthread_mutex_unlock(&user_count_mutex);
 }
 
-
-static int reading_user_count = 0;
+static int reader_done_count = 0;
+static int reader_count = 0;
 static pthread_mutex_t reading_user_count_mutex;
-void reset_reading_user_count();
+/**
+ * @brief Get the reading user count object
+ * 
+ * @return int 
+ * READERS can't really access until the server state is at reading no need for a mutex
+ */
+int get_reading_user_count() {
+    return reader_count;
+}
+
+int are_readers_done() {
+    return reader_count >= reader_count;
+}
+
+void reset_reader_done_count() {
+    reader_done_count = 0;
+}
+
 void increment_reading_user_count();
 void decrement_reading_user_count();
 
+static int writer_count = 0;
+static pthread_mutex_t writer_count_mutex;
 static int entry_array_size;
 static struct user_entry entry_array[CLIENT_MAX];
 static pthread_mutex_t entry_array_mutex;
-void reset_entry_array();
-void sort_entry_array();
+
+/**
+ * @brief Get the entry writer count object
+ * 
+ * This function will only be used during SORTING state.
+ * At that point, all writers will try to finish their jobs and just yield.
+ * So, we know that the count will always be decrementing
+ * when this is used. Does not really need a mutex.
+ * 
+ * @return int 
+ */
+int get_entry_writer_count() {
+    // assert(get_server_state == SORTING);
+    return writer_count;
+}
+
+void reset_entry_array() {
+    entry_array_size = 0;
+}
+
+void sort_entry_array() {
+    /* todo: sort array here */
+    entry_array_size = 0;
+}
+
 /* https://www.tutorialspoint.com/c_standard_library/c_function_qsort.htm */
 void output_entry_sorter();
 void add_entry(struct user_entry entry);
