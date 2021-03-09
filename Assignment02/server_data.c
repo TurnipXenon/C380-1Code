@@ -46,7 +46,7 @@ void decrement_user_count() {
 
 static int reader_done_count = 0;
 static int reader_count = 0;
-static pthread_mutex_t reading_user_count_mutex;
+static pthread_mutex_t reading_user_count_mutex = PTHREAD_MUTEX_INITIALIZER;
 /**
  * @brief Get the reading user count object
  * 
@@ -69,15 +69,11 @@ void increment_reading_user_count();
 void decrement_reading_user_count();
 
 static int writer_count = 0;
-static pthread_mutex_t writer_count_mutex;
+static pthread_mutex_t writer_count_mutex = PTHREAD_MUTEX_INITIALIZER;
 static int entry_array_size = 0;
 static struct user_entry entry_array[CLIENT_MAX];
-static pthread_mutex_t entry_array_mutex;
-static pthread_mutex_t entry_array_register_mutex;
-
-void test_stub() {
-    /* todo: delete */
-}
+static pthread_mutex_t entry_array_mutex = PTHREAD_MUTEX_INITIALIZER;
+static pthread_mutex_t entry_array_register_mutex = PTHREAD_MUTEX_INITIALIZER;
 
 /**
  * @brief Get the entry writer count object
@@ -139,14 +135,40 @@ void unregister_writer(int index) {
 }
 
 void reset_entry_array() {
-    entry_array_size = 0;
 }
 
 void sort_entry_array() {
     /* todo: sort array here */
-    entry_array_size = 0;
+    // entry_array_size = 0;
 }
 
 /* https://www.tutorialspoint.com/c_standard_library/c_function_qsort.htm */
 void output_entry_sorter();
-void add_entry(struct user_entry entry);
+
+void add_entry(struct user_entry *entry, int index) {
+    while (get_server_state() != DONE) {
+        pthread_yield();
+    }
+
+    pthread_mutex_lock(&writer_count_mutex);
+    ++writer_count;
+    pthread_mutex_unlock(&writer_count_mutex);
+
+    entry_array[index].tv = entry->tv;
+    strcpy(entry_array[index].string, entry->string);
+    printf("Cow: %s\n", entry->string);
+
+    pthread_mutex_lock(&writer_count_mutex);
+    --writer_count;
+    pthread_mutex_unlock(&writer_count_mutex);
+}
+
+void test_stub() {
+    /* todo: delete */
+    printf("Printing entry array (size: %d)\n", entry_array_size);
+    for (int i = 0; i < entry_array_size; ++i) {
+        if (entry_array[i].is_taken) {
+            printf(" ===> %s\n", entry_array[i].string);
+        }
+    }
+}

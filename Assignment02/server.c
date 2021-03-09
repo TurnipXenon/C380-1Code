@@ -10,52 +10,52 @@
  */
 void translate_masks(char *buf, uint32_t mask) {
     if (mask & IN_ACCESS) {
-        strcat(buf, " IN_ACCESS");
+        strcat(buf, "IN_ACCESS ");
     }
     if (mask & IN_ATTRIB) {
-        strcat(buf, " IN_ATTRIB");
+        strcat(buf, "IN_ATTRIB ");
     }
     if (mask & IN_CLOSE_WRITE) {
-        strcat(buf, " IN_CLOSE_WRITE");
+        strcat(buf, "IN_CLOSE_WRITE ");
     }
     if (mask & IN_CLOSE_NOWRITE) {
-        strcat(buf, " IN_CLOSE_NO_WRITE");
+        strcat(buf, "IN_CLOSE_NO_WRITE ");
     }
     if (mask & IN_CREATE) {
-        strcat(buf, " IN_CREATE");
+        strcat(buf, "IN_CREATE ");
     }
     if (mask & IN_DELETE) {
-        strcat(buf, " IN_DELETE");
+        strcat(buf, "IN_DELETE ");
     }
     if (mask & IN_DELETE_SELF) {
-        strcat(buf, " IN_DELETE_SELF");
+        strcat(buf, "IN_DELETE_SELF ");
     }
     if (mask & IN_MODIFY) {
-        strcat(buf, " IN_MODIFY");
+        strcat(buf, "IN_MODIFY ");
     }
     if (mask & IN_MOVE_SELF) {
-        strcat(buf, " IN_MOVE_SELF");
+        strcat(buf, "IN_MOVE_SELF ");
     }
     if (mask & IN_MOVED_FROM) {
-        strcat(buf, " IN_MOVED_FROM");
+        strcat(buf, "IN_MOVED_FROM ");
     }
     if (mask & IN_MOVED_TO) {
-        strcat(buf, " IN_MOVED_TO");
+        strcat(buf, "IN_MOVED_TO ");
     }
     if (mask & IN_OPEN) {
-        strcat(buf, " IN_OPEN");
+        strcat(buf, "IN_OPEN ");
     }
     if (mask & IN_IGNORED) {
-        strcat(buf, " IN_IGNORED");
+        strcat(buf, "IN_IGNORED ");
     }
     if (mask & IN_ISDIR) {
-        strcat(buf, " IN_ISDIR");
+        strcat(buf, "IN_ISDIR ");
     }
     if (mask & IN_Q_OVERFLOW) {
-        strcat(buf, " IN_Q_OVERFLOW");
+        strcat(buf, "IN_Q_OVERFLOW ");
     }
     if (mask & IN_UNMOUNT) {
-        strcat(buf, " IN_UNMOUNT");
+        strcat(buf, "IN_UNMOUNT ");
     }
 }
 
@@ -66,6 +66,7 @@ void *observer_thread(void *arg) {
     to the log file, in the order they are received. */
     thread_arg *t_arg = (thread_arg*)arg;
     user_msg msg; /* to be sent to user client */
+    struct user_entry entry;
 
     /* Temporary */
     char *monitored = NULL;
@@ -84,6 +85,8 @@ void *observer_thread(void *arg) {
     observer_index = register_writer();
     printf("Testing observer: %d\n", observer_index);
 
+    /* todo: Should we notify the client that we failed??? */
+
     // todo: improve
     while(observer_index != -1) {
         struct notapp_msg notification;
@@ -98,7 +101,6 @@ void *observer_thread(void *arg) {
 
         if (event.len) {
             valread = read(t_arg->sock, msg.event_loc, event.len + 1);
-            printf("Received: %s\n", msg.event_loc);
         } else {
             msg.event_loc[0] = '\0';
         }
@@ -107,46 +109,35 @@ void *observer_thread(void *arg) {
         msg.tv = notification.tv;
         msg.mask = event.mask;
 
-        /* Identify event type here */
-        // if (event.mask & IN_OPEN)
-        //     printf("IN_OPEN: ");
-        // if (event.mask & IN_CLOSE_NOWRITE)
-        //     printf("IN_CLOSE_NOWRITE: ");
-        // if (event.mask & IN_CLOSE_WRITE)
-        //     printf("IN_CLOSE_WRITE: ");
-
-        /* Print the name of the watched directory */
-
         /* Print the name of the file */
-        if (event.len) {
-            strcpy(msg.event_loc, msg.event_loc);
-        } else {
+        if (!event.len) {
             msg.event_loc[0] = '\0';
         }
 
-        printf("Testing read\n");
         char msg_buf[BUF_SIZE] = {0};
         char tmp_buf[BUF_SIZE] = {0};
         snprintf(msg_buf, BUF_SIZE - 1, "%ld.%06ld\t", msg.tv.tv_sec, msg.tv.tv_usec);
         snprintf(tmp_buf, BUF_SIZE - 1, "%s\t", msg.host);
-        printf("Host: %s\n", msg.host);
         strcat(msg_buf, tmp_buf);
         snprintf(tmp_buf, BUF_SIZE - 1, "%s\t", msg.monitored);
         strcat(msg_buf, tmp_buf);
 
         if (event.len) {
             strcat(msg_buf, msg.event_loc);
+            strcat(msg_buf, " ");
         }
 
         translate_masks(msg_buf, msg.mask);
+
+        // todo: put safety stuff
+        strcpy(entry.string, msg_buf);
+        entry.tv = msg.tv;
         
-        printf("%s\n", msg_buf);
+        // printf("%s\n", msg_buf);
+        // printf("==============\n");
 
-        // mask_buffer();
-        /* todo: print masks here */
-
-        printf("\n");
-        printf("==============\n");
+        /* write on entry array */
+        add_entry(&entry, observer_index);
     }
 
     /* todo: gracefully disconnecting! */
@@ -204,6 +195,8 @@ static void *output_sorter(void *arg) {
             while (get_entry_writer_count() != 0) {
                 pthread_yield();
             }
+
+            test_stub();
 
             /* todo: now we are sorting */
             sort_entry_array(); /* might need the reader count here??? */
@@ -284,19 +277,19 @@ void do_server(notapp_args arg) {
         exit(0);
     }
 
-    // /* Start timer */
-    // {
-    //     pthread_t thread;
-    //     pthread_create(&thread, NULL, server_timer, NULL);
-    //     pthread_detach(thread);
-    // }
+    /* Start timer */
+    {
+        pthread_t thread;
+        pthread_create(&thread, NULL, server_timer, NULL);
+        pthread_detach(thread);
+    }
 
-    // /* Start sorter */
-    // {
-    //     pthread_t thread;
-    //     pthread_create(&thread, NULL, output_sorter, NULL);
-    //     pthread_detach(thread);
-    // }
+    /* Start sorter */
+    {
+        pthread_t thread;
+        pthread_create(&thread, NULL, output_sorter, NULL);
+        pthread_detach(thread);
+    }
 
     while(1) {
         if (listen(server_fd, 3) < 0) 

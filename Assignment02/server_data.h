@@ -72,6 +72,6 @@ void reset_entry_array();
 void sort_entry_array();
 /* https://www.tutorialspoint.com/c_standard_library/c_function_qsort.htm */
 void output_entry_sorter();
-void add_entry(struct user_entry entry);
+void add_entry(struct user_entry *entry, int index);
 
 #endif /* _SERVER_DATA_H_ */
