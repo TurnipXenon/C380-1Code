@@ -10,6 +10,7 @@
 #define CLIENT_MAX 256
 
 struct user_entry {
+    bool is_taken;
     struct timeval tv;
     char string[BUF_SIZE];
 };
@@ -37,6 +38,9 @@ enum server_state {
     READING
 };
 
+/* todo: delete */
+void test_stub();
+
 /**
  * @brief Determines when the state transitions to SORTING
  * 
@@ -62,6 +66,8 @@ void decrement_reading_user_count();
  * @return
  */
 int get_entry_writer_count();
+int register_writer();
+void unregister_writer(int index);
 void reset_entry_array();
 void sort_entry_array();
 /* https://www.tutorialspoint.com/c_standard_library/c_function_qsort.htm */

@@ -70,9 +70,14 @@ void decrement_reading_user_count();
 
 static int writer_count = 0;
 static pthread_mutex_t writer_count_mutex;
-static int entry_array_size;
+static int entry_array_size = 0;
 static struct user_entry entry_array[CLIENT_MAX];
 static pthread_mutex_t entry_array_mutex;
+static pthread_mutex_t entry_array_register_mutex;
+
+void test_stub() {
+    /* todo: delete */
+}
 
 /**
  * @brief Get the entry writer count object
@@ -87,6 +92,50 @@ static pthread_mutex_t entry_array_mutex;
 int get_entry_writer_count() {
     // assert(get_server_state == SORTING);
     return writer_count;
+}
+
+int register_writer() {
+    int index = -1;
+
+    // todo: improve???
+    // we need to gain exclusive access to adding a spot in the array
+    // find an empty spot in the array
+    pthread_mutex_lock(&entry_array_register_mutex);
+
+    for(int i = 0; i < entry_array_size; ++i) {
+        if(!entry_array[i].is_taken) {
+            index = i;
+            entry_array[index].is_taken = true;
+            break;
+        }
+    }
+
+    if (index == -1) {
+        ++entry_array_size;
+
+        if (entry_array_size <= CLIENT_MAX) {
+            index = entry_array_size - 1;
+            entry_array[index].is_taken = true;
+        } else {
+            // fail
+            --entry_array_size;
+        }
+    }
+
+    pthread_mutex_unlock(&entry_array_register_mutex);
+
+    return index;
+}
+
+void unregister_writer(int index) {
+    if (index == -1 || index >= CLIENT_MAX) {
+        return;
+    }
+
+    entry_array[index].is_taken = false;
+    if (index + 1 == entry_array_size) {
+        --entry_array_size;
+    }
 }
 
 void reset_entry_array() {

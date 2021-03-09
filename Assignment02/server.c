@@ -45,6 +45,18 @@ void translate_masks(char *buf, uint32_t mask) {
     if (mask & IN_OPEN) {
         strcat(buf, " IN_OPEN");
     }
+    if (mask & IN_IGNORED) {
+        strcat(buf, " IN_IGNORED");
+    }
+    if (mask & IN_ISDIR) {
+        strcat(buf, " IN_ISDIR");
+    }
+    if (mask & IN_Q_OVERFLOW) {
+        strcat(buf, " IN_Q_OVERFLOW");
+    }
+    if (mask & IN_UNMOUNT) {
+        strcat(buf, " IN_UNMOUNT");
+    }
 }
 
 void *observer_thread(void *arg) {
@@ -52,10 +64,13 @@ void *observer_thread(void *arg) {
     updates a common data structure which stores the most recent event that came from 
     each observer. If a logfile was specified, the server also dumps the received events 
     to the log file, in the order they are received. */
-    char *monitored = NULL;
-    char *ip_host = NULL;
     thread_arg *t_arg = (thread_arg*)arg;
     user_msg msg; /* to be sent to user client */
+
+    /* Temporary */
+    char *monitored = NULL;
+    char *ip_host = NULL;
+    int observer_index = -1;
 
     monitored = read_string(t_arg->sock);
     strcpy(msg.monitored, monitored);
@@ -65,7 +80,12 @@ void *observer_thread(void *arg) {
     strcpy(msg.host, ip_host);
     free(ip_host);
 
-    while(1) {
+    /* Register self to server data */
+    observer_index = register_writer();
+    printf("Testing observer: %d\n", observer_index);
+
+    // todo: improve
+    while(observer_index != -1) {
         struct notapp_msg notification;
         /* todo: notification size may not be enough */
         int valread = read(t_arg->sock, &notification, sizeof(notification)); 
@@ -131,6 +151,8 @@ void *observer_thread(void *arg) {
 
     /* todo: gracefully disconnecting! */
     printf("Client disconnected!\n");
+
+    unregister_writer(observer_index);
 
     /* https://stackoverflow.com/a/36568809/10024566 */
     static const long ok_return = 1;
@@ -262,19 +284,19 @@ void do_server(notapp_args arg) {
         exit(0);
     }
 
-    /* Start timer */
-    {
-        pthread_t thread;
-        pthread_create(&thread, NULL, server_timer, NULL);
-        pthread_detach(thread);
-    }
+    // /* Start timer */
+    // {
+    //     pthread_t thread;
+    //     pthread_create(&thread, NULL, server_timer, NULL);
+    //     pthread_detach(thread);
+    // }
 
-    /* Start sorter */
-    {
-        pthread_t thread;
-        pthread_create(&thread, NULL, output_sorter, NULL);
-        pthread_detach(thread);
-    }
+    // /* Start sorter */
+    // {
+    //     pthread_t thread;
+    //     pthread_create(&thread, NULL, output_sorter, NULL);
+    //     pthread_detach(thread);
+    // }
 
     while(1) {
         if (listen(server_fd, 3) < 0) 
