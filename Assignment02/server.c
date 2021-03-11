@@ -91,7 +91,9 @@ void *observer_thread(void *arg) {
     while(observer_index != -1) {
         struct notapp_msg notification;
         /* todo: notification size may not be enough */
+        printf("Waiting for message from: %s\n", msg.monitored);
         int valread = read(t_arg->sock, &notification, sizeof(notification)); 
+        printf("Receive message from: %s\n", msg.monitored);
 
         if (is_disconnect(&notification) || valread == 0) {
             break;
@@ -158,33 +160,56 @@ void *user_thread(void *arg) {
     all M clients receiveconsistent, i.e., identical, information. In other words, 
     the threads serving the user clients "broadcast" the currentstate of most recent 
     events to all simultaneously connected user clients. */
-    thread_arg *t_arg = (thread_arg*)arg;
+    int socket = *((int*)arg);
+    int confirmation = 1;
+
+    // todo: register
+    // todo: OVER HERE
 
     while(1) {
-        break;
+        while (get_server_state() != READING) {
+            sched_yield();
+        }
+
+        // todo: check are they dead?
+        int valread = read(socket, &confirmation, sizeof(int));
+        if (is_disconnect(&confirmation) || valread == 0) {
+            break;
+        }
+
+        send_entries(socket);
+        
+        while (get_server_state() == READING) {
+            sched_yield();
+        }
     }
 
     /* todo: gracefully disconnecting! */
     printf("Client disconnected!\n");
+
+    // todo: unregister
 
     /* https://stackoverflow.com/a/36568809/10024566 */
     static const long ok_return = 1;
     return (void*)&ok_return;
 }
 
-static void *output_sorter(void *arg) {
+static void *output_sorter() {
     while(1) {
-        pthread_yield();
+        sched_yield();
 
         /* I'm not modifying the timer so it's okay to read it */
         if (get_timer_expired()) {
             /* Now, I need to access it */
+            struct timeval tv;
+            gettimeofday(&tv, NULL);
+            printf("Attempting to reset timer %d:\n", tv.tv_sec);
             set_timer_expired(false);
             printf("Timer reset\n");
 
             /* the server state must be DONE to transition to SORTING */
             while (get_server_state() != DONE) {
-                pthread_yield();
+                sched_yield();
             }
 
             printf("Flipping state\n");
@@ -193,14 +218,13 @@ static void *output_sorter(void *arg) {
             /* todo: wait for all observers to finish writing */
             /* make sure that the writer count is 0 */
             while (get_entry_writer_count() != 0) {
-                pthread_yield();
+                sched_yield();
             }
 
             test_stub();
 
             /* todo: now we are sorting */
             sort_entry_array(); /* might need the reader count here??? */
-            printf("Sorting\n");
 
 
             // cut off for readers to join
@@ -208,7 +232,7 @@ static void *output_sorter(void *arg) {
 
             /* watch for readers */
             while (!are_readers_done()) {
-                pthread_yield();
+                sched_yield();
             }
 
             // reset reader done count
@@ -219,9 +243,13 @@ static void *output_sorter(void *arg) {
             printf("Done: let observers observe\n");
         }
     }
+
+    /* https://stackoverflow.com/a/36568809/10024566 */
+    static const long ok_return = 1;
+    return (void*)&ok_return;
 }
 
-static void *server_timer(void *arg) {
+static void *server_timer() {
     /* todo: set up timer */
     struct timespec delay = {5, 0};
     while(1) {
@@ -230,6 +258,10 @@ static void *server_timer(void *arg) {
         printf("Timer expired\n");
         set_timer_expired(true);
     }
+
+    /* https://stackoverflow.com/a/36568809/10024566 */
+    static const long ok_return = 1;
+    return (void*)&ok_return;
 }
 
 void do_server(notapp_args arg) {
@@ -321,7 +353,7 @@ void do_server(notapp_args arg) {
                 pthread_detach(thread);
                 break;
             case INTRO_USER:
-                pthread_create(&thread, NULL, user_thread, NULL);
+                pthread_create(&thread, NULL, user_thread, &new_socket);
                 pthread_detach(thread);
                 break;
             default:
@@ -351,6 +383,6 @@ void do_server(notapp_args arg) {
             is_parent = 0;
         }
 
-        printf("Connection success\n");
+        printf("Connection success %d\n", new_socket);
     }
 }

@@ -34,9 +34,17 @@ run_test: test
 observer1: notapp
 	./notapp -o 127.0.0.1 51089 test_folder1
 
+.PHONY: observer2
+observer2: notapp
+	./notapp -o 127.0.0.1 51089 test_folder2
+
+.PHONY: observer3
+observer3: notapp
+	./notapp -o 127.0.0.1 51089 test_folder3
+
 .PHONY: user1
 user1: notapp
-	./notapp -u 127.0.0.1 49299
+	gdb --args ./notapp -u 127.0.0.1 51089
 
 .PHONY: server1
 server1: notapp

@@ -10,6 +10,8 @@
 #include <stdio.h>
 #include <time.h>
 #include <stdbool.h>
+#include <pthread.h>
+#include <sched.h>
 
 #include "notapp_base.h"
 #include "socket_helper.h"

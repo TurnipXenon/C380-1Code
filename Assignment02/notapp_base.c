@@ -10,7 +10,7 @@ void handle_signal(int sig) {
 
 
 bool is_disconnect(void* val) {
-    if (*((int*)val) == -1) {
+    if (*((int*)val) == DISCONNECT_CODE) {
         return true;
     } else {
         return false;

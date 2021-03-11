@@ -4,6 +4,7 @@
 #include <pthread.h>
 #include <sys/time.h>
 #include <stdbool.h>
+#include <sched.h>
 
 #include "notapp_base.h"
 
@@ -49,6 +50,7 @@ void test_stub();
 void set_timer_expired(bool status);
 bool get_timer_expired();
 
+enum server_state get_server_state();
 void set_server_state(enum server_state server_state);
 
 void increment_user_count();
@@ -59,6 +61,8 @@ int get_reading_user_count();
 void reset_reader_done_count();
 void increment_reading_user_count();
 void decrement_reading_user_count();
+void register_reader();
+void unregister_reader();
 
 /**
  * @brief Get the writing state object
@@ -70,6 +74,7 @@ int register_writer();
 void unregister_writer(int index);
 void reset_entry_array();
 void sort_entry_array();
+void send_entries(int socket);
 /* https://www.tutorialspoint.com/c_standard_library/c_function_qsort.htm */
 void output_entry_sorter();
 void add_entry(struct user_entry *entry, int index);

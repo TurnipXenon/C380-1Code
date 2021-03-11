@@ -44,9 +44,10 @@ void decrement_user_count() {
     pthread_mutex_unlock(&user_count_mutex);
 }
 
+
+static pthread_mutex_t reader_count_mutex = PTHREAD_MUTEX_INITIALIZER;
 static int reader_done_count = 0;
 static int reader_count = 0;
-static pthread_mutex_t reading_user_count_mutex = PTHREAD_MUTEX_INITIALIZER;
 /**
  * @brief Get the reading user count object
  * 
@@ -68,11 +69,23 @@ void reset_reader_done_count() {
 void increment_reading_user_count();
 void decrement_reading_user_count();
 
+void register_reader() {
+    pthread_mutex_lock(&reader_count_mutex);
+    ++reader_count;
+    pthread_mutex_unlock(&reader_count_mutex);
+}
+
+void unregister_reader() {
+    pthread_mutex_lock(&reader_count_mutex);
+    --reader_count;
+    pthread_mutex_unlock(&reader_count_mutex);
+}
+
+static int observer_count = 0;
 static int writer_count = 0;
 static pthread_mutex_t writer_count_mutex = PTHREAD_MUTEX_INITIALIZER;
 static int entry_array_size = 0;
 static struct user_entry entry_array[CLIENT_MAX];
-static pthread_mutex_t entry_array_mutex = PTHREAD_MUTEX_INITIALIZER;
 static pthread_mutex_t entry_array_register_mutex = PTHREAD_MUTEX_INITIALIZER;
 
 /**
@@ -98,6 +111,8 @@ int register_writer() {
     // find an empty spot in the array
     pthread_mutex_lock(&entry_array_register_mutex);
 
+    ++observer_count;
+
     for(int i = 0; i < entry_array_size; ++i) {
         if(!entry_array[i].is_taken) {
             index = i;
@@ -115,6 +130,7 @@ int register_writer() {
         } else {
             // fail
             --entry_array_size;
+            --observer_count;
         }
     }
 
@@ -132,12 +148,25 @@ void unregister_writer(int index) {
     if (index + 1 == entry_array_size) {
         --entry_array_size;
     }
+
+    --observer_count;
 }
 
 void reset_entry_array() {
 }
 
+int sort_entry_array_comp(const void *elem1, const void *elem2) {
+    struct user_entry *entry1 = ((struct user_entry*)elem1);
+    struct user_entry *entry2 = ((struct user_entry*)elem2);
+    if (entry1->tv.tv_sec > entry2->tv.tv_sec) return  -1;
+    if (entry1->tv.tv_sec < entry2->tv.tv_sec) return  1;
+    if (entry1->tv.tv_usec > entry2->tv.tv_usec) return  -1;
+    if (entry1->tv.tv_usec < entry2->tv.tv_usec) return  1;
+    return 0;
+}
+
 void sort_entry_array() {
+    qsort(entry_array, entry_array_size, sizeof(struct user_entry), sort_entry_array_comp);
     /* todo: sort array here */
     // entry_array_size = 0;
 }
@@ -147,7 +176,7 @@ void output_entry_sorter();
 
 void add_entry(struct user_entry *entry, int index) {
     while (get_server_state() != DONE) {
-        pthread_yield();
+        sched_yield();
     }
 
     pthread_mutex_lock(&writer_count_mutex);
@@ -156,11 +185,20 @@ void add_entry(struct user_entry *entry, int index) {
 
     entry_array[index].tv = entry->tv;
     strcpy(entry_array[index].string, entry->string);
-    printf("Cow: %s\n", entry->string);
 
     pthread_mutex_lock(&writer_count_mutex);
     --writer_count;
     pthread_mutex_unlock(&writer_count_mutex);
+}
+
+void send_entries(int socket) {
+    // say how many entries
+    send(socket, &observer_count, sizeof(observer_count), 0);
+
+    // say strings
+    for (int i = 0; i < observer_count; ++i) {
+        send_string(socket, entry_array[i].string);
+    }
 }
 
 void test_stub() {

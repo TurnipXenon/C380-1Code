@@ -30,6 +30,8 @@
 
 #define USER_SERVE_OUTPUT 1
 
+#define DISCONNECT_CODE -10
+
 enum msg_type {
     CONNECTION_OBSERVER,
     CONNECTION_USER,
