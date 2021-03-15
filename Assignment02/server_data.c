@@ -59,7 +59,7 @@ int get_reading_user_count() {
 }
 
 int are_readers_done() {
-    return reader_count >= reader_count;
+    return reader_done_count >= reader_count;
 }
 
 void reset_reader_done_count() {
@@ -193,12 +193,16 @@ void add_entry(struct user_entry *entry, int index) {
 
 void send_entries(int socket) {
     // say how many entries
+    printf("[Cupcake] Sending observer count: %d\n", observer_count);
     send(socket, &observer_count, sizeof(observer_count), 0);
 
     // say strings
     for (int i = 0; i < observer_count; ++i) {
+        printf("Sending to user: %s\n", entry_array[i].string);
         send_string(socket, entry_array[i].string);
     }
+
+    ++reader_done_count;
 }
 
 void test_stub() {

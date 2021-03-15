@@ -44,7 +44,7 @@ observer3: notapp
 
 .PHONY: user1
 user1: notapp
-	gdb --args ./notapp -u 127.0.0.1 51089
+	./notapp -u 127.0.0.1 51089
 
 .PHONY: server1
 server1: notapp

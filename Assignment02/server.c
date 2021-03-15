@@ -164,19 +164,25 @@ void *user_thread(void *arg) {
     int confirmation = 1;
 
     // todo: register
-    // todo: OVER HERE
+    printf("Registering user %d\n", socket);
+    register_reader();
+    printf("Reader registered %d\n", socket);
 
     while(1) {
+        printf("User waiting for READING\n");
         while (get_server_state() != READING) {
             sched_yield();
         }
 
         // todo: check are they dead?
+        printf("User checking if not dead\n");
         int valread = read(socket, &confirmation, sizeof(int));
         if (is_disconnect(&confirmation) || valread == 0) {
             break;
         }
 
+        printf("User READING or sending");
+        printf("Sending entries to %d\n", socket);
         send_entries(socket);
         
         while (get_server_state() == READING) {
@@ -185,9 +191,9 @@ void *user_thread(void *arg) {
     }
 
     /* todo: gracefully disconnecting! */
-    printf("Client disconnected!\n");
+    printf("User client disconnected!\n");
 
-    // todo: unregister
+    unregister_reader();
 
     /* https://stackoverflow.com/a/36568809/10024566 */
     static const long ok_return = 1;
@@ -221,13 +227,14 @@ static void *output_sorter() {
                 sched_yield();
             }
 
-            test_stub();
+            // test_stub();
 
             /* todo: now we are sorting */
             sort_entry_array(); /* might need the reader count here??? */
 
 
             // cut off for readers to join
+            printf("Time for users\n");
             set_server_state(READING);
 
             /* watch for readers */
@@ -240,7 +247,7 @@ static void *output_sorter() {
 
             set_server_state(DONE);
             /* At this point, readers can now proceed to waiting back to sorting */
-            printf("Done: let observers observe\n");
+            // printf("Done: let observers observe\n");
         }
     }
 

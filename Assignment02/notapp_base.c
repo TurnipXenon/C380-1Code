@@ -20,7 +20,7 @@ bool is_disconnect(void* val) {
 /* todo: transfer to different header */
 void send_string(int sock, char *string) {
     size_t str_size = strlen(string) + 1;
-    printf("Sending size: %zu\n", str_size);
+    // printf("Sending size: %zu\n", str_size);
 
     /* Send the size first */
     send(sock, &str_size, sizeof(size_t), 0);
