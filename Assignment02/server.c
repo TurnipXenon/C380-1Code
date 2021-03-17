@@ -99,20 +99,22 @@ void *observer_thread(void *arg) {
             break;
         }
 
-        struct inotify_event event = notification.event;
+        if (notification.len) {
+            valread = read(t_arg->sock, msg.event_loc, notification.len + 1);
 
-        if (event.len) {
-            valread = read(t_arg->sock, msg.event_loc, event.len + 1);
+            if (is_disconnect(msg.event_loc) || valread == 0) {
+                break;
+            }
         } else {
             msg.event_loc[0] = '\0';
         }
 
         /* Process events to formattable thing for user client */
         msg.tv = notification.tv;
-        msg.mask = event.mask;
+        msg.mask = notification.mask;
 
         /* Print the name of the file */
-        if (!event.len) {
+        if (!notification.len) {
             msg.event_loc[0] = '\0';
         }
 
@@ -124,7 +126,7 @@ void *observer_thread(void *arg) {
         snprintf(tmp_buf, BUF_SIZE - 1, "%s\t", msg.monitored);
         strcat(msg_buf, tmp_buf);
 
-        if (event.len) {
+        if (notification.len) {
             strcat(msg_buf, msg.event_loc);
             strcat(msg_buf, " ");
         }
@@ -135,17 +137,18 @@ void *observer_thread(void *arg) {
         strcpy(entry.string, msg_buf);
         entry.tv = msg.tv;
         
-        // printf("%s\n", msg_buf);
-        // printf("==============\n");
+        printf("************\n");
+        printf("%s\n", msg_buf);
+        printf("************\n");
 
         /* write on entry array */
         add_entry(&entry, observer_index);
     }
 
     /* todo: gracefully disconnecting! */
-    printf("Client disconnected!\n");
-
+    printf("Client disconnected and unregistered!\n");
     unregister_writer(observer_index);
+    printf("Unregistered success!\n");
 
     /* https://stackoverflow.com/a/36568809/10024566 */
     static const long ok_return = 1;
@@ -200,7 +203,9 @@ void *user_thread(void *arg) {
     return (void*)&ok_return;
 }
 
-static void *output_sorter() {
+static void *output_sorter(void *arg) {
+    char* logfile = ((char*)arg);
+
     while(1) {
         sched_yield();
 
@@ -209,7 +214,7 @@ static void *output_sorter() {
             /* Now, I need to access it */
             struct timeval tv;
             gettimeofday(&tv, NULL);
-            printf("Attempting to reset timer %d:\n", tv.tv_sec);
+            printf("Attempting to reset timer %ld:\n", tv.tv_sec);
             set_timer_expired(false);
             printf("Timer reset\n");
 
@@ -236,6 +241,11 @@ static void *output_sorter() {
             // cut off for readers to join
             printf("Time for users\n");
             set_server_state(READING);
+
+            /* write on logfile  */
+            if (logfile != NULL) {
+                print_logfile(logfile);
+            }
 
             /* watch for readers */
             while (!are_readers_done()) {
@@ -326,7 +336,7 @@ void do_server(notapp_args arg) {
     /* Start sorter */
     {
         pthread_t thread;
-        pthread_create(&thread, NULL, output_sorter, NULL);
+        pthread_create(&thread, NULL, output_sorter, arg.logfile);
         pthread_detach(thread);
     }
 

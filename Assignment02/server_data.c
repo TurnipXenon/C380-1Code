@@ -140,6 +140,7 @@ int register_writer() {
 }
 
 void unregister_writer(int index) {
+    printf("Unregistering: %d\n", index);
     if (index == -1 || index >= CLIENT_MAX) {
         return;
     }
@@ -207,10 +208,32 @@ void send_entries(int socket) {
 
 void test_stub() {
     /* todo: delete */
-    printf("Printing entry array (size: %d)\n", entry_array_size);
+    printf("Printing observers at (size: %d)\n", observer_count);
     for (int i = 0; i < entry_array_size; ++i) {
         if (entry_array[i].is_taken) {
             printf(" ===> %s\n", entry_array[i].string);
         }
     }
+}
+
+void print_logfile(char *logfile) {
+    // assume not null
+
+    FILE *fp;
+    fp = fopen(logfile, "a");
+
+    if (fp == NULL) {
+        printf("Unable to open %s\n", logfile);
+        return;
+    }
+    
+    fprintf(fp, "\n");
+    fprintf(fp, CLIENT_HEADER);
+    for (int i = 0; i < entry_array_size; ++i) {
+        if (entry_array[i].is_taken) {
+            fprintf(fp, " %s\n", entry_array[i].string);
+        }
+    }
+
+    fclose(fp);
 }

@@ -79,4 +79,6 @@ void send_entries(int socket);
 void output_entry_sorter();
 void add_entry(struct user_entry *entry, int index);
 
+void print_logfile(char *logfile);
+
 #endif /* _SERVER_DATA_H_ */

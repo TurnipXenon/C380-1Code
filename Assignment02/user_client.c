@@ -62,7 +62,7 @@ void do_user_client(notapp_args arg) {
 
         
         printf("Entry count is %d\n", entry_count);
-        printf("%s\t%s\t%s\t%s\n", "TIME", "HOST", "MONITORED", "EVENT");
+        printf(CLIENT_HEADER);
         for (index = 0; index < entry_count; ++index) {
             text = read_string(sock);
             printf("%s\n", text);

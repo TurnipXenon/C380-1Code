@@ -48,7 +48,7 @@ user1: notapp
 
 .PHONY: server1
 server1: notapp
-	valgrind ./notapp -s -t 2.5 -l server1_test.txt -p 51089 # valgrind ./notapp -s -t 2.5 -l server1_test.txt
+	valgrind ./notapp -s -t 2.5 -l logfiles/server1_test.txt -p 51089 # valgrind ./notapp -s -t 2.5 -l server1_test.txt
 
 # .PHONY notapp.time
 # notapp.time:

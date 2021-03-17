@@ -1,48 +1,5 @@
 #include "observer_client.h"
 
-static void handle_events(int file_desc, int sock) {
-    // code based on 'man inotify'
-    char buf[4096]
-               __attribute__ ((aligned(__alignof__(struct inotify_event))));
-    struct inotify_event *event;
-    ssize_t len;
-
-    while(1) {
-        // read events
-        len = read(file_desc, buf, sizeof(buf));
-        if (len == -1 && errno != EAGAIN) {
-            perror("read");
-            // todo: disconnect + clean up
-            return;
-        }
-
-        /* From man notify:
-        If the nonblocking read() found no events to read, then
-        it returns -1 with errno set to EAGAIN. In that case,
-        we exit the loop. */
-        if (len <= 0) {
-            break;
-        }
-
-        for (char *ptr = buf; ptr < buf + len;
-                ptr += EVENT_STRUCT_SIZE + event->len) {
-            
-            event = (struct inotify_event *) ptr;
-
-            struct notapp_msg event_message;
-            event_message.type = NOTIFICATION;
-            event_message.event = *event;
-            gettimeofday(&event_message.tv, NULL);
-
-            send(sock, &event_message, sizeof(event_message) , 0); 
-
-            if (event->len) {
-                send(sock, event->name, event->len + 1, 0);
-            }
-        }
-    }
-}
-
 /* todo: clean up lol */
 void do_observer_client(notapp_args arg) {
     // region Set up socket
@@ -53,9 +10,6 @@ void do_observer_client(notapp_args arg) {
     // todo attach a sigint handle here
     // code base 'man inotify'
     int file_desc = -1;
-    int poll_num;
-    nfds_t nfds = 1;
-    struct pollfd fds[1]; 
     int jump_val;
 
     if ((sock = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
@@ -90,6 +44,8 @@ void do_observer_client(notapp_args arg) {
         if (file_desc > 0) {
             close(file_desc);
         }
+
+        printf("Sending closing\n");
         return;
     }
 
@@ -141,8 +97,6 @@ void do_observer_client(notapp_args arg) {
     );
 
     // Inotify input
-    fds[0].fd = file_desc;
-    fds[0].events = POLLIN; // todo may need to change???
     char buffer[EVENT_BUFFER_SIZE];
     int i = 0;
 
@@ -161,8 +115,11 @@ void do_observer_client(notapp_args arg) {
             
             struct notapp_msg event_message;
             event_message.type = NOTIFICATION;
-            event_message.event = *event;
             gettimeofday(&event_message.tv, NULL);
+            event_message.wd = event->wd;
+            event_message.mask = event->mask;
+            event_message.cookie = event->cookie;
+            event_message.len = event->len;
 
             send(sock, &event_message, sizeof(event_message) , 0); 
 
@@ -173,27 +130,5 @@ void do_observer_client(notapp_args arg) {
             bytesProcessed += EVENT_STRUCT_SIZE + event->len;
         }
         printf("Finish sending...\n");
-
-
-        // poll_num = poll(fds, nfds, -1);
-        // if (poll_num == -1) {
-        //     if (errno == EINTR) {
-        //         // reissue system call
-        //         continue;
-        //     }
-
-        //     /* else */
-        //     perror("???");
-        //     break;
-        // }
-
-        // if (poll_num > 0) {
-        //     if (fds[0].revents & POLLIN) {
-        //         printf("Sending event\n");
-        //         handle_events(file_desc, sock);
-        //     }
-        // }
-
-        // printf("Polling\n");
     }
 }

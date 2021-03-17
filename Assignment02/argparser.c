@@ -5,7 +5,7 @@ notapp_args init_notapp_args() {
         UNKNOWN, // role
         5.0f, // interval
         "0", // sport
-        "logfile.txt", // logfile
+        NULL, // logfile
         "127.0.0.1", // saddr
         "randomfile.txt" // fileordir
     };

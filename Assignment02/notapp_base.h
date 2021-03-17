@@ -32,6 +32,8 @@
 
 #define DISCONNECT_CODE -10
 
+#define CLIENT_HEADER "TIME\t\t\t\tHOST\t\t\tMONITORED\t\tEVENT\n"
+
 enum msg_type {
     CONNECTION_OBSERVER,
     CONNECTION_USER,
@@ -45,7 +47,11 @@ enum msg_type {
 typedef struct notapp_msg {
     enum msg_type type;
     struct timeval tv;
-    struct inotify_event event;
+    int wd;            /* Watch descriptor */
+    uint32_t mask;     /* Mask describing event */
+    uint32_t cookie;   /* Unique cookie associating related events (for rename(2)) */
+    uint32_t len;      /* Size of name field */
+    // struct inotify_event event;  document removal due to unknown behavior???
 } notapp_msg;
 
 enum msg_identity {
