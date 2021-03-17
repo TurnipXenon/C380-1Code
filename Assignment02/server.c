@@ -227,7 +227,7 @@ static void *output_sorter() {
                 sched_yield();
             }
 
-            // test_stub();
+            test_stub();
 
             /* todo: now we are sorting */
             sort_entry_array(); /* might need the reader count here??? */

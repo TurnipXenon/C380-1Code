@@ -20,10 +20,10 @@
 // region todo DELETE
 
 /* size of the event structure, not counting name */
-#define EVENT_SIZE (sizeof (struct inotify_event))
+#define EVENT_STRUCT_SIZE (sizeof (struct inotify_event))
 
 /* reasonable guess as to size of 1024 events */
-#define BUF_LEN (1024 * (EVENT_SIZE + 16))
+#define BUF_LEN (1024 * (EVENT_STRUCT_SIZE + 16)) // todo: delete
 // endregion todo DELETE
 
 #define BUF_SIZE 1024
@@ -44,8 +44,8 @@ enum msg_type {
 
 typedef struct notapp_msg {
     enum msg_type type;
-    struct inotify_event event;
     struct timeval tv;
+    struct inotify_event event;
 } notapp_msg;
 
 enum msg_identity {

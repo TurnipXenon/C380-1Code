@@ -14,9 +14,12 @@
 #include <sys/inotify.h>
 #include <unistd.h>
 #include <string.h>
+#include <limits.h>
 
 #include "notapp_base.h"
 #include "notapp_base.h"
+
+#define EVENT_BUFFER_SIZE (10 * (EVENT_STRUCT_SIZE + NAME_MAX + 1))
 
 /* todo: clean up lol */
 void do_observer_client(notapp_args arg);

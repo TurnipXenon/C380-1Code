@@ -25,7 +25,7 @@ static void handle_events(int file_desc, int sock) {
         }
 
         for (char *ptr = buf; ptr < buf + len;
-                ptr += EVENT_SIZE + event->len) {
+                ptr += EVENT_STRUCT_SIZE + event->len) {
             
             event = (struct inotify_event *) ptr;
 
@@ -143,25 +143,57 @@ void do_observer_client(notapp_args arg) {
     // Inotify input
     fds[0].fd = file_desc;
     fds[0].events = POLLIN; // todo may need to change???
+    char buffer[EVENT_BUFFER_SIZE];
+    int i = 0;
 
     // Listen to events
     while(1) {
-        poll_num = poll(fds, nfds, -1);
-        if (poll_num == -1) {
-            if (errno == EINTR) {
-                // reissue system call
-                continue;
+        // read 
+        printf("[%d] Reading...\n", i);
+        ++i;
+        int bytesRead = read(file_desc, buffer, BUF_SIZE), bytesProcessed = 0;
+        if(bytesRead < 0) // read error
+            continue;
+
+        printf("Sending...\n");
+        while(bytesProcessed < bytesRead) {
+            struct inotify_event* event = (struct inotify_event*)(buffer + bytesProcessed);
+            
+            struct notapp_msg event_message;
+            event_message.type = NOTIFICATION;
+            event_message.event = *event;
+            gettimeofday(&event_message.tv, NULL);
+
+            send(sock, &event_message, sizeof(event_message) , 0); 
+
+            if (event->len) {
+                send(sock, event->name, event->len + 1, 0);
             }
 
-            /* else */
-            perror("???");
-            break;
+            bytesProcessed += EVENT_STRUCT_SIZE + event->len;
         }
+        printf("Finish sending...\n");
 
-        if (poll_num > 0) {
-            if (fds[0].revents & POLLIN) {
-                handle_events(file_desc, sock);
-            }
-        }
+
+        // poll_num = poll(fds, nfds, -1);
+        // if (poll_num == -1) {
+        //     if (errno == EINTR) {
+        //         // reissue system call
+        //         continue;
+        //     }
+
+        //     /* else */
+        //     perror("???");
+        //     break;
+        // }
+
+        // if (poll_num > 0) {
+        //     if (fds[0].revents & POLLIN) {
+        //         printf("Sending event\n");
+        //         handle_events(file_desc, sock);
+        //     }
+        // }
+
+        // printf("Polling\n");
     }
 }
