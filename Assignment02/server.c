@@ -281,15 +281,47 @@ static void *server_timer() {
     return (void*)&ok_return;
 }
 
+static void daemonize() {
+    int i,lfp;
+char str[10];
+	if(getppid()==1) return; /* already a daemon */
+	i=fork();
+	if (i<0) exit(1); /* fork error */
+	if (i>0) exit(0); /* parent exits */
+	/* child (daemon) continues */
+	setsid(); /* obtain a new process group */
+	for (i=getdtablesize();i>=0;--i) close(i); /* close all descriptors */
+	i=open("/dev/null",O_RDWR); dup(i); dup(i); /* handle standart I/O */
+	umask(027); /* set newly created file permissions */
+	// chdir(RUNNING_DIR); /* change running directory */
+	// lfp=open(LOCK_FILE,O_RDWR|O_CREAT,0640);
+	if (lfp<0) exit(1); /* can not open */
+	if (lockf(lfp,F_TLOCK,0)<0) exit(0); /* can not lock */
+	/* first instance continues */
+	sprintf(str,"%d\n",getpid());
+	write(lfp,str,strlen(str)); /* record pid to lockfile */
+	signal(SIGCHLD,SIG_IGN); /* ignore child */
+	signal(SIGTSTP,SIG_IGN); /* ignore tty signals */
+	signal(SIGTTOU,SIG_IGN);
+	signal(SIGTTIN,SIG_IGN);
+
+    // todo: handle here
+	// signal(SIGHUP,signal_handler); /* catch hangup signal */
+	// signal(SIGTERM,signal_handler); /* catch kill signal */
+}
+
 void do_server(notapp_args arg) {
+
+    // daemonize();
+
     // sock stream time
 
     // based on https://www.geeksforgeeks.org/socket-programming-cc/
     int jump_val;
     int server_fd, new_socket; 
     struct sockaddr_in address; 
-    int addrlen = sizeof(address); 
-    int is_parent = 1; /* or not yet daemonized */
+    int addrlen = sizeof(address);
+
 
     // todo: bind to port
     if ((server_fd = socket(AF_INET, SOCK_STREAM, 0)) == 0) 
@@ -298,13 +330,7 @@ void do_server(notapp_args arg) {
         return;
     }
 
-    // Forcefully attaching socket to the port 8080 
-    // if (setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT, 
-    //                                               &opt, sizeof(opt))) 
-    // { 
-    //     perror("setsockopt"); 
-    //     exit(EXIT_FAILURE); 
-    // } 
+
 
     int sport = atoi(arg.sport);
     address.sin_family = AF_INET; 
@@ -317,12 +343,19 @@ void do_server(notapp_args arg) {
         exit(EXIT_FAILURE); 
     }
 
+    
+
     (void)signal(SIGINT, handle_signal);
     jump_val = sigsetjmp(env, 1);
 
     /* Clean up */
     if (jump_val != 0) {
         close(server_fd);
+        
+        openlog ("notapp", LOG_PID, LOG_DAEMON);
+        syslog (LOG_NOTICE, "notapp daemon terminated.");
+        closelog();
+
         exit(0);
     }
 
@@ -340,12 +373,28 @@ void do_server(notapp_args arg) {
         pthread_detach(thread);
     }
 
+    
+
+
+    socklen_t len = sizeof(address);
+    if (getsockname(server_fd, (struct sockaddr *)&address, &len) == -1)
+        perror("getsockname");
+    else
+        printf("Port number %d\n", ntohs(address.sin_port));
+    
+    
+
     while(1) {
+        // sleep (20);
+        // return;
+
         if (listen(server_fd, 3) < 0) 
         { 
             perror("listen"); 
             exit(EXIT_FAILURE); 
         } 
+
+        
 
         if ((new_socket = accept(server_fd, (struct sockaddr *)&address, (socklen_t*)&addrlen))<0) 
         { 
@@ -376,28 +425,6 @@ void do_server(notapp_args arg) {
             default:
                 perror("Unknown client connected\n");
                 break;
-        }
-
-        if (is_parent) {
-            /* Print port */
-            if (sport == 0) {
-                // from: https://stackoverflow.com/a/4047837/10024566
-                socklen_t len = sizeof(address);
-                if (getsockname(server_fd, (struct sockaddr *)&address, &len) == -1)
-                    perror("getsockname");
-                else
-                    printf("port number %d\n", ntohs(address.sin_port));
-            }
-
-            /* todo: daemonize here */
-            // int i = fork();
-
-            // if (i < 0) exit(1); /* fork error */
-            // if (i > 0) exit(0); /* kill parent */
-
-            /* daemon time >:)c */
-
-            is_parent = 0;
         }
 
         printf("Connection success %d\n", new_socket);

@@ -17,6 +17,12 @@
 #include "socket_helper.h"
 #include "server_data.h"
 
+#include <signal.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <syslog.h>
+#include <fcntl.h>
+
 typedef struct thread_arg {
     int sock;
     int interval;
