@@ -89,7 +89,7 @@ static void *observer_thread(void *arg) {
     free(ip_host);
 
     /* Register self to server data */
-    observer_index = register_writer();
+    observer_index = register_observer();
 
     /* Clean up entry */
     entry.tv = (struct timeval){0,0};
@@ -152,7 +152,7 @@ static void *observer_thread(void *arg) {
         add_entry(&entry, observer_index);
     }
 
-    unregister_writer(observer_index);
+    unregister_observer(observer_index);
 
     /* https://stackoverflow.com/a/36568809/10024566 */
     static const long ok_return = 1;
@@ -177,7 +177,7 @@ static void *user_thread(void *arg) {
     int socket = *((int*)arg);
     int confirmation = 1;
 
-    register_reader();
+    register_user();
 
     while(1) {
         while (get_server_state() != READING && !is_locked()) {
@@ -197,7 +197,7 @@ static void *user_thread(void *arg) {
         }
     }
 
-    unregister_reader();
+    unregister_user();
 
     /* https://stackoverflow.com/a/36568809/10024566 */
     static const long ok_return = 1;
@@ -305,7 +305,7 @@ static void daemonize(int sock) {
         if (i == sock) {
             continue;
         }
-        
+
         close(i); /* close all descriptors */
     }
 
@@ -364,6 +364,16 @@ void do_server(notapp_args arg) {
         exit(0);
     }
 
+    socklen_t len = sizeof(address);
+    if (sport == 0) {
+        if (getsockname(server_fd, (struct sockaddr *)&address, &len) == -1)
+            perror("getsockname");
+        else
+            printf("Port number %d\n", ntohs(address.sin_port));
+    }
+
+    daemonize(server_fd);
+
     /* Start timer */
     {
         pthread_t thread;
@@ -377,16 +387,6 @@ void do_server(notapp_args arg) {
         pthread_create(&thread, NULL, output_sorter, arg.logfile);
         pthread_detach(thread);
     }
-
-    socklen_t len = sizeof(address);
-    if (sport == 0) {
-        if (getsockname(server_fd, (struct sockaddr *)&address, &len) == -1)
-            perror("getsockname");
-        else
-            printf("Port number %d\n", ntohs(address.sin_port));
-    }
-
-    daemonize(server_fd);
 
     /* Accept clients and spawn threads for each */
     while(1) {

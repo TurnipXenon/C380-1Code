@@ -121,12 +121,12 @@ void reset_reader_done_count();
 /**
  * @brief Register a reader thread, equivalent to increasing the reader count
  */
-void register_reader();
+void register_user();
 
 /**
  * @brief Unregister a reader thread, equivalent to decreasing the reader count
  */
-void unregister_reader();
+void unregister_user();
 
 /**
  * @brief Get how many observer threads there are accessing the entry list
@@ -140,12 +140,12 @@ int get_entry_writer_count();
  * 
  * @return int 
  */
-int register_writer();
+int register_observer();
 
 /**
  * @brief Register an observer_thread, equivalent to increasing the writer count
  */
-void unregister_writer(int index);
+void unregister_observer(int index);
 
 /**
  * @brief Sort entries in entry array

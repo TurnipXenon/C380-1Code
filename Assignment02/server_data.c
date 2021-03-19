@@ -127,18 +127,18 @@ void reset_reader_done_count() {
 }
 
 /**
- * @brief Register a reader thread, equivalent to increasing the reader count
+ * @brief Register a user thread, equivalent to increasing the reader count
  */
-void register_reader() {
+void register_user() {
     pthread_mutex_lock(&reader_count_mutex);
     ++reader_count;
     pthread_mutex_unlock(&reader_count_mutex);
 }
 
 /**
- * @brief Unregister a reader thread, equivalent to decreasing the reader count
+ * @brief Unregister a user thread, equivalent to decreasing the reader count
  */
-void unregister_reader() {
+void unregister_user() {
     pthread_mutex_lock(&reader_count_mutex);
     --reader_count;
     pthread_mutex_unlock(&reader_count_mutex);
@@ -168,11 +168,11 @@ int get_entry_writer_count() {
 }
 
 /**
- * @brief Register an observer_thread, equivalent to increasing the writer count
+ * @brief Register an observer_thread
  * 
  * @return int writer index
  */
-int register_writer() {
+int register_observer() {
     int index = -1;
 
     pthread_mutex_lock(&entry_array_register_mutex);
@@ -206,9 +206,9 @@ int register_writer() {
 }
 
 /**
- * @brief Register an observer_thread, equivalent to increasing the writer count
+ * @brief Unregister an observer_thread
  */
-void unregister_writer(int index) {
+void unregister_observer(int index) {
     if (index == -1 || index >= CLIENT_MAX) {
         return;
     }

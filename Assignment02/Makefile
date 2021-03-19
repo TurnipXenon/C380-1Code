@@ -13,6 +13,10 @@ notapp: argparser.o notapp_base.o observer_client.o user_client.o server.o serve
 notapp.time:
 	make clean && make CFLAGS='-D NOTAPP_TIME'
 
+.PHONY: run_test
+run_test: test
+	./test
+
 .PHONY: clean
 clean:
 	rm -f *.o notapp
@@ -35,4 +39,4 @@ user1: notapp
 
 .PHONY: server1
 server1: notapp
-	./notapp -s -t 5.5 -p 57993 # valgrind ./notapp -s -t 2.5 -l server1_test.txt
+	./notapp -s -t 5.5 -p 57993 -l logfiles/server1_test.txt # valgrind ./notapp -s -t 2.5 -l server1_test.txt
