@@ -20,7 +20,6 @@ bool is_disconnect(void* val) {
 /* todo: transfer to different header */
 void send_string(int sock, char *string) {
     size_t str_size = strlen(string) + 1;
-    // printf("Sending size: %zu\n", str_size);
 
     /* Send the size first */
     send(sock, &str_size, sizeof(size_t), 0);
@@ -45,7 +44,6 @@ char *read_string(int sock) {
     /* Read string */
     str = malloc(str_size);
     {
-        printf("str_size: %zu\n", str_size);
         int valread = read(sock, str, str_size);
         
         if (valread == -1 || is_disconnect(str)) {
@@ -54,4 +52,19 @@ char *read_string(int sock) {
     }
 
     return str;
+}
+
+// https://stackoverflow.com/a/18154608/10024566
+void clear_screen() {
+#ifdef _WIN32
+    system("cls");
+#elif defined(unix) || defined(__unix__) || defined(__unix) || (defined(__APPLE__) && defined(__MACH__))
+    system("clear");
+#endif
+}
+
+struct observer_msg create_disconnect_observer_message() {
+    struct observer_msg msg;
+    msg.type = DISCONNECTION_OBSERVER;
+    return msg;
 }

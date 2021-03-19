@@ -60,12 +60,14 @@ void do_user_client(notapp_args arg) {
             break;
         }
 
-        
+        clear_screen();
         printf("Entry count is %d\n", entry_count);
         printf(CLIENT_HEADER);
         for (index = 0; index < entry_count; ++index) {
             text = read_string(sock);
-            printf("%s\n", text);
+            if (strlen(text) > 0) {
+                printf("%s\n", text);
+            }
             free(text);
         }
 

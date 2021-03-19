@@ -1,15 +1,28 @@
 #include "server_data.h"
 
+static bool possible_lock_detected = false;
 static bool timer_expired = false;
 static pthread_mutex_t timer_expired_mutex = PTHREAD_MUTEX_INITIALIZER;
 void set_timer_expired(bool status) {
     pthread_mutex_lock(&timer_expired_mutex);
+
+    if (status && timer_expired) {
+        // if time has expired and previous status was still expired
+        possible_lock_detected = true;
+    } else {
+        possible_lock_detected = false;
+    }
+
     timer_expired = status;
     pthread_mutex_unlock(&timer_expired_mutex);
 }
 
 bool get_timer_expired() {
     return timer_expired;
+}
+
+bool is_locked() {
+    return possible_lock_detected;
 }
 
 

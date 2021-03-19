@@ -81,4 +81,6 @@ void add_entry(struct user_entry *entry, int index);
 
 void print_logfile(char *logfile);
 
+bool is_locked();
+
 #endif /* _SERVER_DATA_H_ */

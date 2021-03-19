@@ -88,14 +88,24 @@ void *observer_thread(void *arg) {
     /* todo: Should we notify the client that we failed??? */
 
     // todo: improve
+    int ohno = 0;
     while(observer_index != -1) {
-        struct notapp_msg notification;
+        struct observer_msg notification;
         /* todo: notification size may not be enough */
-        printf("Waiting for message from: %s\n", msg.monitored);
         int valread = read(t_arg->sock, &notification, sizeof(notification)); 
-        printf("Receive message from: %s\n", msg.monitored);
 
-        if (is_disconnect(&notification) || valread == 0) {
+        if (valread == 0) {
+            ++ohno;
+            if (ohno > 10) {
+                break;
+            }
+            continue;
+        }
+
+        ohno = 0;
+        
+        if (notification.type == DISCONNECTION_OBSERVER || valread < 0) {
+            printf("Toes...\n");
             break;
         }
 
@@ -103,6 +113,7 @@ void *observer_thread(void *arg) {
             valread = read(t_arg->sock, msg.event_loc, notification.len + 1);
 
             if (is_disconnect(msg.event_loc) || valread == 0) {
+                printf("Culprit!\n");
                 break;
             }
         } else {
@@ -137,9 +148,9 @@ void *observer_thread(void *arg) {
         strcpy(entry.string, msg_buf);
         entry.tv = msg.tv;
         
-        printf("************\n");
+        // printf("************\n");
         printf("%s\n", msg_buf);
-        printf("************\n");
+        // printf("************\n");
 
         /* write on entry array */
         add_entry(&entry, observer_index);
@@ -167,25 +178,24 @@ void *user_thread(void *arg) {
     int confirmation = 1;
 
     // todo: register
-    printf("Registering user %d\n", socket);
+    printf("[USER %d] Registering user %d\n", socket, socket);
     register_reader();
-    printf("Reader registered %d\n", socket);
+    printf("[USER %d] Reader registered %d\n", socket, socket);
 
     while(1) {
-        printf("User waiting for READING\n");
+        printf("[USER %d] User waiting for READING\n", socket);
         while (get_server_state() != READING) {
             sched_yield();
         }
 
         // todo: check are they dead?
-        printf("User checking if not dead\n");
+        printf("[USER %d] User checking if not dead\n", socket);
         int valread = read(socket, &confirmation, sizeof(int));
         if (is_disconnect(&confirmation) || valread == 0) {
             break;
         }
 
-        printf("User READING or sending");
-        printf("Sending entries to %d\n", socket);
+        printf("[USER %d] User READING or sending\n", socket);
         send_entries(socket);
         
         while (get_server_state() == READING) {
@@ -211,6 +221,8 @@ static void *output_sorter(void *arg) {
 
         /* I'm not modifying the timer so it's okay to read it */
         if (get_timer_expired()) {
+            
+            // clear_screen();
             /* Now, I need to access it */
             struct timeval tv;
             gettimeofday(&tv, NULL);
@@ -219,7 +231,7 @@ static void *output_sorter(void *arg) {
             printf("Timer reset\n");
 
             /* the server state must be DONE to transition to SORTING */
-            while (get_server_state() != DONE) {
+            while (get_server_state() != DONE && !is_locked()) {
                 sched_yield();
             }
 
@@ -228,7 +240,7 @@ static void *output_sorter(void *arg) {
 
             /* todo: wait for all observers to finish writing */
             /* make sure that the writer count is 0 */
-            while (get_entry_writer_count() != 0) {
+            while (get_entry_writer_count() != 0 && !is_locked()) {
                 sched_yield();
             }
 
@@ -248,7 +260,7 @@ static void *output_sorter(void *arg) {
             }
 
             /* watch for readers */
-            while (!are_readers_done()) {
+            while (!are_readers_done() && !is_locked()) {
                 sched_yield();
             }
 
@@ -282,24 +294,20 @@ static void *server_timer() {
 }
 
 static void daemonize() {
-    int i,lfp;
-char str[10];
+    int i;
+    char str[10];
 	if(getppid()==1) return; /* already a daemon */
 	i=fork();
 	if (i<0) exit(1); /* fork error */
 	if (i>0) exit(0); /* parent exits */
+
 	/* child (daemon) continues */
 	setsid(); /* obtain a new process group */
-	for (i=getdtablesize();i>=0;--i) close(i); /* close all descriptors */
+	// for (i=getdtablesize();i>=0;--i) close(i); /* close all descriptors */
 	i=open("/dev/null",O_RDWR); dup(i); dup(i); /* handle standart I/O */
 	umask(027); /* set newly created file permissions */
-	// chdir(RUNNING_DIR); /* change running directory */
-	// lfp=open(LOCK_FILE,O_RDWR|O_CREAT,0640);
-	if (lfp<0) exit(1); /* can not open */
-	if (lockf(lfp,F_TLOCK,0)<0) exit(0); /* can not lock */
 	/* first instance continues */
 	sprintf(str,"%d\n",getpid());
-	write(lfp,str,strlen(str)); /* record pid to lockfile */
 	signal(SIGCHLD,SIG_IGN); /* ignore child */
 	signal(SIGTSTP,SIG_IGN); /* ignore tty signals */
 	signal(SIGTTOU,SIG_IGN);
@@ -311,8 +319,6 @@ char str[10];
 }
 
 void do_server(notapp_args arg) {
-
-    // daemonize();
 
     // sock stream time
 
@@ -373,16 +379,13 @@ void do_server(notapp_args arg) {
         pthread_detach(thread);
     }
 
-    
-
-
     socklen_t len = sizeof(address);
     if (getsockname(server_fd, (struct sockaddr *)&address, &len) == -1)
         perror("getsockname");
     else
         printf("Port number %d\n", ntohs(address.sin_port));
-    
-    
+
+    daemonize();
 
     while(1) {
         // sleep (20);

@@ -37,8 +37,8 @@ void do_observer_client(notapp_args arg) {
 
     /* Notify server about leaving */
     if (jump_val != 0) {
-        int dummy_val = DISCONNECT_CODE;
-        send(sock, &dummy_val, sizeof(dummy_val),0);
+        struct observer_msg disconnect_msg = create_disconnect_observer_message();
+        send(sock, &disconnect_msg, sizeof(disconnect_msg),0);
         close(sock);
 
         if (file_desc > 0) {
@@ -109,11 +109,11 @@ void do_observer_client(notapp_args arg) {
         if(bytesRead < 0) // read error
             continue;
 
-        printf("Sending...\n");
+        printf("Sending %d bytes...\n", bytesRead);
         while(bytesProcessed < bytesRead) {
             struct inotify_event* event = (struct inotify_event*)(buffer + bytesProcessed);
             
-            struct notapp_msg event_message;
+            struct observer_msg event_message;
             event_message.type = NOTIFICATION;
             gettimeofday(&event_message.tv, NULL);
             event_message.wd = event->wd;
