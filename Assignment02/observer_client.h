@@ -21,7 +21,11 @@
 
 #define EVENT_BUFFER_SIZE (10 * (EVENT_STRUCT_SIZE + NAME_MAX + 1))
 
-/* todo: clean up lol */
+/**
+ * @brief Wait for inotify events and send them to server
+ * 
+ * @param arg 
+ */
 void do_observer_client(notapp_args arg);
 
 #endif /* _OBSERVER_CLIENT_H_ */

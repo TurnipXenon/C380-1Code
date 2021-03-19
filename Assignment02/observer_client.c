@@ -1,14 +1,31 @@
 #include "observer_client.h"
 
-/* todo: clean up lol */
+/**
+ * @brief Cleanup before finishing
+ * 
+ * @param sock 
+ * @param file_desc 
+ */
+static cleanup(int sock, int file_desc) {
+    struct observer_msg disconnect_msg = create_disconnect_observer_message();
+    send(sock, &disconnect_msg, sizeof(disconnect_msg),0);
+    close(sock);
+
+    if (file_desc > 0) {
+        close(file_desc);
+    }
+}
+
+/**
+ * @brief Wait for inotify events and send them to server
+ * 
+ * @param arg 
+ */
 void do_observer_client(notapp_args arg) {
-    // region Set up socket
-    /* Code based on https://www.geeksforgeeks.org/socket-programming-cc/ */
+    /* Set up socket
+       Code based on https://www.geeksforgeeks.org/socket-programming-cc/ */
     int sock = 0;
     struct sockaddr_in serv_addr;
-    
-    // todo attach a sigint handle here
-    // code base 'man inotify'
     int file_desc = -1;
     int jump_val;
 
@@ -21,7 +38,6 @@ void do_observer_client(notapp_args arg) {
     serv_addr.sin_family = AF_INET;
     serv_addr.sin_port = htons(sport);
     
-    // Convert address to binary form
     if (inet_pton(AF_INET, arg.saddr, &serv_addr.sin_addr) <= 0) {
         perror("Invalid address / Address not supported");
         return;
@@ -32,20 +48,12 @@ void do_observer_client(notapp_args arg) {
         return;
     }
 
+    /* Notify server of kill signal */
     (void)signal(SIGINT, handle_signal);
     jump_val = sigsetjmp(env, 1);
 
-    /* Notify server about leaving */
     if (jump_val != 0) {
-        struct observer_msg disconnect_msg = create_disconnect_observer_message();
-        send(sock, &disconnect_msg, sizeof(disconnect_msg),0);
-        close(sock);
-
-        if (file_desc > 0) {
-            close(file_desc);
-        }
-
-        printf("Sending closing\n");
+        cleanup(sock, file_desc);
         return;
     }
 
@@ -63,53 +71,51 @@ void do_observer_client(notapp_args arg) {
         char *IPbuffer; 
         struct hostent *host_entry; 
     
-        // To retrieve hostname 
         gethostname(hostbuffer, sizeof(hostbuffer)); 
-        // checkHostName(hostname); 
     
-        // To retrieve host information 
         host_entry = gethostbyname(hostbuffer); 
-        // checkHostEntry(host_entry); 
     
-        // To convert an Internet network 
-        // address into ASCII string 
+        /* Convert an Internet network address into ASCII string */
         IPbuffer = inet_ntoa(*((struct in_addr*) 
                             host_entry->h_addr_list[0])); 
     
-        printf("Host IP: %s\n", IPbuffer); 
         send_string(sock, IPbuffer);
     }
 
 
-    // Initialize inotify
+    /* Initialize inotify */
     file_desc = inotify_init();
     if (file_desc == -1) {
+        cleanup(sock, file_desc);
         perror("inotify_init");
-        // todo: notify disconnection + clean up
         return;
     }
 
-    // Add watcher
+    /* Add watcher */
     inotify_add_watch(
         file_desc,
         arg.fileordir,
         IN_ALL_EVENTS
     );
 
-    // Inotify input
+    /* Inotify input */
     char buffer[EVENT_BUFFER_SIZE];
     int i = 0;
 
-    // Listen to events
-    while(1) {
-        // read 
-        printf("[%d] Reading...\n", i);
-        ++i;
-        int bytesRead = read(file_desc, buffer, BUF_SIZE), bytesProcessed = 0;
-        if(bytesRead < 0) // read error
-            continue;
+    /* Set up auto kill */
+    pthread_t thread;
+    pthread_create(&thread, NULL, auto_kill, NULL);
+    pthread_detach(thread);
 
-        printf("Sending %d bytes...\n", bytesRead);
+    /* Listen to events and send */
+    while(1) {
+        alert_activity();
+
+        int bytesRead = read(file_desc, buffer, BUF_SIZE), bytesProcessed = 0;
+        if(bytesRead < 0) {
+            continue;
+        }
+
         while(bytesProcessed < bytesRead) {
             struct inotify_event* event = (struct inotify_event*)(buffer + bytesProcessed);
             
@@ -129,6 +135,5 @@ void do_observer_client(notapp_args arg) {
 
             bytesProcessed += EVENT_STRUCT_SIZE + event->len;
         }
-        printf("Finish sending...\n");
     }
 }

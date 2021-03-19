@@ -19,6 +19,7 @@
 #include <unistd.h>
 #include <stdint.h>
 #include <sys/inotify.h>
+#include <pthread.h>
 
 #include <setjmp.h>
 #include <stdlib.h> // for malloc
@@ -31,6 +32,8 @@
 #define DISCONNECT_CODE -10
 
 #define CLIENT_HEADER "TIME\t\t\t\tHOST\t\t\tMONITORED\t\tEVENT\n"
+
+#define AUTOKILL_TIME 60
 
 /**
  * @brief determines whether a message from an observer is a notification or disconnection
@@ -133,5 +136,12 @@ void clear_screen();
  * @return struct observer_msg 
  */
 struct observer_msg create_disconnect_observer_message();
+
+/**
+ * @brief Run on client to kill themselves when they are dormant for some time
+ * 
+ * @return void* 
+ */
+void *auto_kill();
 
 #endif /* _NOTAPP_BASE_H_ */

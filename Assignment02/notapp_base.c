@@ -65,7 +65,8 @@ void clear_screen() {
 }
 
 /**
- * @brief Create a disconnect observer message object by setting the type to DISCONNECTION_OBSERVER
+ * @brief Create a disconnect observer message object by setting
+ * the type to DISCONNECTION_OBSERVER
  * 
  * @return struct observer_msg 
  */
@@ -73,4 +74,35 @@ struct observer_msg create_disconnect_observer_message() {
     struct observer_msg msg;
     msg.type = DISCONNECTION_OBSERVER;
     return msg;
+}
+
+static bool is_dormant = false;
+static pthread_mutex_t is_dormant_mutex = PTHREAD_MUTEX_INITIALIZER;
+
+void alert_activity() {
+    pthread_mutex_lock(&is_dormant_mutex);
+    is_dormant = false;
+    pthread_mutex_unlock(&is_dormant_mutex);
+}
+
+/**
+ * @brief Run on client to kill themselves when they are dormant for some time
+ * 
+ * @return void* 
+ */
+void *auto_kill() {
+    while(1) {
+        sleep(AUTOKILL_TIME);
+        
+        pthread_mutex_lock(&is_dormant_mutex);
+        if (is_dormant) {
+            raise(SIGINT);
+        }
+
+        is_dormant = true;
+        pthread_mutex_unlock(&is_dormant_mutex);
+    }
+
+    static const long ok_return = 1;
+    return (void*)&ok_return;
 }

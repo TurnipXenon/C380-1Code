@@ -9,21 +9,18 @@ void do_user_client(notapp_args arg) {
     int valread = 0;
     struct sockaddr_in serv_addr;
     char *text = NULL;
-    
-    // todo attach a sigint handle here
-    // code base 'man inotify'
     int jump_val;
 
     serv_addr.sin_family = AF_INET;
     serv_addr.sin_port = htons(atoi(arg.sport));
 
-    /* Code based on https://www.geeksforgeeks.org/socket-programming-cc/ */
+    /* Connect to server
+       Code based on https://www.geeksforgeeks.org/socket-programming-cc/ */
     if ((sock = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
         perror("Socket creation error");
         return;
     }
     
-    // Convert address to binary form
     if (inet_pton(AF_INET, arg.saddr, &serv_addr.sin_addr) <= 0) {
         perror("Invalid address / Address not supported");
         return;
@@ -34,10 +31,10 @@ void do_user_client(notapp_args arg) {
         return;
     }
 
+    /* Notify server of kill signal */
     (void)signal(SIGINT, handle_signal);
     jump_val = sigsetjmp(env, 1);
 
-    /* Notify server about leaving */
     if (jump_val != 0) {
         int dummy_val = DISCONNECT_CODE;
         send(sock, &dummy_val, sizeof(dummy_val),0);
@@ -49,7 +46,15 @@ void do_user_client(notapp_args arg) {
     enum msg_identity id = INTRO_USER;
     send(sock , &id, sizeof(id), 0);
 
+    /* Set up auto kill */
+    pthread_t thread;
+    pthread_create(&thread, NULL, auto_kill, NULL);
+    pthread_detach(thread);
+
+    /* Print content */
     while (1) {
+        alert_activity();
+        
         printf("I am not yet dead!\n");
         send(sock, &success_code, sizeof(success_code), 0);
 
