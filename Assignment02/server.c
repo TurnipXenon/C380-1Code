@@ -102,7 +102,6 @@ static void *observer_thread(void *arg) {
     /* Receive indicies */
     while(observer_index != -1) {
         struct observer_msg notification;
-        /* todo: notification size may not be enough */
         int valread = read(sock, &notification, sizeof(notification)); 
 
         if (notification.type == DISCONNECTION_OBSERVER || valread <= 0) {
@@ -161,7 +160,6 @@ static void *observer_thread(void *arg) {
         add_entry(&entry, observer_index);
     }
 
-    /* todo: gracefully disconnecting! */
     printf("Client disconnected and unregistered!\n");
     unregister_writer(observer_index);
     printf("Unregistered success!\n");
@@ -200,7 +198,7 @@ static void *user_thread(void *arg) {
             sched_yield();
         }
 
-        // todo: check are they dead?
+        /* Is the user client dead? */
         printf("[USER %d] User checking if not dead\n", socket);
         int valread = read(socket, &confirmation, sizeof(int));
         if (is_disconnect(&confirmation) || valread == 0) {
@@ -214,9 +212,6 @@ static void *user_thread(void *arg) {
             sched_yield();
         }
     }
-
-    /* todo: gracefully disconnecting! */
-    printf("User client disconnected!\n");
 
     unregister_reader();
 
@@ -261,7 +256,6 @@ static void *output_sorter(void *arg) {
             // todo: remove
             test_stub();
 
-            /* todo: now we are sorting */
             sort_entry_array();
 
 
@@ -342,25 +336,23 @@ static void daemonize() {
 	signal(SIGTTIN,SIG_IGN);
 }
 
+/**
+ * @brief Accepts connection and spawns threads
+ * 
+ * @param arg 
+ */
 void do_server(notapp_args arg) {
-
-    // sock stream time
-
     // based on https://www.geeksforgeeks.org/socket-programming-cc/
     int jump_val;
     int server_fd, new_socket; 
     struct sockaddr_in address; 
     int addrlen = sizeof(address);
 
-
-    // todo: bind to port
     if ((server_fd = socket(AF_INET, SOCK_STREAM, 0)) == 0) 
     { 
         perror("socket failed");
         return;
     }
-
-
 
     int sport = atoi(arg.sport);
     address.sin_family = AF_INET; 
@@ -425,7 +417,6 @@ void do_server(notapp_args arg) {
             exit(EXIT_FAILURE); 
         } 
 
-        /* todo: create thread for new connection */
         enum msg_identity client_id;
         int valread = read(new_socket, &client_id, sizeof(client_id)); 
         if (valread == 0) {

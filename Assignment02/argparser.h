@@ -21,7 +21,6 @@
  * received and any of the actions that it took. The log file is meant mainly for debugging 
  * so it has to be informative to you and the teaching assistants.
  * 
- * todo: move this somewhere
  * When starting as a client of either type (observer or user), the client connects to the 
  * server listening on port <sport> of the host while <saddr> IP address. In the case of an
  * observer client, the <fileordir> indicates the file or directory to monitor for all
@@ -42,8 +41,20 @@
 
 #define MIN_ARG_COUNT 3
 
+/**
+ * @brief Creates a default struct notapp_args
+ * 
+ * @return notapp_args 
+ */
 notapp_args init_notapp_args();
 
+/**
+ * @brief Parses the command line arguments and interprets them as a struct notapp_args
+ * 
+ * @param argc 
+ * @param argv 
+ * @return notapp_args 
+ */
 notapp_args parse_args(int argc, char *argv[]);
 
 #endif /* _ARG_PARSER_H_ */

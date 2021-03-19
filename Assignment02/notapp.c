@@ -29,9 +29,6 @@ int main(int argc, char *argv[]) {
     notapp_args arg = parse_args(argc, argv);
 
     switch (arg.role) {
-        case UNKNOWN:
-            printf("todo: notapp error\n");
-            break;
         case SERVER:
             do_server(arg);
             break;
@@ -41,8 +38,9 @@ int main(int argc, char *argv[]) {
         case USER_CLIENT:
             do_user_client(arg);
             break;
+        case UNKNOWN:
         default:
-            printf("todo: Not handled\n");
+            printf("Unknown client type\n");
             break;
     }
 }

@@ -64,7 +64,7 @@ void do_observer_client(notapp_args arg) {
     /* Send monitored file size */
     send_string(sock, arg.fileordir);
 
-    /* Send host ip todo
+    /* Send host ip
        Code from https://www.geeksforgeeks.org/c-program-display-hostname-ip-address/ */
     {
         char hostbuffer[256]; 

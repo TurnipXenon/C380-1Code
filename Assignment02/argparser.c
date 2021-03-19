@@ -1,5 +1,10 @@
 #include "argparser.h"
 
+/**
+ * @brief Creates a default struct notapp_args
+ * 
+ * @return notapp_args 
+ */
 notapp_args init_notapp_args() {
     notapp_args ret = {
         UNKNOWN, // role
@@ -12,14 +17,18 @@ notapp_args init_notapp_args() {
     return ret;
 }
 
-// todo: private
-notapp_args parse_args_server(int argc, char *argv[]) {
+/**
+ * @brief Specialized parser for server types
+ * 
+ * @param argc 
+ * @param argv 
+ * @return notapp_args 
+ */
+static notapp_args parse_args_server(int argc, char *argv[]) {
     notapp_args ret = init_notapp_args();
 
-// todo: put assumptions
     if (argc < 3) {
-        // todo: error message here
-        printf("Not enough args todo\n");
+        printf("Not enough args\n");
         return ret;
     }
 
@@ -28,7 +37,7 @@ notapp_args parse_args_server(int argc, char *argv[]) {
 
     while (index < argc) {
         if (index + 1 == argc) {
-            printf("todo: handle no args value\n");
+            printf("Invalid argument format\n");
             return ret;
         }
 
@@ -36,14 +45,12 @@ notapp_args parse_args_server(int argc, char *argv[]) {
             char *pf;
             ret.interval = strtof(argv[index + 1], &pf);
             interval_flag = true;
-            // todo: what if pf != null ???
-            // todo: error???
         } else if (strcmp(argv[index], "-p") == 0) {
             ret.sport = argv[index + 1];
         } else if (strcmp(argv[index], "-l") == 0) {
             ret.logfile = argv[index + 1];
         } else {
-            printf("todo: handle unknown flag\n");
+            printf("Unknown flag detected: %s\n", argv[index]);
             return ret;
         }
 
@@ -51,7 +58,7 @@ notapp_args parse_args_server(int argc, char *argv[]) {
     }
 
     if (!interval_flag) {
-        printf("todo: required flag not present\n");
+        printf("Required flag not present\n");
         return ret;
     }
 
@@ -60,12 +67,18 @@ notapp_args parse_args_server(int argc, char *argv[]) {
     return ret;
 }
 
-// todo: private
-notapp_args parse_args_observer_client(int argc, char *argv[]) {
+/**
+ * @brief Specialized parser for observer client types
+ * 
+ * @param argc 
+ * @param argv 
+ * @return notapp_args 
+ */
+static notapp_args parse_args_observer_client(int argc, char *argv[]) {
     notapp_args ret = init_notapp_args();
 
     if (argc != 5) {
-        printf("Not enough args todo\n");
+        printf("Not enough args\n");
         return ret;
     }
 
@@ -77,9 +90,14 @@ notapp_args parse_args_observer_client(int argc, char *argv[]) {
     return ret;
 }
 
-// todo: private
-notapp_args parse_args_user_client(int argc, char *argv[]) {
-    // todo
+/**
+ * @brief Specialized parser for user client types
+ * 
+ * @param argc 
+ * @param argv 
+ * @return notapp_args 
+ */
+static notapp_args parse_args_user_client(int argc, char *argv[]) {
     notapp_args ret = init_notapp_args();
 
     if (argc != 4) {
@@ -94,11 +112,17 @@ notapp_args parse_args_user_client(int argc, char *argv[]) {
     return ret;
 }
 
+/**
+ * @brief Parses the command line arguments and interprets them as a struct notapp_args
+ * 
+ * @param argc 
+ * @param argv 
+ * @return notapp_args 
+ */
 notapp_args parse_args(int argc, char *argv[])
 {
     // assumes that len(argv) == argc
     if (argc < MIN_ARG_COUNT) {
-        printf("todo: error handling in parse_args\n");
         return init_notapp_args();
     }
 
@@ -110,7 +134,6 @@ notapp_args parse_args(int argc, char *argv[])
     } else if (strcmp(flag_role, "-u") == 0) {
         return parse_args_user_client(argc, argv);
     } else {
-        printf("todo: error handling in parse_args\n");
         return init_notapp_args();
     }
 }
