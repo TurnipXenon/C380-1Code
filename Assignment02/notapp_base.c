@@ -1,5 +1,10 @@
 #include "notapp_base.h"
 
+/**
+ * @brief Handles segfault and sigjumps program to alert disconnect to server
+ * 
+ * @param sig 
+ */
 void handle_signal(int sig) {
     if (sig == SIGINT) {
         (void) signal(SIGINT, SIG_IGN);
@@ -8,6 +13,13 @@ void handle_signal(int sig) {
     siglongjmp(env, 1);
 }
 
+/**
+ * @brief Checks whether the value sent was a DISCONNECT_CODE
+ * 
+ * @param val 
+ * @return true Value sent was a DISCONNECT_CODE
+ * @return false 
+ */
 bool is_disconnect(void* val) {
     if (*((int*)val) == DISCONNECT_CODE) {
         return true;
@@ -16,6 +28,12 @@ bool is_disconnect(void* val) {
     }
 }
 
+/**
+ * @brief Sends a string
+ * 
+ * @param sock 
+ * @param string 
+ */
 void send_string(int sock, char *string) {
     size_t str_size = strlen(string) + 1;
 
@@ -26,6 +44,13 @@ void send_string(int sock, char *string) {
     send(sock, string, str_size, 0);
 }
 
+/**
+ * @brief Reads a string
+ * 
+ * @param sock 
+ * @return char* string stored in heap, use free after use
+ * @return NULL reading string failed
+ */
 char *read_string(int sock) {
     char *str;
     size_t str_size;

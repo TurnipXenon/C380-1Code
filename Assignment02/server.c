@@ -341,11 +341,16 @@ static void daemonize(int sock) {
     int i;
 	if (getppid() == 1) return; /* already a daemon */
 	i = fork();
-	if (i < 0) exit(1); /* fork error */
-	if (i > 0) exit(0); /* parent exits */
+	if (i < 0) exit(EXIT_FAILURE); /* fork error */
+	if (i > 0) exit(EXIT_SUCCESS); /* parent exits */
 
 	/* child (daemon) continues */
 	setsid(); /* obtain a new process group */
+    
+    /* Second fork */
+	i = fork();
+	if (i < 0) exit(EXIT_FAILURE); /* fork error */
+	if (i > 0) exit(EXIT_SUCCESS); /* parent exits */
     
     for (i=getdtablesize();i>=0;--i) {
         if (i == sock) {

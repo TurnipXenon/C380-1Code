@@ -1,5 +1,10 @@
 #include "user_client.h"
 
+/**
+ * @brief Display activities from server
+ * 
+ * @param arg 
+ */
 void do_user_client(notapp_args arg) {
     int success_code = 1;
     bool client_done = false;
