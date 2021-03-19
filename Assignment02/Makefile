@@ -1,5 +1,4 @@
 CC=gcc -Wall -Wextra -std=gnu99 -g -pthread $(CFLAGS)
-EXRANOFF=setarch `uname -m` -R
 
 .PHONY: all
 all: notapp
@@ -18,28 +17,22 @@ notapp.time:
 clean:
 	rm -f *.o notapp
 
-.PHONY: run_test
-run_test: test
-	./test
-
 .PHONY: observer1
 observer1: notapp
-	./notapp -o 127.0.0.1 41139 test_folder1
+	./notapp -o 127.0.0.1 57993 test_folder1
 
 .PHONY: observer2
 observer2: notapp
-	./notapp -o 127.0.0.1 41139 test_folder2
+	./notapp -o 127.0.0.1 57993 test_folder2
 
 .PHONY: observer3
 observer3: notapp
-	./notapp -o 127.0.0.1 41139 test_folder3
+	./notapp -o 127.0.0.1 57993 test_folder3
 
 .PHONY: user1
 user1: notapp
-	./notapp -u 127.0.0.1 41139
+	./notapp -u 127.0.0.1 57993
 
 .PHONY: server1
 server1: notapp
-	./notapp -s -t 5.5 -l logfiles/server1_test.txt -p 41139 # valgrind ./notapp -s -t 2.5 -l server1_test.txt
-
-# valgrind ./notapp -s -t 2.5 -l logfiles/server1_test.txt -p 51089 # valgrind ./notapp -s -t 2.5 -l server1_test.txt
+	./notapp -s -t 5.5 -p 57993 # valgrind ./notapp -s -t 2.5 -l server1_test.txt

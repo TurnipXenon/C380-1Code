@@ -56,18 +56,15 @@ void do_user_client(notapp_args arg) {
     while (1) {
         alert_activity();
         
-        printf("I am not yet dead!\n");
         send(sock, &success_code, sizeof(success_code), 0);
 
         /* Wait for the count of entries to print */
-        printf("Check entry count!\n");
         valread = read(sock, &entry_count, sizeof(int));
         if(valread == 0 || is_disconnect(&entry_count)) {
             break;
         }
 
         clear_screen();
-        printf("Entry count is %d\n", entry_count);
         printf(CLIENT_HEADER);
         for (index = 0; index < entry_count; ++index) {
             text = read_string(sock);

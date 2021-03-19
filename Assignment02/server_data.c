@@ -209,7 +209,6 @@ int register_writer() {
  * @brief Register an observer_thread, equivalent to increasing the writer count
  */
 void unregister_writer(int index) {
-    printf("Unregistering: %d\n", index);
     if (index == -1 || index >= CLIENT_MAX) {
         return;
     }
@@ -279,26 +278,14 @@ void add_entry(struct user_entry *entry, int index) {
  */
 void send_entries(int socket) {
     // say how many entries
-    printf("[Cupcake] Sending observer count: %d\n", observer_count);
     send(socket, &observer_count, sizeof(observer_count), 0);
 
     // say strings
     for (int i = 0; i < observer_count; ++i) {
-        printf("Sending to user: %s\n", entry_array[i].string);
         send_string(socket, entry_array[i].string);
     }
 
     ++reader_done_count;
-}
-
-void test_stub() {
-    /* todo: delete */
-    printf("Printing observers at (size: %d)\n", observer_count);
-    for (int i = 0; i < entry_array_size; ++i) {
-        if (entry_array[i].is_taken) {
-            printf(" ===> %s\n", entry_array[i].string);
-        }
-    }
 }
 
 /**

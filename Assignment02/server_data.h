@@ -42,9 +42,6 @@ enum server_state {
     READING
 };
 
-/* todo: delete */
-void test_stub();
-
 /**
  * @brief Determines when the state transitions from DONE to SORTING
  * 

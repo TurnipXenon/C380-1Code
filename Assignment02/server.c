@@ -1,12 +1,10 @@
 #include "server.h"
 
 /**
- * @brief 
+ * @brief Translates the mask into text
  * 
  * @param buf 
  * @param mask
- * @remark Make sure that buf is empty
- * To play safe keep buf 200 chars 
  */
 static void translate_masks(char *buf, uint32_t mask) {
     if (mask & IN_ACCESS) {
@@ -92,7 +90,6 @@ static void *observer_thread(void *arg) {
 
     /* Register self to server data */
     observer_index = register_writer();
-    printf("Testing observer: %d\n", observer_index);
 
     /* Clean up entry */
     entry.tv = (struct timeval){0,0};
@@ -148,21 +145,14 @@ static void *observer_thread(void *arg) {
 
         translate_masks(msg_buf, mask);
 
-        // todo: put safety stuff
         strcpy(entry.string, msg_buf);
         entry.tv = tv;
         
-        // printf("************\n");
-        printf("%s\n", msg_buf);
-        // printf("************\n");
-
         /* write on entry array */
         add_entry(&entry, observer_index);
     }
 
-    printf("Client disconnected and unregistered!\n");
     unregister_writer(observer_index);
-    printf("Unregistered success!\n");
 
     /* https://stackoverflow.com/a/36568809/10024566 */
     static const long ok_return = 1;
@@ -187,25 +177,19 @@ static void *user_thread(void *arg) {
     int socket = *((int*)arg);
     int confirmation = 1;
 
-    // todo: register
-    printf("[USER %d] Registering user %d\n", socket, socket);
     register_reader();
-    printf("[USER %d] Reader registered %d\n", socket, socket);
 
     while(1) {
-        printf("[USER %d] User waiting for READING\n", socket);
         while (get_server_state() != READING && !is_locked()) {
             sched_yield();
         }
 
         /* Is the user client dead? */
-        printf("[USER %d] User checking if not dead\n", socket);
         int valread = read(socket, &confirmation, sizeof(int));
         if (is_disconnect(&confirmation) || valread == 0) {
             break;
         }
 
-        printf("[USER %d] User READING or sending\n", socket);
         send_entries(socket);
         
         while (get_server_state() == READING && !is_locked()) {
@@ -236,16 +220,13 @@ static void *output_sorter(void *arg) {
             /* Now, I need to access it */
             struct timeval tv;
             gettimeofday(&tv, NULL);
-            printf("Attempting to reset timer %ld:\n", tv.tv_sec);
             set_timer_expired(false);
-            printf("Timer reset\n");
 
             /* The server state must be DONE to transition to SORTING */
             while (get_server_state() != DONE && !is_locked()) {
                 sched_yield();
             }
 
-            printf("Flipping state\n");
             set_server_state(SORTING);
 
             /* make sure that the writer count is 0 */
@@ -253,14 +234,9 @@ static void *output_sorter(void *arg) {
                 sched_yield();
             }
 
-            // todo: remove
-            test_stub();
-
             sort_entry_array();
 
-
             /* cut off for readers to join */
-            printf("Time for users\n");
             set_server_state(READING);
 
             /* write on logfile  */
@@ -315,21 +291,30 @@ static void *server_timer(void *arg) {
 /**
  * @brief Daemonizes the program
  */
-static void daemonize() {
+static void daemonize(int sock) {
     int i;
-    char str[10];
-	if(getppid()==1) return; /* already a daemon */
-	i=fork();
-	if (i<0) exit(1); /* fork error */
-	if (i>0) exit(0); /* parent exits */
+	if (getppid() == 1) return; /* already a daemon */
+	i = fork();
+	if (i < 0) exit(1); /* fork error */
+	if (i > 0) exit(0); /* parent exits */
 
 	/* child (daemon) continues */
 	setsid(); /* obtain a new process group */
-	// for (i=getdtablesize();i>=0;--i) close(i); /* close all descriptors */
-	i=open("/dev/null",O_RDWR); dup(i); dup(i); /* handle standart I/O */
+    
+    for (i=getdtablesize();i>=0;--i) {
+        if (i == sock) {
+            continue;
+        }
+        
+        close(i); /* close all descriptors */
+    }
+
+    i = open("/dev/null", O_RDWR);
+    dup(i); dup(i); /* handle standard I/O */
+
 	umask(027); /* set newly created file permissions */
-	/* first instance continues */
-	sprintf(str,"%d\n",getpid());
+	
+    /* first instance continues */
 	signal(SIGCHLD,SIG_IGN); /* ignore child */
 	signal(SIGTSTP,SIG_IGN); /* ignore tty signals */
 	signal(SIGTTOU,SIG_IGN);
@@ -401,7 +386,7 @@ void do_server(notapp_args arg) {
             printf("Port number %d\n", ntohs(address.sin_port));
     }
 
-    daemonize();
+    daemonize(server_fd);
 
     /* Accept clients and spawn threads for each */
     while(1) {
@@ -438,7 +423,5 @@ void do_server(notapp_args arg) {
                 perror("Unknown client connected\n");
                 break;
         }
-
-        printf("Connection success %d\n", new_socket);
     }
 }
