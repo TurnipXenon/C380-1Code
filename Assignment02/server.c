@@ -63,6 +63,8 @@ static void translate_masks(char *buf, uint32_t mask) {
  * event that came from each observer. If a logfile was specified, the server
  * also dumps the received events to the log file, in the order they are received.
  * 
+ * See also output_sorter.
+ * 
  * @param arg 
  * @return void* 
  */
@@ -170,6 +172,8 @@ static void *observer_thread(void *arg) {
  * the threads serving the user clients "broadcast" the currentstate of most recent 
  * events to all simultaneously connected user clients.
  * 
+ * See also output_sorter
+ * 
  * @param arg 
  * @return void* 
  */
@@ -206,6 +210,48 @@ static void *user_thread(void *arg) {
 
 /**
  * @brief Serves as a traffic enforcer for all the threads
+ * 
+ * Output sorter has three phases, according to enum server_state: DONE, SORTING, and READING.
+ * 
+ * In DONE state:
+ * - All observer threads are free to write.
+ * - Output sorter is waiting.
+ * - All user threads are waiting.
+ * 
+ * During the transition from DONE to SORTING:
+ * - All observer threads are barred from writing since it's not SORTING state.
+ * - Output sorter waits for all observer threads writing to get out.
+ * - All user threads are waiting.
+ * 
+ * In SORTING state:
+ * - All observer threads are waiting.
+ * - Output sorter sorts.
+ * - All user threads are waiting.
+ * 
+ * During the transition from SORTING to READING:
+ * - All observer threads are waiting.
+ * - Output sorter will simply change the server state since there's not much to do.
+ * - All user threads are waiting.
+ * 
+ * In READING state:
+ * - All observer threads are waiting.
+ * - Output sorter writes on the log file if there's a log file.
+ * - All user threads read and send the entries on one go. When done, they yield
+ *   until a server state change.
+ * 
+ * During the transition from READING to DONE:
+ * - All observer threads are waiting.
+ * - Output sorter waits for all registered user clients to finish their job.
+ * - When user threads are done, they increment a counter indicating so. The counter
+ *   is used to ensure that all readers are done with their job, and output sorter
+ *   can also find out if it can change the server state. Reset the reader counter after.
+ * 
+ * Tnere's also a mechanic that prevents deadlock due to concurrency and uncertainty from
+ * socket communication. When the output sorter has not completed a full-rotation of all
+ * the phases in under two intervals via server_timer, then we assume that we are stuck
+ * in a lock. Timer triggers this is_locked(), and all threads reliant on the server state
+ * will make a full sprint back to the server state DONE. Threads reliant on the server state
+ * include the output_sorter and user_thread.
  * 
  * @param arg 
  * @return void* 
