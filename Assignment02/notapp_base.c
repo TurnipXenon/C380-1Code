@@ -79,6 +79,9 @@ struct observer_msg create_disconnect_observer_message() {
 static bool is_dormant = false;
 static pthread_mutex_t is_dormant_mutex = PTHREAD_MUTEX_INITIALIZER;
 
+/**
+ * @brief Toggles is_dormant to false indicating the process is not dormant
+ */
 void alert_activity() {
     pthread_mutex_lock(&is_dormant_mutex);
     is_dormant = false;

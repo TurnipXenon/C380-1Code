@@ -14,7 +14,6 @@
 #include <sched.h>
 
 #include "notapp_base.h"
-#include "socket_helper.h"
 #include "server_data.h"
 
 #include <signal.h>

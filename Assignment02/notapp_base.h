@@ -144,4 +144,6 @@ struct observer_msg create_disconnect_observer_message();
  */
 void *auto_kill();
 
+void alert_activity();
+
 #endif /* _NOTAPP_BASE_H_ */

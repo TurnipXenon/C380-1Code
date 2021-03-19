@@ -6,7 +6,7 @@
  * @param sock 
  * @param file_desc 
  */
-static cleanup(int sock, int file_desc) {
+static void cleanup(int sock, int file_desc) {
     struct observer_msg disconnect_msg = create_disconnect_observer_message();
     send(sock, &disconnect_msg, sizeof(disconnect_msg),0);
     close(sock);
@@ -100,7 +100,6 @@ void do_observer_client(notapp_args arg) {
 
     /* Inotify input */
     char buffer[EVENT_BUFFER_SIZE];
-    int i = 0;
 
     /* Set up auto kill */
     pthread_t thread;

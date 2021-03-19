@@ -20,9 +20,7 @@
  * Rule: if we can cast it to -1, then it's a failure or disconnect
  */
 
-#include "notapp_base.h"
 #include "argparser.h"
-#include "socket_helper.h"
 #include "server.h"
 #include "user_client.h"
 #include "observer_client.h"

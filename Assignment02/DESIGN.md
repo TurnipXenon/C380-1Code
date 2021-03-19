@@ -1,4 +1,6 @@
-# (A) Protocol
+# Refinement: Server timestamps
+
+# (Protocol
 
 # Visualization
 <pre>
@@ -9,7 +11,6 @@
 Observer |      |      |              |      |      | User
          | ---->|------+---> Server <-+------|<---- |
 </pre>
-
 
 # Phase 1: Introduction
 When either Observer or User first connects to the server program. They introduce themselves
@@ -70,5 +71,3 @@ read_string() to obtain the string.
 Anticipates an integer determining the length of the string. Then, it tries to receive this
 string. It returns a string allocated in the heap, which puts the responsibility to free onto
 its user. Otherwise, it returns a null value when it fails.
-
-# (B) Refinement: Server timestamps

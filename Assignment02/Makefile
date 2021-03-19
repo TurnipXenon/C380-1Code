@@ -7,7 +7,7 @@ all: notapp
 %.o: %.c %.h
 	$(CC) -c -o $@ $<
 
-notapp: argparser.o socket_helper.o notapp_base.o observer_client.o user_client.o server.o server_data.o notapp.c
+notapp: argparser.o notapp_base.o observer_client.o user_client.o server.o server_data.o notapp.c
 	$(CC) -o $@ $^
 
 .PHONY: notapp.time

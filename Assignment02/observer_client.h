@@ -17,7 +17,6 @@
 #include <limits.h>
 
 #include "notapp_base.h"
-#include "notapp_base.h"
 
 #define EVENT_BUFFER_SIZE (10 * (EVENT_STRUCT_SIZE + NAME_MAX + 1))
 

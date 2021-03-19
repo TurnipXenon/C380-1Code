@@ -409,7 +409,7 @@ void do_server(notapp_args arg) {
             printf("Port number %d\n", ntohs(address.sin_port));
     }
 
-    // daemonize();
+    daemonize();
 
     /* Accept clients and spawn threads for each */
     while(1) {
