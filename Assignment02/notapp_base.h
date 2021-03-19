@@ -1,3 +1,11 @@
+/**
+ * @file notapp_base.h
+ * @author Allan Manuba
+ * 
+ * @brief Base file where shared data structures and functions are
+ * 
+ */
+
 #ifndef _NOTAPP_BASE_H_
 #define _NOTAPP_BASE_H_
 
@@ -16,24 +24,29 @@
 #include <stdlib.h> // for malloc
 #include <signal.h>
 
-/* size of the event structure, not counting name */
 #define EVENT_STRUCT_SIZE (sizeof (struct inotify_event))
 
-/* usual buffer size */
 #define BUF_SIZE 1024
 
 #define DISCONNECT_CODE -10
 
 #define CLIENT_HEADER "TIME\t\t\t\tHOST\t\t\tMONITORED\t\tEVENT\n"
 
+/**
+ * @brief determines whether a message from an observer is a notification or disconnection
+ */
 enum msg_type {
     NOTIFICATION,
     DISCONNECTION_OBSERVER,
 };
 
+/**
+ * @struct observer_msg
+ * @brief message received by the server thread from observer
+ */
 struct observer_msg {
-    enum msg_type type;
-    struct timeval tv;
+    enum msg_type type; /**< @brief message type */
+    struct timeval tv; /**< @brief time message was received */
     int wd;            /* Watch descriptor */
     uint32_t mask;     /* Mask describing event */
     uint32_t cookie;   /* Unique cookie associating related events (for rename(2)) */

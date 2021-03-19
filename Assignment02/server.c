@@ -88,24 +88,12 @@ void *observer_thread(void *arg) {
     /* todo: Should we notify the client that we failed??? */
 
     // todo: improve
-    int ohno = 0;
     while(observer_index != -1) {
         struct observer_msg notification;
         /* todo: notification size may not be enough */
         int valread = read(t_arg->sock, &notification, sizeof(notification)); 
 
-        if (valread == 0) {
-            ++ohno;
-            if (ohno > 10) {
-                break;
-            }
-            continue;
-        }
-
-        ohno = 0;
-        
-        if (notification.type == DISCONNECTION_OBSERVER || valread < 0) {
-            printf("Toes...\n");
+        if (notification.type == DISCONNECTION_OBSERVER || valread <= 0) {
             break;
         }
 
@@ -121,7 +109,13 @@ void *observer_thread(void *arg) {
         }
 
         /* Process events to formattable thing for user client */
+#ifdef NOTAPP_TIME
+printf("Hehehe\n");
+        gettimeofday(&msg.tv, NULL);
+#else
         msg.tv = notification.tv;
+#endif
+
         msg.mask = notification.mask;
 
         /* Print the name of the file */

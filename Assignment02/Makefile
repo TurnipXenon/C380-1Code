@@ -22,6 +22,10 @@ test: argparser.o test.c
 # mem_3: memlayout.o mem_3.c
 # 	$(CC) -o mem_3 memlayout.o mem_3.c -ldl
 
+.PHONY: notapp.time
+notapp.time:
+	make clean && make CFLAGS='-D NOTAPP_TIME'
+
 .PHONY: clean
 clean:
 	rm -f *.o notapp
