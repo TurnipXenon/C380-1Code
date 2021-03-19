@@ -8,7 +8,7 @@
  * @remark Make sure that buf is empty
  * To play safe keep buf 200 chars 
  */
-void translate_masks(char *buf, uint32_t mask) {
+static void translate_masks(char *buf, uint32_t mask) {
     if (mask & IN_ACCESS) {
         strcat(buf, "IN_ACCESS ");
     }
@@ -60,34 +60,33 @@ void translate_masks(char *buf, uint32_t mask) {
 }
 
 /**
- * @brief 
+ * @brief it collects, as quickly as possible, data received from the observer
+ * clients and updates a common data structure which stores the most recent
+ * event that came from each observer. If a logfile was specified, the server
+ * also dumps the received events to the log file, in the order they are received.
  * 
  * @param arg 
  * @return void* 
  */
-void *observer_thread(void *arg) {
-    /* it collects, as quickly as possible, data received from the observerclients and 
-    updates a common data structure which stores the most recent event that came from 
-    each observer. If a logfile was specified, the server also dumps the received events 
-    to the log file, in the order they are received. */
-    thread_arg *t_arg = (thread_arg*)arg;
+static void *observer_thread(void *arg) {
+    int sock = *((int*)arg);
     char event_loc[BUF_SIZE];
     char monitored[BUF_SIZE];
     char host[17];
     struct user_entry entry;
     struct timeval tv;
     uint32_t mask;
-
-    /* Temporary */
-    char *tmp_monitored = NULL;
-    char *ip_host = NULL;
     int observer_index = -1;
 
-    tmp_monitored = read_string(t_arg->sock);
+    /* Temporary variables */
+    char *tmp_monitored = NULL;
+    char *ip_host = NULL;
+
+    tmp_monitored = read_string(sock);
     strcpy(monitored, tmp_monitored);
     free(tmp_monitored);
 
-    ip_host = read_string(t_arg->sock);
+    ip_host = read_string(sock);
     strcpy(host, ip_host);
     free(ip_host);
 
@@ -95,21 +94,25 @@ void *observer_thread(void *arg) {
     observer_index = register_writer();
     printf("Testing observer: %d\n", observer_index);
 
-    // todo: improve
+    /* Clean up entry */
+    entry.tv = (struct timeval){0,0};
+    entry.string[0] = '\0';
+    add_entry(&entry, observer_index);
+
+    /* Receive indicies */
     while(observer_index != -1) {
         struct observer_msg notification;
         /* todo: notification size may not be enough */
-        int valread = read(t_arg->sock, &notification, sizeof(notification)); 
+        int valread = read(sock, &notification, sizeof(notification)); 
 
         if (notification.type == DISCONNECTION_OBSERVER || valread <= 0) {
             break;
         }
 
         if (notification.len) {
-            valread = read(t_arg->sock, event_loc, notification.len + 1);
+            valread = read(sock, event_loc, notification.len + 1);
 
             if (is_disconnect(event_loc) || valread == 0) {
-                printf("Culprit!\n");
                 break;
             }
         } else {
@@ -167,14 +170,21 @@ void *observer_thread(void *arg) {
     return (void*)&ok_return;
 }
 
-void *user_thread(void *arg) {
-    /* The threads serving the user clients are periodically (with <interval> period) 
-    sending the updated information of this common data structure to their 
-    corresponding user clients, so that it can be rendered. It is expected that if
-    there are M user clients connected at the moment the periodic update is triggered, 
-    all M clients receiveconsistent, i.e., identical, information. In other words, 
-    the threads serving the user clients "broadcast" the currentstate of most recent 
-    events to all simultaneously connected user clients. */
+/**
+ * @brief Print activities
+ * 
+ * The threads serving the user clients are periodically (with <interval> period)
+ * sending the updated information of this common data structure to their 
+ * corresponding user clients, so that it can be rendered. It is expected that if
+ * there are M user clients connected at the moment the periodic update is triggered, 
+ * all M clients receiveconsistent, i.e., identical, information. In other words, 
+ * the threads serving the user clients "broadcast" the currentstate of most recent 
+ * events to all simultaneously connected user clients.
+ * 
+ * @param arg 
+ * @return void* 
+ */
+static void *user_thread(void *arg) {
     int socket = *((int*)arg);
     int confirmation = 1;
 
@@ -185,7 +195,7 @@ void *user_thread(void *arg) {
 
     while(1) {
         printf("[USER %d] User waiting for READING\n", socket);
-        while (get_server_state() != READING) {
+        while (get_server_state() != READING && !is_locked()) {
             sched_yield();
         }
 
@@ -199,7 +209,7 @@ void *user_thread(void *arg) {
         printf("[USER %d] User READING or sending\n", socket);
         send_entries(socket);
         
-        while (get_server_state() == READING) {
+        while (get_server_state() == READING && !is_locked()) {
             sched_yield();
         }
     }
@@ -214,16 +224,19 @@ void *user_thread(void *arg) {
     return (void*)&ok_return;
 }
 
+/**
+ * @brief Serves as a traffic enforcer for all the threads
+ * 
+ * @param arg 
+ * @return void* 
+ */
 static void *output_sorter(void *arg) {
     char* logfile = ((char*)arg);
 
     while(1) {
         sched_yield();
 
-        /* I'm not modifying the timer so it's okay to read it */
         if (get_timer_expired()) {
-            
-            // clear_screen();
             /* Now, I need to access it */
             struct timeval tv;
             gettimeofday(&tv, NULL);
@@ -231,7 +244,7 @@ static void *output_sorter(void *arg) {
             set_timer_expired(false);
             printf("Timer reset\n");
 
-            /* the server state must be DONE to transition to SORTING */
+            /* The server state must be DONE to transition to SORTING */
             while (get_server_state() != DONE && !is_locked()) {
                 sched_yield();
             }
@@ -239,19 +252,19 @@ static void *output_sorter(void *arg) {
             printf("Flipping state\n");
             set_server_state(SORTING);
 
-            /* todo: wait for all observers to finish writing */
             /* make sure that the writer count is 0 */
             while (get_entry_writer_count() != 0 && !is_locked()) {
                 sched_yield();
             }
 
+            // todo: remove
             test_stub();
 
             /* todo: now we are sorting */
-            sort_entry_array(); /* might need the reader count here??? */
+            sort_entry_array();
 
 
-            // cut off for readers to join
+            /* cut off for readers to join */
             printf("Time for users\n");
             set_server_state(READING);
 
@@ -265,23 +278,26 @@ static void *output_sorter(void *arg) {
                 sched_yield();
             }
 
-            // reset reader done count
             reset_reader_done_count();
 
             set_server_state(DONE);
             /* At this point, readers can now proceed to waiting back to sorting */
-            // printf("Done: let observers observe\n");
         }
     }
 
-    /* https://stackoverflow.com/a/36568809/10024566 */
+    /* based on https://stackoverflow.com/a/36568809/10024566 */
     static const long ok_return = 1;
     return (void*)&ok_return;
 }
 
-static void *server_timer() {
-    /* todo: set up timer */
-    struct timespec delay = {5, 0};
+static void *server_timer(void *arg) {
+    const long nanosec_in_sec = 1000000000;
+    float interval = *((float*)arg);
+    struct timespec delay = {
+        (int)interval,
+        ((long)(interval * nanosec_in_sec) % nanosec_in_sec)
+    };
+    printf("delay %d | %d\n", delay.tv_sec, delay.tv_nsec);
     while(1) {
         nanosleep(&delay, NULL);
         /* flip switch being watched by threads */
@@ -350,8 +366,6 @@ void do_server(notapp_args arg) {
         exit(EXIT_FAILURE); 
     }
 
-    
-
     (void)signal(SIGINT, handle_signal);
     jump_val = sigsetjmp(env, 1);
 
@@ -369,7 +383,7 @@ void do_server(notapp_args arg) {
     /* Start timer */
     {
         pthread_t thread;
-        pthread_create(&thread, NULL, server_timer, NULL);
+        pthread_create(&thread, NULL, server_timer, &arg.interval);
         pthread_detach(thread);
     }
 
@@ -386,19 +400,15 @@ void do_server(notapp_args arg) {
     else
         printf("Port number %d\n", ntohs(address.sin_port));
 
-    daemonize();
+    // daemonize();
 
+    /* Accept clients and spawn threads for each */
     while(1) {
-        // sleep (20);
-        // return;
-
         if (listen(server_fd, 3) < 0) 
         { 
             perror("listen"); 
             exit(EXIT_FAILURE); 
         } 
-
-        
 
         if ((new_socket = accept(server_fd, (struct sockaddr *)&address, (socklen_t*)&addrlen))<0) 
         { 
@@ -414,12 +424,10 @@ void do_server(notapp_args arg) {
         }
         
         pthread_t thread;
-        thread_arg t_arg;
-        t_arg.sock = new_socket;
 
         switch(client_id) {
             case INTRO_OBSERVER:
-                pthread_create(&thread, NULL, observer_thread, &t_arg);
+                pthread_create(&thread, NULL, observer_thread, &new_socket);
                 pthread_detach(thread);
                 break;
             case INTRO_USER:

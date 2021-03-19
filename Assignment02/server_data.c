@@ -8,6 +8,7 @@ void set_timer_expired(bool status) {
 
     if (status && timer_expired) {
         // if time has expired and previous status was still expired
+        printf("Lock detected >.<\n");
         possible_lock_detected = true;
     } else {
         possible_lock_detected = false;

@@ -23,27 +23,11 @@
 #include <syslog.h>
 #include <fcntl.h>
 
-typedef struct thread_arg {
-    int sock;
-    int interval;
-} thread_arg;
-
-#define THREAD_ARG_SIZE (sizeof (thread_arg))
-
 /**
- * @brief 
+ * @brief Spawn threads for clients
  * 
- * @param buf 
- * @param mask
- * @remark Make sure that buf is empty
- * To play safe keep buf 200 chars 
+ * @param arg 
  */
-void translate_masks(char *buf, uint32_t mask);
-
-void *observer_thread(void *arg);
-
-void *user_thread(void *arg);
-
 void do_server(notapp_args arg);
 
 #endif /* _SERVER_H_ */
