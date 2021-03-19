@@ -108,6 +108,12 @@ static void *observer_thread(void *arg) {
         if (notification.type == DISCONNECTION_OBSERVER || valread <= 0) {
             break;
         }
+        
+#ifdef NOTAPP_TIME
+        gettimeofday(&tv, NULL);
+#else
+        tv = notification.tv;
+#endif
 
         if (notification.len) {
             valread = read(sock, event_loc, notification.len + 1);
@@ -120,11 +126,6 @@ static void *observer_thread(void *arg) {
         }
 
         /* Process events to formattable thing for user client */
-#ifdef NOTAPP_TIME
-        gettimeofday(&tv, NULL);
-#else
-        tv = notification.tv;
-#endif
 
         mask = notification.mask;
 
@@ -290,6 +291,14 @@ static void *output_sorter(void *arg) {
     return (void*)&ok_return;
 }
 
+/**
+ * @brief Serves as a timer
+ * 
+ * It also helps release processes when they get stuck in a possible "locked" situation.
+ * 
+ * @param arg 
+ * @return void* 
+ */
 static void *server_timer(void *arg) {
     const long nanosec_in_sec = 1000000000;
     float interval = *((float*)arg);
@@ -297,11 +306,10 @@ static void *server_timer(void *arg) {
         (int)interval,
         ((long)(interval * nanosec_in_sec) % nanosec_in_sec)
     };
-    printf("delay %d | %d\n", delay.tv_sec, delay.tv_nsec);
+
     while(1) {
         nanosleep(&delay, NULL);
         /* flip switch being watched by threads */
-        printf("Timer expired\n");
         set_timer_expired(true);
     }
 
@@ -310,6 +318,9 @@ static void *server_timer(void *arg) {
     return (void*)&ok_return;
 }
 
+/**
+ * @brief Daemonizes the program
+ */
 static void daemonize() {
     int i;
     char str[10];
@@ -329,10 +340,6 @@ static void daemonize() {
 	signal(SIGTSTP,SIG_IGN); /* ignore tty signals */
 	signal(SIGTTOU,SIG_IGN);
 	signal(SIGTTIN,SIG_IGN);
-
-    // todo: handle here
-	// signal(SIGHUP,signal_handler); /* catch hangup signal */
-	// signal(SIGTERM,signal_handler); /* catch kill signal */
 }
 
 void do_server(notapp_args arg) {
@@ -395,10 +402,12 @@ void do_server(notapp_args arg) {
     }
 
     socklen_t len = sizeof(address);
-    if (getsockname(server_fd, (struct sockaddr *)&address, &len) == -1)
-        perror("getsockname");
-    else
-        printf("Port number %d\n", ntohs(address.sin_port));
+    if (sport == 0) {
+        if (getsockname(server_fd, (struct sockaddr *)&address, &len) == -1)
+            perror("getsockname");
+        else
+            printf("Port number %d\n", ntohs(address.sin_port));
+    }
 
     // daemonize();
 

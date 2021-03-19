@@ -52,6 +52,7 @@ void do_user_client(notapp_args arg) {
     pthread_detach(thread);
 
     /* Print content */
+    clear_screen();
     while (1) {
         alert_activity();
         
