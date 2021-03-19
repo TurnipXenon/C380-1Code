@@ -59,33 +59,41 @@ void translate_masks(char *buf, uint32_t mask) {
     }
 }
 
+/**
+ * @brief 
+ * 
+ * @param arg 
+ * @return void* 
+ */
 void *observer_thread(void *arg) {
     /* it collects, as quickly as possible, data received from the observerclients and 
     updates a common data structure which stores the most recent event that came from 
     each observer. If a logfile was specified, the server also dumps the received events 
     to the log file, in the order they are received. */
     thread_arg *t_arg = (thread_arg*)arg;
-    user_msg msg; /* to be sent to user client */
+    char event_loc[BUF_SIZE];
+    char monitored[BUF_SIZE];
+    char host[17];
     struct user_entry entry;
+    struct timeval tv;
+    uint32_t mask;
 
     /* Temporary */
-    char *monitored = NULL;
+    char *tmp_monitored = NULL;
     char *ip_host = NULL;
     int observer_index = -1;
 
-    monitored = read_string(t_arg->sock);
-    strcpy(msg.monitored, monitored);
-    free(monitored);
+    tmp_monitored = read_string(t_arg->sock);
+    strcpy(monitored, tmp_monitored);
+    free(tmp_monitored);
 
     ip_host = read_string(t_arg->sock);
-    strcpy(msg.host, ip_host);
+    strcpy(host, ip_host);
     free(ip_host);
 
     /* Register self to server data */
     observer_index = register_writer();
     printf("Testing observer: %d\n", observer_index);
-
-    /* todo: Should we notify the client that we failed??? */
 
     // todo: improve
     while(observer_index != -1) {
@@ -98,49 +106,48 @@ void *observer_thread(void *arg) {
         }
 
         if (notification.len) {
-            valread = read(t_arg->sock, msg.event_loc, notification.len + 1);
+            valread = read(t_arg->sock, event_loc, notification.len + 1);
 
-            if (is_disconnect(msg.event_loc) || valread == 0) {
+            if (is_disconnect(event_loc) || valread == 0) {
                 printf("Culprit!\n");
                 break;
             }
         } else {
-            msg.event_loc[0] = '\0';
+            event_loc[0] = '\0';
         }
 
         /* Process events to formattable thing for user client */
 #ifdef NOTAPP_TIME
-printf("Hehehe\n");
-        gettimeofday(&msg.tv, NULL);
+        gettimeofday(&tv, NULL);
 #else
-        msg.tv = notification.tv;
+        tv = notification.tv;
 #endif
 
-        msg.mask = notification.mask;
+        mask = notification.mask;
 
         /* Print the name of the file */
         if (!notification.len) {
-            msg.event_loc[0] = '\0';
+            event_loc[0] = '\0';
         }
 
         char msg_buf[BUF_SIZE] = {0};
         char tmp_buf[BUF_SIZE] = {0};
-        snprintf(msg_buf, BUF_SIZE - 1, "%ld.%06ld\t", msg.tv.tv_sec, msg.tv.tv_usec);
-        snprintf(tmp_buf, BUF_SIZE - 1, "%s\t", msg.host);
+        snprintf(msg_buf, BUF_SIZE - 1, "%ld.%06ld\t", tv.tv_sec, tv.tv_usec);
+        snprintf(tmp_buf, BUF_SIZE - 1, "%s\t", host);
         strcat(msg_buf, tmp_buf);
-        snprintf(tmp_buf, BUF_SIZE - 1, "%s\t", msg.monitored);
+        snprintf(tmp_buf, BUF_SIZE - 1, "%s\t", monitored);
         strcat(msg_buf, tmp_buf);
 
         if (notification.len) {
-            strcat(msg_buf, msg.event_loc);
+            strcat(msg_buf, event_loc);
             strcat(msg_buf, " ");
         }
 
-        translate_masks(msg_buf, msg.mask);
+        translate_masks(msg_buf, mask);
 
         // todo: put safety stuff
         strcpy(entry.string, msg_buf);
-        entry.tv = msg.tv;
+        entry.tv = tv;
         
         // printf("************\n");
         printf("%s\n", msg_buf);

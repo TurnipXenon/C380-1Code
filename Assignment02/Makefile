@@ -10,18 +10,6 @@ all: notapp
 notapp: argparser.o socket_helper.o notapp_base.o observer_client.o user_client.o server.o server_data.o notapp.c
 	$(CC) -o $@ $^
 
-test: argparser.o test.c
-	$(CC) -o test argparser.o test.c
-
-# mem_1: memlayout.o mem_1.c
-# 	$(CC) -o mem_1 memlayout.o mem_1.c
-
-# mem_2: memlayout.o mem_2.c
-# 	$(CC) -o mem_2 memlayout.o mem_2.c
-
-# mem_3: memlayout.o mem_3.c
-# 	$(CC) -o mem_3 memlayout.o mem_3.c -ldl
-
 .PHONY: notapp.time
 notapp.time:
 	make clean && make CFLAGS='-D NOTAPP_TIME'
@@ -55,27 +43,3 @@ server1: notapp
 	./notapp -s -t 2.5 -l logfiles/server1_test.txt -p 51089 # valgrind ./notapp -s -t 2.5 -l server1_test.txt
 
 # valgrind ./notapp -s -t 2.5 -l logfiles/server1_test.txt -p 51089 # valgrind ./notapp -s -t 2.5 -l server1_test.txt
-
-# .PHONY notapp.time
-# notapp.time:
-# 	ls
-
-# .PHONY notapp.bold
-# notapp.bold:
-# 	ls
-
-# .PHONY: test_1
-# test_1: mem_1
-# 	$(EXRANOFF) ./mem_1
-
-# .PHONY: test_2
-# test_2: mem_2
-# 	$(EXRANOFF) ./mem_2
-
-# .PHONY: test_3
-# test_3: mem_3
-# 	$(EXRANOFF) ./mem_3
-
-# .PHONY: test_all
-# test_all:
-# 	make test_1 && make test_2 && make test_3

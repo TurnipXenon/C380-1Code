@@ -45,20 +45,26 @@ enum msg_type {
  * @brief message received by the server thread from observer
  */
 struct observer_msg {
-    enum msg_type type; /**< @brief message type */
-    struct timeval tv; /**< @brief time message was received */
-    int wd;            /* Watch descriptor */
-    uint32_t mask;     /* Mask describing event */
-    uint32_t cookie;   /* Unique cookie associating related events (for rename(2)) */
-    uint32_t len;      /* Size of name field */
-    // struct inotify_event event;  document removal due to unknown behavior???
+    enum msg_type type; /**< @brief Message type */
+    struct timeval tv;  /**< @brief Time message was received */
+    int wd;             /**< @brief Watch descriptor */
+    uint32_t mask;      /**< @brief Mask describing event */
+    uint32_t cookie;    /**< @brief Unique cookie associating related events (for rename(2)) */
+    uint32_t len;       /**< @brief Size of name field */
 };
 
+/**
+ * @brief Helps the server determine whether the new client is an observer
+ * or a user
+ */
 enum msg_identity {
     INTRO_OBSERVER,
     INTRO_USER
 };
 
+/**
+ * @brief Used in the parser to determine what role the user wants to run
+ */
 enum role {
     UNKNOWN,
     SERVER,
@@ -66,6 +72,9 @@ enum role {
     USER_CLIENT
 };
 
+/**
+ * @brief Data structure returned after parsing through the commandline arguments
+ */
 typedef struct notapp_args {
     enum role role;
     float interval;
@@ -75,32 +84,54 @@ typedef struct notapp_args {
     char *fileordir;
 } notapp_args;
 
-typedef struct user_msg {
-    struct timeval tv;
-    char host[17];
-    char monitored[BUF_SIZE];
-    char event_loc[BUF_SIZE];
-    uint32_t mask;
-} user_msg;
-
 /**
  * @brief Stores context during sigsetjumps in user client and observer client
  */
 sigjmp_buf env;
 
+/**
+ * @brief Handles segfault and sigjumps program to alert disconnect to server
+ * 
+ * @param sig 
+ */
 void handle_signal(int sig);
 
+/**
+ * @brief Checks whether the value sent was a DISCONNECT_CODE
+ * 
+ * @param val 
+ * @return true Value sent was a DISCONNECT_CODE
+ * @return false 
+ */
 bool is_disconnect(void* val);
 
-/* todo: transfer to different header */
+/**
+ * @brief Sends a string
+ * 
+ * @param sock 
+ * @param string 
+ */
 void send_string(int sock, char *string);
 
+/**
+ * @brief Reads a string
+ * 
+ * @param sock 
+ * @return char* string stored in heap, use free after use
+ * @return NULL reading string failed
+ */
 char *read_string(int sock);
 
-int notapp_connect(notapp_args arg, enum msg_identity id);
-
+/**
+ * @brief Clears screen
+ */
 void clear_screen();
 
+/**
+ * @brief Create a disconnect observer message object
+ * 
+ * @return struct observer_msg 
+ */
 struct observer_msg create_disconnect_observer_message();
 
 #endif /* _NOTAPP_BASE_H_ */

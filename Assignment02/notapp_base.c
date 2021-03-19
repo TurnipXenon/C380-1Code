@@ -8,7 +8,6 @@ void handle_signal(int sig) {
     siglongjmp(env, 1);
 }
 
-
 bool is_disconnect(void* val) {
     if (*((int*)val) == DISCONNECT_CODE) {
         return true;
@@ -17,7 +16,6 @@ bool is_disconnect(void* val) {
     }
 }
 
-/* todo: transfer to different header */
 void send_string(int sock, char *string) {
     size_t str_size = strlen(string) + 1;
 
@@ -54,7 +52,10 @@ char *read_string(int sock) {
     return str;
 }
 
-// https://stackoverflow.com/a/18154608/10024566
+/**
+ * @brief Calls appropriate screen clearing functions depending on OS
+ * Code by JSQuareD from https://stackoverflow.com/a/18154608/10024566
+ */
 void clear_screen() {
 #ifdef _WIN32
     system("cls");
@@ -63,6 +64,11 @@ void clear_screen() {
 #endif
 }
 
+/**
+ * @brief Create a disconnect observer message object by setting the type to DISCONNECTION_OBSERVER
+ * 
+ * @return struct observer_msg 
+ */
 struct observer_msg create_disconnect_observer_message() {
     struct observer_msg msg;
     msg.type = DISCONNECTION_OBSERVER;
