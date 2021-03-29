@@ -2,6 +2,15 @@
 #include <stdlib.h>
 #include <string.h>
 
+/**
+ * @brief 
+ * 
+ * whatever 2> asdfa.txt
+ * 
+ * @param argc 
+ * @param argv 
+ * @return int 
+ */
 int main(int argc, char *argv[]) {
     unsigned int skipsize = 0u;
 
