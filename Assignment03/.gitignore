@@ -1,6 +1,7 @@
 # executables
 valws379
 lackey_test
+*.o
 
 # other files
 lab9/test.txt

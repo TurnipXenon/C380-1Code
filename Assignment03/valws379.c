@@ -13,16 +13,9 @@
  */
 int main(int argc, char *argv[])
 {
+    // todo: do arguments
     unsigned int skipsize = 0u;
     char str_line[41];
-
-    /* from: https://linuxhint.com/pipe_system_call_c/ */
-    // int pipefds[2];
-
-    // if(pipe(pipefds) == -1) {
-    //     perror("pipe");
-    //     exit(EXIT_FAILURE);
-    // }
 
     if (argc == 3 && strcmp(argv[1], "-s") == 0)
     {
@@ -42,21 +35,8 @@ int main(int argc, char *argv[])
     // /* Start read once you see I in char[0] */
     // read(pipefds[0], str_line, 4);
     scanf("%40s", str_line);
+    
 
-    /* Scanf until empty: https://stackoverflow.com/questions/27607744/reading-input-from-stdin-until-empty-line */
-    FILE *fptr = NULL;
-    fptr = fopen("newprogram.txt", "w");
-    if (fptr == NULL)
-    {
-        printf("Error!");
-        exit(1);
-    }
-
-    printf("Okie dokie: %s\n", str_line);
-    scanf("%40s", str_line);
-
-    printf("Okie dokie 2: %s\n", str_line);
-    fclose(fptr);
 
     /* End reading when you see = */
 
