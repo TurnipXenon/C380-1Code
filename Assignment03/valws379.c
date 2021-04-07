@@ -13,7 +13,7 @@
  */
 int main(int argc, char *argv[]) {
     unsigned int skipsize = 0u;
-
+    char str_line[5];
 
     if (argc == 3 && strcmp(argv[1], "-s") == 0) {
         skipsize = (unsigned int) atoi(argv[2]);
@@ -26,6 +26,14 @@ int main(int argc, char *argv[]) {
         printf("todo: Arg error\n");
         return 0;
     }
+
+    // /* Start read once you see I in char[0] */
+
+
+    // printf("Hello: %s\n", str_line);
+    fprintf(stdout, "Say something!\n");
+
+    /* End reading when you see = */
 
     return 0;
 }
