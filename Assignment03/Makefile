@@ -33,4 +33,8 @@ argtest1: valws379
 
 .PHONY: test1
 test1: valws379 lackey_test
-	 valgrind --tool=lackey --trace-mem=yes ./lackey_test 2> ./valws379 -s 32
+	 valgrind --tool=lackey --trace-mem=yes ./lackey_test 2>&1 /dev/null | ./valws379 -s 32 > test1_out.txt
+
+.PHONY: test2
+test2: valws379
+	./a.out | ./valws379 -s 32 > hanako.txt
