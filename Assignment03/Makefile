@@ -25,7 +25,7 @@ argtest1: valws379
 
 .PHONY: test1
 test1: valws379 lackey_test
-	 valgrind --tool=lackey --trace-mem=yes ./lackey_test 2>&1 /dev/null | ./valws379 -s 3 32 3
+	 valgrind --tool=lackey --trace-mem=yes ./lackey_test 2>&1 /dev/null | ./valws379 -s 3 16 3
 	
 
 .PHONY: valgrind1

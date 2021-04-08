@@ -124,7 +124,7 @@ void queue_debug(struct queue *queue) {
     struct queue_node *node = queue->head;
 
     while(node != NULL) {
-        printf("{%llu, %llu}-> ", node->value.address, node->value.page_size);
+        printf("{%llu, %llu}-> ", node->value.address, node->value.page_count);
         node = node->tail;
     }
 

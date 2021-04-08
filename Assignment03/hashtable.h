@@ -34,8 +34,8 @@ struct hashtable *new_hashtable();
 
 void destroy_hashtable(struct hashtable *hashtable);
 
-ull put(struct hashtable *hashtable, struct mem_ref mem_ref);
+void put(struct hashtable *hashtable, ull address);
 
-ull delete(struct hashtable *hashtable, struct mem_ref mem_ref);
+void delete(struct hashtable *hashtable, ull address);
 
 #endif /* _HASHTABLE_H_ */

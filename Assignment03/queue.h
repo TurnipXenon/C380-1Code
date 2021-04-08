@@ -1,8 +1,6 @@
 #ifndef _QUEUE_H_
 #define _QUEUE_H_
 
-#include <stdio.h> /* for perror */
-
 #include "valws379_base.h"
 
 struct queue_node {
