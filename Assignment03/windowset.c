@@ -1,24 +1,24 @@
 #include "windowset.h"
 
-static int page_size = 16;
-static unsigned long window_size = 100;
+static ull page_size = 16;
+static ull window_size = 100;
 static ull set_size = 0;
 
 /**
  * @brief Set the page size
  * 
- * @param value int
+ * @param value ull
  */
-void set_page_size(int value) {
+void set_page_size(ull value) {
     page_size = value;
 }
 
 /**
  * @brief Set the window size object
  * 
- * @param windows_size unsigned long
+ * @param windows_size ull
  */
-void set_window_size(unsigned long value) {
+void set_window_size(ull value) {
     window_size = value;
 }
 

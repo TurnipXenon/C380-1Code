@@ -22,7 +22,7 @@ typedef unsigned long long ull;
  * 
  * @param value int
  */
-void set_page_size(int value);
+void set_page_size(ull value);
 
 /**
  * @brief Set the window size object
@@ -31,7 +31,7 @@ void set_page_size(int value);
  * 
  * @param windows_size unsigned long
  */
-void set_window_size(unsigned long value);
+void set_window_size(ull value);
 
 /**
  * @brief Insert new memory reference into window set
