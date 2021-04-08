@@ -6,7 +6,7 @@ all: valws379
 %.o: %.c %.h
 	$(CC) -c -o $@ $<
 
-valws379: windowset.o valws379.c
+valws379: valws379_base.o queue.o windowset.o valws379.c
 	$(CC) -o $@ $^
 
 # notapp: argparser.o notapp_base.o observer_client.o user_client.o server.o server_data.o notapp.c
@@ -14,14 +14,6 @@ valws379: windowset.o valws379.c
 
 lackey_test: lab9/lackey.c
 	$(CC) -g -o $@ $^
-
-.PHONY: notapp.time
-notapp.time:
-	make clean && make CFLAGS='-D NOTAPP_TIME'
-
-.PHONY: run_test
-run_test: test
-	./test
 
 .PHONY: clean
 clean:
@@ -33,8 +25,9 @@ argtest1: valws379
 
 .PHONY: test1
 test1: valws379 lackey_test
-	 valgrind --tool=lackey --trace-mem=yes ./lackey_test 2>&1 /dev/null | ./valws379 -s 32 32 100 > test1_out.txt
+	 valgrind --tool=lackey --trace-mem=yes ./lackey_test 2>&1 /dev/null | ./valws379 -s 3 32 3
+	
 
-.PHONY: test2
-test2: valws379 lackey_test
-	 valgrind --tool=lackey --trace-mem=yes ./lackey_test 2>&1 /dev/null | ./valws379 -s 32 32 100
+.PHONY: valgrind1
+valgrind1: valws379 lackey_test
+	 valgrind --tool=lackey --trace-mem=yes ./lackey_test 2>&1 /dev/null | valgrind --leak-check=full ./valws379 -s 3 32 3

@@ -4,22 +4,24 @@ static ull page_size = 16;
 static ull window_size = 100;
 static ull set_size = 0;
 
-/**
- * @brief Set the page size
- * 
- * @param value ull
- */
-void set_page_size(ull value) {
-    page_size = value;
-}
+static struct queue *queue;
 
 /**
- * @brief Set the window size object
+ * @brief 
+ * @brief Initialize window set
  * 
- * @param windows_size ull
+ * Initialize everything required for the window set to work.
+ * 
+ * @param page_size_ 
+ * @param window_size_ 
  */
-void set_window_size(ull value) {
-    window_size = value;
+void initialize_window_set(ull page_size_, ull window_size_) {
+    page_size = page_size_;
+    window_size = window_size_;
+
+    queue = create_queue();
+
+    // todo: initialize set
 }
 
 /**
@@ -32,6 +34,19 @@ void set_window_size(ull value) {
  */
 void window_set_insert(ull address, ull page_size) {
     // todo: window_set_insert(ull address, ull page_size)
+    struct mem_ref mem_ref;
+    mem_ref.address = address;
+    mem_ref.page_size = page_size;
+
+    enqueue(queue, mem_ref);
+
+    /* todo: hashset */
+
+    if (queue->size > window_size) {
+        mem_ref = dequeue(queue);
+
+        // todo: remove mem_ref from hashset
+    }
 }
 
 /**
@@ -39,6 +54,25 @@ void window_set_insert(ull address, ull page_size) {
  * 
  * @return ull 
  */
-ull get_size() {
+ull get_window_set_size() {
     return set_size;
+}
+
+/**
+ * @brief Destroy windowset
+ */
+void destroy_window_set() {
+    // todo: clean up
+
+    destroy_queue(queue);
+}
+
+
+/**
+ * @brief todo: delete
+ * 
+ */
+void window_set_debug() {
+    printf("Queue size: %llu\n", queue->size);
+    queue_debug(queue);
 }

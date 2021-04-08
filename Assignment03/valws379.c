@@ -118,17 +118,22 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-
+    initialize_window_set(page_size, window_size);
 
     // /* Start read once you see I in char[0] */
     /* from: https://stackoverflow.com/a/27607770/10024566 */
-    int num = 0;
+    ull mem_ref_count = 0u;
+    int num = 0; /* todo: delete */
     while(fgets(str_buffer, BUFFER_SIZE, stdin) != NULL && is_empty_line(str_buffer)) {
         if (sscanf(str_buffer, "%4s %100s", char_code, str_numbers) == 2) {
             printf("%s %s\n", char_code, str_numbers);
 
             if (is_valid_code(char_code)) {
                 /* todo: skip references here */
+                if (mem_ref_count < skipsize) {
+                    ++mem_ref_count;
+                    continue;
+                }
 
                 /* 
                 Assume that if we get the correct code, we have the correct format after
@@ -139,10 +144,13 @@ int main(int argc, char *argv[])
                 ref_address = strtoull(token, NULL, 16);
                 token = strtok(NULL, seps);
                 sscanf(token, "%llu", &ref_page_size);
-
-                printf("Address: %llX  ;  Page size: %llu\n", ref_address, ref_page_size);
                 
                 /* todo: insert stuff here */
+                window_set_insert(ref_address, ref_page_size);
+
+                // printf("Address: %llX  ;  Page size: %llu\n", ref_address, ref_page_size);
+                printf("Window set size %llu\n", get_window_set_size());
+                window_set_debug();
             }
 
             if (num > 11) {
@@ -152,6 +160,8 @@ int main(int argc, char *argv[])
             ++num;
         }
     }
+
+
 
     // read_result = fgets(str_buffer, BUFFER_SIZE, stdin);
     // printf("Result: %s\n", str_buffer);

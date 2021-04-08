@@ -1,8 +1,7 @@
 /**
  * @file windowset.h
- * @author your name (you@domain.com)
+ * @author Allan Manuba
  * @brief 
- * @version 0.1
  * @date 2021-04-07
  * 
  * @remark
@@ -13,25 +12,19 @@
 #ifndef _WINDOW_SET_H_
 #define _WINDOW_SET_H_
 
-typedef unsigned long long ull;
+#include "valws379_base.h"
+#include "queue.h"
 
 /**
- * @brief Set the page size
+ * @brief 
+ * @brief Initialize window set
  * 
- * This is used to better determine the load factor for the hashtable
+ * Initialize everything required for the window set to work.
  * 
- * @param value int
+ * @param page_size_ 
+ * @param window_size_ 
  */
-void set_page_size(ull value);
-
-/**
- * @brief Set the window size object
- * 
- * This is used to know which addresses to purge when @ref window_set_insert(ull) is used
- * 
- * @param windows_size unsigned long
- */
-void set_window_size(ull value);
+void initialize_window_set(ull page_size_, ull window_size_);
 
 /**
  * @brief Insert new memory reference into window set
@@ -48,6 +41,17 @@ void window_set_insert(ull address, ull page_size);
  * 
  * @return ull 
  */
-ull get_size();
+ull get_window_set_size();
+
+/**
+ * @brief Clean up
+ */
+void destroy_window_set();
+
+/**
+ * @brief todo: delete
+ * 
+ */
+void window_set_debug();
 
 #endif /* _WINDOW_SET_H_ */
