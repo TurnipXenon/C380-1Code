@@ -30,8 +30,8 @@ void set_window_size(ull value) {
  * @param address 
  * @param page_size 
  */
-void insert(ull address, ull page_size) {
-    // todo: insert(ull address, ull page_size)
+void window_set_insert(ull address, ull page_size) {
+    // todo: window_set_insert(ull address, ull page_size)
 }
 
 /**

@@ -6,7 +6,7 @@
  * @date 2021-04-07
  * 
  * @remark
- * Call set_page_size and set_window_size before using insert even if there are default values
+ * Call set_page_size and set_window_size before using window_set_insert even if there are default values
  * for them.
  */
 
@@ -27,7 +27,7 @@ void set_page_size(ull value);
 /**
  * @brief Set the window size object
  * 
- * This is used to know which addresses to purge when @ref insert(ull) is used
+ * This is used to know which addresses to purge when @ref window_set_insert(ull) is used
  * 
  * @param windows_size unsigned long
  */
@@ -41,7 +41,7 @@ void set_window_size(ull value);
  * @param address 
  * @param page_size 
  */
-void insert(ull address, ull page_size);
+void window_set_insert(ull address, ull page_size);
 
 /**
  * @brief Get the size of the window set
