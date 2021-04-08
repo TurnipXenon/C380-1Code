@@ -7,7 +7,7 @@
  * @param file_desc 
  */
 static void cleanup(int sock, int file_desc) {
-    struct observer_msg disconnect_msg = create_disconnect_observer_message();
+    struct observer_msg disconnect_msg = new_disconnect_observer_message();
     send(sock, &disconnect_msg, sizeof(disconnect_msg),0);
     close(sock);
 

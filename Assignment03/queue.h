@@ -1,7 +1,6 @@
 #ifndef _QUEUE_H_
 #define _QUEUE_H_
 
-#include <stdlib.h> /* for malloc */
 #include <stdio.h> /* for perror */
 
 #include "valws379_base.h"
@@ -23,7 +22,7 @@ struct queue {
  * 
  * @return struct queue* 
  */
-struct queue *create_queue();
+struct queue *new_queue();
 
 /**
  * @brief Enqueue a node on the head

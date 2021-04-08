@@ -2,9 +2,9 @@
 
 static ull page_size = 16;
 static ull window_size = 100;
-static ull set_size = 0;
 
 static struct queue *queue;
+static struct hashtable *hashtable;
 
 /**
  * @brief 
@@ -19,9 +19,10 @@ void initialize_window_set(ull page_size_, ull window_size_) {
     page_size = page_size_;
     window_size = window_size_;
 
-    queue = create_queue();
+    queue = new_queue();
 
     // todo: initialize set
+    hashtable = new_hashtable();
 }
 
 /**
@@ -41,11 +42,13 @@ void window_set_insert(ull address, ull page_size) {
     enqueue(queue, mem_ref);
 
     /* todo: hashset */
+    put(hashtable, mem_ref);
 
     if (queue->size > window_size) {
         mem_ref = dequeue(queue);
 
         // todo: remove mem_ref from hashset
+        delete(hashtable, mem_ref);
     }
 }
 
@@ -55,7 +58,7 @@ void window_set_insert(ull address, ull page_size) {
  * @return ull 
  */
 ull get_window_set_size() {
-    return set_size;
+    return hashtable->count;
 }
 
 /**
@@ -65,6 +68,7 @@ void destroy_window_set() {
     // todo: clean up
 
     destroy_queue(queue);
+    destroy_hashtable(hashtable);
 }
 
 

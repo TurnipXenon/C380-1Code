@@ -7,11 +7,11 @@
  * 
  * @return struct queue_node* 
  */
-struct queue_node *create_node() {
+struct queue_node *new_node() {
     struct queue_node *node = (struct queue_node*) malloc(sizeof(struct queue_node));
     node->head = NULL;
     node->tail = NULL;
-    node->value = create_mem_ref(); // default value
+    node->value = new_mem_ref(); // default value
     return node;
 }
 
@@ -29,7 +29,7 @@ void destroy_node(struct queue_node *node) {
  * 
  * @return struct queue* 
  */
-struct queue *create_queue() {
+struct queue *new_queue() {
     struct queue *queue = (struct queue*) malloc(sizeof(struct queue));
     queue->head = NULL;
     queue->tail = NULL;
@@ -44,7 +44,7 @@ struct queue *create_queue() {
  * @param value 
  */
 void enqueue(struct queue *queue, struct mem_ref value) {
-    struct queue_node *node = create_node();
+    struct queue_node *node = new_node();
     node->value = value;
 
     if (queue->head == NULL) {
@@ -68,7 +68,7 @@ void enqueue(struct queue *queue, struct mem_ref value) {
  * @return ull 
  */
 struct mem_ref dequeue(struct queue *queue) {
-    struct mem_ref value = create_mem_ref();
+    struct mem_ref value = new_mem_ref();
 
     if (queue->tail != NULL) {
         /* Case: non-empty */

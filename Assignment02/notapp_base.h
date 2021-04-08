@@ -135,7 +135,7 @@ void clear_screen();
  * 
  * @return struct observer_msg 
  */
-struct observer_msg create_disconnect_observer_message();
+struct observer_msg new_disconnect_observer_message();
 
 /**
  * @brief Run on client to kill themselves when they are dormant for some time

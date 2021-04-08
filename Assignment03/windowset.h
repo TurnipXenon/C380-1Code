@@ -14,6 +14,7 @@
 
 #include "valws379_base.h"
 #include "queue.h"
+#include "hashtable.h"
 
 /**
  * @brief 

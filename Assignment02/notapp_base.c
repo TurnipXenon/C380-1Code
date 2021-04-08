@@ -95,7 +95,7 @@ void clear_screen() {
  * 
  * @return struct observer_msg 
  */
-struct observer_msg create_disconnect_observer_message() {
+struct observer_msg new_disconnect_observer_message() {
     struct observer_msg msg;
     msg.type = DISCONNECTION_OBSERVER;
     return msg;
