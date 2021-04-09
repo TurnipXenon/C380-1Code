@@ -12,6 +12,20 @@ struct mem_ref {
     ull page_count;
 };
 
+struct key_value {
+    ull key;
+    ull value;
+};
+
 struct mem_ref new_mem_ref();
+
+/**
+ * @brief Get the power of two for a value.
+ * Assumes that value is > 0
+ * 
+ * @param value 
+ * @return ull 
+ */
+ull get_power_of_two(ull value);
 
 #endif /* _VALWS_379_H_ */

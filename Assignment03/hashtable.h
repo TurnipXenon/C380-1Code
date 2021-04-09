@@ -2,32 +2,26 @@
 #define _HASHTABLE_H_
 
 #include "valws379_base.h"
+#include "linkedlist.h"
 
-#define GROW_SIZE 10
-#define SHRINK_SIZE 4
-
-struct entry {
-    ull key;
-    ull value;
-};
-
-struct entry_node {
-    struct entry entry;
-    struct entry_node* next;
-};
+#define TABLE_SIZE 32
+#define SPLIT_SIZE 20
+#define MERGE_SIZE 12
 
 enum hashtable_mode {
     SINGLE,
     DUAL
 };
 
+struct bucket {
+    struct hashtable *table; // basis of expanded or not?
+    struct linked_list *linked_list;
+};
+
 struct hashtable {
-    enum hashtable_mode mode;
     ull count;
-    ull height;
-    struct entry_node *entry_nodes;
-    struct hashtable *upper;
-    struct hashtable *lower;
+    ull level;
+    struct bucket bucket[TABLE_SIZE];
 };
 
 struct hashtable *new_hashtable();

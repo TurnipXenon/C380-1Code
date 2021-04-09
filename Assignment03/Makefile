@@ -6,7 +6,7 @@ all: valws379
 %.o: %.c %.h
 	$(CC) -c -o $@ $<
 
-valws379: valws379_base.o queue.o windowset.o hashtable.o valws379.c
+valws379: valws379_base.o queue.o windowset.o hashtable.o linkedlist.o valws379.c
 	$(CC) -o $@ $^
 
 # notapp: argparser.o notapp_base.o observer_client.o user_client.o server.o server_data.o notapp.c

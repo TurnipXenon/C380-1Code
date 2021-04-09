@@ -21,13 +21,8 @@ void initialize_window_set(ull page_size_, ull window_size_) {
     window_size = window_size_;
 
     /* Calculate page exponent: Assuming not page_size > 0*/
-    page_exponent = -1;
-    ull value = page_size;
-    while(value != 0) {
-        ++page_exponent;
-        value = value >> 1;
-    }
-
+    page_exponent = get_power_of_two(page_size);
+    
     queue = new_queue();
 
     // todo: initialize set
