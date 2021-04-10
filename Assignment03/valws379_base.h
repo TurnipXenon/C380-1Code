@@ -4,6 +4,12 @@
 #include <stdio.h> /* perror */
 #include <stddef.h> /* for NULL */
 #include <stdlib.h> /* for malloc */
+#include <stdbool.h>
+
+#define TABLE_SIZE 32
+#define HASH_MASK (TABLE_SIZE - 1)
+#define SPLIT_SIZE 20
+#define MERGE_SIZE 12
 
 typedef unsigned long long ull;
 

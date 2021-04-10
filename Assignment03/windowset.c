@@ -59,7 +59,7 @@ void window_set_insert(ull address, ull page_size) {
     /* Reduce by 1 to count own position too */
     ull upper_address = (address + page_size - 1) >> page_exponent; 
     ull page_count = (upper_address - lower_address) + 1;
-    printf("Processed: %llX, %llu\n", lower_address, page_count);
+    // printf("Processed: %llX, %llu\n", lower_address, page_count);
 
     mem_ref.address = lower_address;
     mem_ref.page_count = page_count;
@@ -102,6 +102,6 @@ void destroy_window_set() {
  * 
  */
 void window_set_debug() {
-    printf("Queue size: %llu\n", queue->size);
-    queue_debug(queue);
+    // printf("Queue size: %llu\n", queue->size);
+    // queue_debug(queue);
 }

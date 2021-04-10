@@ -4,10 +4,6 @@
 #include "valws379_base.h"
 #include "linkedlist.h"
 
-#define TABLE_SIZE 32
-#define SPLIT_SIZE 20
-#define MERGE_SIZE 12
-
 enum hashtable_mode {
     SINGLE,
     DUAL
@@ -21,6 +17,7 @@ struct bucket {
 struct hashtable {
     ull count;
     ull level;
+    ull shifts;
     struct bucket bucket[TABLE_SIZE];
 };
 

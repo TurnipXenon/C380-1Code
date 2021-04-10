@@ -1,6 +1,7 @@
 # executables
 valws379
 lackey_test
+queue_test
 *.o
 
 # other files
@@ -9,3 +10,4 @@ test1_out.txt
 
 # folders
 extras/
+results/

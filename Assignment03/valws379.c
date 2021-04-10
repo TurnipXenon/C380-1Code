@@ -153,7 +153,7 @@ int main(int argc, char *argv[])
                 window_set_debug();
             }
 
-            if (num > 11) {
+            if (num > 100) {
                 break;
             }
 

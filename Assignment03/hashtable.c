@@ -4,6 +4,7 @@ struct hashtable *_new_hashtable(ull level) {
     struct hashtable *hashtable = (struct hashtable*) malloc(sizeof(struct hashtable));
     hashtable->count = 0u;
     hashtable->level = level;
+    hashtable->shifts = get_power_of_two(TABLE_SIZE) * level;
 
     for (size_t i = 0; i < TABLE_SIZE; ++i) {
         hashtable->bucket[i].table = NULL;
@@ -13,7 +14,7 @@ struct hashtable *_new_hashtable(ull level) {
     return hashtable;
 }
 
-struct hashtable *new_hashtable(ull level) {
+struct hashtable *new_hashtable() {
     return _new_hashtable(0);
 }
 
@@ -29,8 +30,6 @@ void destroy_hashtable(struct hashtable *hashtable) {
         }
 
         free(hashtable);
-        hashtable = NULL;
-
     }
 }
 
@@ -64,43 +63,93 @@ void destroy_hashtable(struct hashtable *hashtable) {
 //     }
 // }
 
-void put(struct hashtable *hashtable, ull address) {
-    switch (hashtable->mode) {
-        case SINGLE:
-            // find in the buckets
-            struct key_value *entry = find_in_bucket(hashtable->entries, address);
+/**
+ * @brief 
+ * 
+ * Assumes that the key is unique.
+ * 
+ * @param hashtable 
+ * @param key_value 
+ */
+static void hashtable_put_key_value(struct hashtable *hashtable, struct key_value key_value) {
+    // find appropriate bucket based on table size
+    ull index = (key_value.key >> hashtable->shifts) & HASH_MASK;
+    struct bucket *bucket = &(hashtable->bucket[index]);
+    ull old_count;
 
-            if (entry != NULL) {
-                /* Entry found: just increment value. Size of pages don't change */
-                entry->value++;
-                return;
-            }
+    if (bucket->table != NULL) {
 
-            /* Entry not found: entry == NULL, try adding to bucket */
-            add_to_bucket(hashtable->entries, address);
+        /* This bucket was already expanded */
+        old_count = bucket->table->count;
+        hashtable_put_key_value(bucket->table, key_value);
+        if (old_count != bucket->table->count) {
+            /* Change detected! Increase count */
             hashtable->count++;
+        }
 
-            if (hashtable->count >= GROW_SIZE) {
-                hashtable->mode = DUAL;
+    } else {
 
-                // find lowest
+        /* This bucket was not expanded */
+        old_count = bucket->linked_list->count;
+        sll_put_key_value(bucket->linked_list, key_value);
+        if (old_count != bucket->linked_list->count) {
+            /* Change detected! Increase count */
+            hashtable->count++;
+        }
 
-                // what's my hash function anyway
+        if (bucket->linked_list->count > SPLIT_SIZE) {
+
+            bucket->table = _new_hashtable(hashtable->level + 1);
+            struct key_value key_value;
+
+            while(sll_pop(bucket->linked_list, &key_value)) {
+                hashtable_put_key_value(bucket->table, key_value);
             }
 
-                // if not found, add to bucket
-            // if bucket full, switch to dual mode + split
-            break;
-        
-        case DUAL:
-            // find >= bucket
+        }
 
-            // update the size of the two buckets
-            break;
+    }
 
-        default:
-            printf("Unknown hashtable mode: %d\n", hashtable->mode);
-            break;
+    // todo: P1
+}
+
+void put(struct hashtable *hashtable, ull address) {
+    // find appropriate bucket based on table size
+    ull index = (address >> hashtable->shifts) & HASH_MASK;
+    struct bucket *bucket = &(hashtable->bucket[index]);
+    ull old_count;
+
+    if (bucket->table != NULL) {
+
+        /* This bucket was already expanded */
+        old_count = bucket->table->count;
+        put(bucket->table, address);
+        if (old_count != bucket->table->count) {
+            /* Change detected! Increase count */
+            hashtable->count++;
+        }
+
+    } else {
+
+        /* This bucket was not expanded */
+        old_count = bucket->linked_list->count;
+        sll_add(bucket->linked_list, address);
+        if (old_count != bucket->linked_list->count) {
+            /* Change detected! Increase count */
+            hashtable->count++;
+        }
+
+        if (bucket->linked_list->count > SPLIT_SIZE) {
+
+            bucket->table = _new_hashtable(hashtable->level + 1);
+            struct key_value key_value;
+
+            while(sll_pop(bucket->linked_list, &key_value)) {
+                hashtable_put_key_value(bucket->table, key_value);
+            }
+
+        }
+
     }
 
     // todo: put(struct hashtable *hashtable, struct mem_ref mem_ref)
@@ -109,20 +158,46 @@ void put(struct hashtable *hashtable, ull address) {
 }
 
 void delete(struct hashtable *hashtable, ull address) {
-    switch (hashtable->mode) {
-        case SINGLE:
-            // find in the buckets
-            break;
-        
-        case DUAL:
-            // find >= bucket
+    // find appropriate bucket based on table size
+    ull index = (address >> hashtable->shifts) & HASH_MASK;
+    struct bucket *bucket = &(hashtable->bucket[index]);
+    ull old_count;
 
-            // if the size of the two buckets under shrink size, switch to single mode
-            break;
+    if (bucket->table != NULL) {
 
-        default:
-            printf("Unknown hashtable mode: %d\n", hashtable->mode);
-            break;
+        /* This bucket was already expanded */
+        old_count = bucket->table->count;
+        delete(bucket->table, address);
+        if (old_count != bucket->table->count) {
+            /* Change detected! Increase count */
+            hashtable->count--;
+        }
+
+        if (bucket->table->count < MERGE_SIZE) {
+            struct hashtable *inner_table = bucket->table;
+            struct key_value key_value;
+
+            for (size_t i = 0; i < TABLE_SIZE; ++i) {
+                while(sll_pop(inner_table->bucket[i].linked_list, &key_value)) {
+                    sll_put_key_value(bucket->linked_list, key_value);
+                }
+            }
+            
+            destroy_hashtable(bucket->table);
+            bucket->table = NULL;
+
+        }
+
+    } else {
+
+        /* This bucket was not expanded */
+        old_count = bucket->linked_list->count;
+        sll_remove(bucket->linked_list, address);
+        if (old_count != bucket->linked_list->count) {
+            /* Change detected! Increase count */
+            hashtable->count--;
+        }
+
     }
 
     // todo: delete(struct hashtable *hashtable, struct mem_ref mem_ref)

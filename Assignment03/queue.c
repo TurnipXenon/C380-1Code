@@ -68,7 +68,7 @@ void enqueue(struct queue *queue, struct mem_ref value) {
  * @return ull 
  */
 struct mem_ref dequeue(struct queue *queue) {
-    struct mem_ref value = new_mem_ref();
+    struct mem_ref value;
 
     if (queue->tail != NULL) {
         /* Case: non-empty */
@@ -85,9 +85,11 @@ struct mem_ref dequeue(struct queue *queue) {
             queue->tail->tail = NULL;
         }
 
+        destroy_node(node);
         queue->size--;
     } else {
         /* Case: empty */
+        value = new_mem_ref();
         perror("Attempt to dequeue when queue is empty! Returning empty mem_ref.\n");
     }
     
