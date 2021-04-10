@@ -94,7 +94,7 @@ int main(int argc, char *argv[])
             case 's':
                 skipsize = strtoull(optarg, NULL, 10);
                 // todo: put precautions of negative value
-                printf("skipsize: %llu\n", skipsize);
+                // printf("skipsize: %llu\n", skipsize);
 
                 // todo: additional powers of two check
                 // todo: check if less than
@@ -126,7 +126,7 @@ int main(int argc, char *argv[])
     int num = 0; /* todo: delete */
     while(fgets(str_buffer, BUFFER_SIZE, stdin) != NULL && is_empty_line(str_buffer)) {
         if (sscanf(str_buffer, "%4s %100s", char_code, str_numbers) == 2) {
-            printf("%s %s\n", char_code, str_numbers);
+            // printf("%s %s\n", char_code, str_numbers);
 
             if (is_valid_code(char_code)) {
                 /* todo: skip references here */
@@ -149,17 +149,21 @@ int main(int argc, char *argv[])
                 window_set_insert(ref_address, ref_page_size);
 
                 // printf("Address: %llX  ;  Page size: %llu\n", ref_address, ref_page_size);
-                printf("Window set size %llu\n", get_window_set_size());
-                window_set_debug();
+                printf("%llu\n", get_window_set_size());
+                // printf("%s, %llX, %llu, %llu\n", char_code, ref_address, ref_page_size, get_window_set_size());
+                // window_set_debug();
+                
+                // if (num > 1000) {
+                //     break;
+                // }
+
+                // ++num;
             }
 
-            if (num > 100) {
-                break;
-            }
-
-            ++num;
         }
     }
+
+    destroy_window_set();
 
 
 

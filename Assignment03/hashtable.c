@@ -122,9 +122,11 @@ void put(struct hashtable *hashtable, ull address) {
     if (bucket->table != NULL) {
 
         /* This bucket was already expanded */
+        // printf("Put in hashtable; ");
         old_count = bucket->table->count;
         put(bucket->table, address);
         if (old_count != bucket->table->count) {
+            // printf("Split table; ");
             /* Change detected! Increase count */
             hashtable->count++;
         }
@@ -133,6 +135,7 @@ void put(struct hashtable *hashtable, ull address) {
 
         /* This bucket was not expanded */
         old_count = bucket->linked_list->count;
+        // printf("Put in SLL; ");
         sll_add(bucket->linked_list, address);
         if (old_count != bucket->linked_list->count) {
             /* Change detected! Increase count */

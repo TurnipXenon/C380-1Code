@@ -48,9 +48,10 @@ void sll_put_key_value(struct linked_list *linked_list, struct key_value key_val
 }
 
 static void sll_insert(struct linked_list *linked_list, ull key) {
+    // printf("Add (%llX): %u\n", key, 1u);
     struct key_value key_value;
     key_value.key = key;
-    key_value.value = 0u;
+    key_value.value = 1u;
     sll_put_key_value(linked_list, key_value);
 }
 
@@ -59,9 +60,25 @@ void sll_add(struct linked_list *linked_list, ull key) {
 
     if (node != NULL) {
         node->key_value.value++;
+        // printf("Add (%llX): %llu\n", node->key_value.key, node->key_value.value);
     } else {
         sll_insert(linked_list, key);
     }
+}
+
+static void sll_delete(struct linked_list *linked_list,
+                    struct sll_node *node, 
+                    struct sll_node *previous) {
+    linked_list->count--;
+
+    if (previous != NULL) {
+        previous->next = node->next;
+    } else {
+        /* previous == NULL: next goes on head */
+        linked_list->head = node->next;
+    }
+
+    free(node);
 }
 
 void sll_remove(struct linked_list *linked_list, ull key) {
@@ -70,21 +87,13 @@ void sll_remove(struct linked_list *linked_list, ull key) {
 
     while(node != NULL) {
         if (node->key_value.key == key) {
-            
+
+            // printf("Delete before (%llX): %llu\n", node->key_value.key, node->key_value.value);
             node->key_value.value--;
+            // printf("Delete after (%llX): %llu\n", node->key_value.key, node->key_value.value);
             
             if (node->key_value.value == 0) {
-                /* Delete node */
-                linked_list->count--;
-
-                if (previous != NULL) {
-                    previous->next = node->next;
-                } else {
-                    /* previous == NULL: next goes on head */
-                    linked_list->head = node->next;
-                }
-
-                free(node);
+                sll_delete(linked_list, node, previous);
             }
 
             /* Else: Don't do anything */
@@ -100,7 +109,7 @@ void sll_remove(struct linked_list *linked_list, ull key) {
 bool sll_pop(struct linked_list *linked_list, struct key_value *key_value) {
     if (linked_list->head != NULL) {
         *key_value = linked_list->head->key_value;
-        sll_remove(linked_list, key_value->key);
+        sll_delete(linked_list, linked_list->head, NULL); // remove head
         linked_list->count--;
         return true;
     } else {

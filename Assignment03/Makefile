@@ -1,4 +1,6 @@
 CC=gcc -Wall -Wextra -std=gnu99 -g $(CFLAGS)
+EXRANOFF=setarch `uname -m` -R
+TEST_LOC=results/test210410_0008.txt
 
 .PHONY: all
 all: valws379
@@ -28,12 +30,12 @@ argtest1: valws379
 
 .PHONY: test1
 test1: valws379 lackey_test
-	 valgrind --tool=lackey --trace-mem=yes ./lackey_test 2>&1 /dev/null | ./valws379 -s 3 16 20 > test210409_2220.txt
+	 valgrind --tool=lackey --trace-mem=yes ./lackey_test 2>&1 /dev/null | $(EXRANOFF) ./valws379 -s 3 16 20 > $(TEST_LOC)
 	
 
 .PHONY: valgrind1
 valgrind1: valws379 lackey_test
-	 valgrind --tool=lackey --trace-mem=yes ./lackey_test 2>&1 /dev/null | valgrind --leak-check=full --show-leak-kinds=all ./valws379 -s 3 32 10  > test210409_2220.txt
+	 valgrind --tool=lackey --trace-mem=yes ./lackey_test 2>&1 /dev/null | $(EXRANOFF) valgrind --leak-check=full ./valws379 -s 0 16 100  > $(TEST_LOC)
 
 .PHONY: queue_test1
 queue_test1: queue_test

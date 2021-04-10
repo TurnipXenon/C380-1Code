@@ -32,7 +32,9 @@ void initialize_window_set(ull page_size_, ull window_size_) {
 static void windowset_put(struct mem_ref mem_ref) {
     ull address = mem_ref.address;
     for (ull i = 0; i < mem_ref.page_count; ++i) {
+        // printf("put: ");
         put(hashtable, address);
+        // prinft("\n");
     }
 }
 
@@ -103,5 +105,5 @@ void destroy_window_set() {
  */
 void window_set_debug() {
     // printf("Queue size: %llu\n", queue->size);
-    // queue_debug(queue);
+    queue_debug(queue);
 }
