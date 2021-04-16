@@ -3,12 +3,18 @@
 
 #include "valws379_base.h"
 
+/**
+ * @brief Doubly-linked node
+ */
 struct queue_node {
     struct mem_ref value;
     struct queue_node *head;
     struct queue_node *tail;
 };
 
+/**
+ * @brief Doubly-linked list used as a queue
+ */
 struct queue {
     ull size;
     struct queue_node *head;

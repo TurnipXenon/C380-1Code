@@ -1,5 +1,10 @@
 #include "linkedlist.h"
 
+/**
+ * @brief Properly allocate and initialize a linked list
+ * 
+ * @return struct linked_list* 
+ */
 struct linked_list *new_linked_list() {
     struct linked_list *new = (struct linked_list*) malloc(sizeof(struct linked_list));
     new->count = 0;
@@ -7,6 +12,11 @@ struct linked_list *new_linked_list() {
     return new;
 }
 
+/**
+ * @brief Properly clean up linked list
+ * 
+ * @param linked_list 
+ */
 void destroy_linked_list(struct linked_list *linked_list) {
     struct sll_node *node = linked_list->head;
     struct sll_node *old_node;
@@ -20,6 +30,14 @@ void destroy_linked_list(struct linked_list *linked_list) {
     free(linked_list);
 }
 
+/**
+ * @brief Find a node with the given key, and return the node. If not found,
+ * returns NULL
+ * 
+ * @param linked_list 
+ * @param key 
+ * @return struct sll_node* 
+ */
 static struct sll_node *sll_find(struct linked_list *linked_list, ull key) {
     struct sll_node *node = linked_list->head;
 
@@ -33,6 +51,12 @@ static struct sll_node *sll_find(struct linked_list *linked_list, ull key) {
     return node;
 }
 
+/**
+ * @brief Puts a key value pair as it is on the head
+ * 
+ * @param linked_list 
+ * @param key_value 
+ */
 void sll_put_key_value(struct linked_list *linked_list, struct key_value key_value) {
     struct sll_node *new_head = (struct sll_node*) malloc(sizeof(struct sll_node));
     new_head->key_value = key_value;
@@ -47,6 +71,12 @@ void sll_put_key_value(struct linked_list *linked_list, struct key_value key_val
     linked_list->count++;
 }
 
+/**
+ * @brief Insert a key value pair at the head
+ * 
+ * @param linked_list 
+ * @param key 
+ */
 static void sll_insert(struct linked_list *linked_list, ull key) {
     #ifdef DEBUG_PRINT
     printf("Add (%llX): %u\n", key, 1u);
@@ -57,6 +87,13 @@ static void sll_insert(struct linked_list *linked_list, ull key) {
     sll_put_key_value(linked_list, key_value);
 }
 
+/**
+ * @brief Increment a value with the matching key, otherwise add a new node 
+ * for the key-value pair.
+ * 
+ * @param linked_list 
+ * @param key 
+ */
 void sll_add(struct linked_list *linked_list, ull key) {
     struct sll_node *node = sll_find(linked_list, key);
 
@@ -70,6 +107,14 @@ void sll_add(struct linked_list *linked_list, ull key) {
     }
 }
 
+/**
+ * @brief Delete a linked list. This needs the previous node
+ * to connect it's next node to.
+ * 
+ * @param linked_list 
+ * @param node 
+ * @param previous 
+ */
 static void sll_delete(struct linked_list *linked_list,
                     struct sll_node *node, 
                     struct sll_node *previous) {
@@ -85,6 +130,13 @@ static void sll_delete(struct linked_list *linked_list,
     free(node);
 }
 
+/**
+ * @brief Decrement a value with the matching key. If the value reaches zero, the node
+ * is deleted.
+ * 
+ * @param linked_list 
+ * @param key 
+ */
 void sll_remove(struct linked_list *linked_list, ull key) {
     struct sll_node *node = linked_list->head;
     struct sll_node *previous = NULL;
@@ -92,7 +144,6 @@ void sll_remove(struct linked_list *linked_list, ull key) {
     while(node != NULL) {
         if (node->key_value.key == key) {
 
-            // printf("Delete before (%llX): %llu\n", node->key_value.key, node->key_value.value);
             node->key_value.value--;
             #ifdef DEBUG_PRINT
             printf("Delete after (%llX): %llu\n", node->key_value.key, node->key_value.value);
@@ -110,6 +161,15 @@ void sll_remove(struct linked_list *linked_list, ull key) {
     }
 }
 
+/**
+ * @brief Remove head and set it to key_value. Return false if there's no element inside
+ * the linked list.
+ * 
+ * @param linked_list 
+ * @param key_value 
+ * @return true 
+ * @return false 
+ */
 bool sll_pop(struct linked_list *linked_list, struct key_value *key_value) {
     if (linked_list->head != NULL) {
         *key_value = linked_list->head->key_value;

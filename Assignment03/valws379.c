@@ -1,68 +1,14 @@
-#include <stdio.h>
+#include <stdio.h> 
 #include <stdlib.h>
-#include <string.h>
-#include <unistd.h> /* for getopt */
-#include <libgen.h> /* for basename */
-#include <ctype.h> /* for isspace */
-#include <stdbool.h>
 
 #include "windowset.h"
+#include "valws379_base.h"
 
 #define BUFFER_SIZE 1000
 
-#define DEBUG_START "# Start\n"
-#define DEBUG_END "# End\n"
+// #define DEBUG_START "# Start\n"
+// #define DEBUG_END "# End\n"
 // #define DEBUG_SKIP_PRINT 63
-
-/**
- * @brief 
- * 
- * @remark
- * From Assignment 2 getopt example
- * 
- * @param program_name 
- */
-void print_usage(char *program_name) {
-    printf("Usage %s [-s <skipsize>] pgsize windowsize\n", basename(program_name));
-}
-
-/**
- * @brief from https://stackoverflow.com/a/27607770/10024566
- * 
- * @param line 
- * @return bool 
- */
-bool is_empty_line(const char *line)
-{
-    /* check if the string consists only of spaces. */
-    while (*line != '\0')
-    {
-        if (isspace(*line) == 0) {
-            return true;
-        }
-
-        line++;
-    }
-
-    return false;
-}
-
-bool is_valid_code(const char* key) {
-    const char * valid_codes[] = {
-        "I",
-        "S",
-        "L",
-        "M"
-    };
-    
-    for (int i = 0; i < 4; ++i) {
-        if (strcmp(key, valid_codes[i]) == 0) {
-            return true;
-        }
-    }
-
-    return false;
-}
 
 /**
  * @brief 

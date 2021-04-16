@@ -1,5 +1,12 @@
 #include "hashtable.h"
 
+
+/**
+ * @brief Allocate and properly initialize a hashtable for windowset
+ * 
+ * @param level needed for indexing and creating deeper levels
+ * @return struct hashtable* 
+ */
 struct hashtable *_new_hashtable(ull level) {
     struct hashtable *hashtable = (struct hashtable*) malloc(sizeof(struct hashtable));
     hashtable->count = 0u;
@@ -14,10 +21,22 @@ struct hashtable *_new_hashtable(ull level) {
     return hashtable;
 }
 
+/**
+ * @brief Allocate and properly initialize a hashtable for windowset
+ * 
+ * Hides the actual need for the levels for creating a new hashtable
+ * 
+ * @return struct hashtable* 
+ */
 struct hashtable *new_hashtable() {
     return _new_hashtable(0);
 }
 
+/**
+ * @brief Do clean up properly for a hashtable
+ * 
+ * @param hashtable 
+ */
 void destroy_hashtable(struct hashtable *hashtable) {
     if (hashtable != NULL) {
         
@@ -33,38 +52,8 @@ void destroy_hashtable(struct hashtable *hashtable) {
     }
 }
 
-// static struct key_value *find_in_bucket(struct key_value *bucket[], ull key) {
-//     for (size_t i = 0; i < GROW_SIZE; i++)
-//     {
-//         if (bucket[i]->key == key) {
-//             return bucket[i];
-//         }
-//     }
-    
-//     return NULL;
-// }
-
-// static void add_to_bucket(struct key_value *bucket[], ull key) {
-//     struct key_value *node = (struct key_value*) malloc(sizeof(struct key_value));
-//     size_t i = 0;
-
-//     node->key = key; 
-//     node->value = 1; // we now have one thing
-
-//     for (; i < GROW_SIZE; ++i) {
-//         if (bucket[i] == NULL) {
-//             bucket[i] = node;
-//             break;
-//         }
-//     }
-    
-//     if (i == GROW_SIZE) {
-//         perror("Bucket overfilled! This should not happen. Entry not added.\n");
-//     }
-// }
-
 /**
- * @brief 
+ * @brief Puts the key value pair as-is into the hashtable buckets
  * 
  * Assumes that the key is unique.
  * 
@@ -72,7 +61,7 @@ void destroy_hashtable(struct hashtable *hashtable) {
  * @param key_value 
  */
 static void hashtable_put_key_value(struct hashtable *hashtable, struct key_value key_value) {
-    // find appropriate bucket based on table size
+    /* find appropriate bucket based on table size */
     ull index = (key_value.key >> hashtable->shifts) & HASH_MASK;
     struct bucket *bucket = &(hashtable->bucket[index]);
     ull old_count;
@@ -109,12 +98,16 @@ static void hashtable_put_key_value(struct hashtable *hashtable, struct key_valu
         }
 
     }
-
-    // todo: P1
 }
 
+/**
+ * @brief Increase the count of the address on the hashtable
+ * 
+ * @param hashtable 
+ * @param address 
+ */
 void put(struct hashtable *hashtable, ull address) {
-    // find appropriate bucket based on table size
+    /* find appropriate bucket based on table size */
     ull index = (address >> hashtable->shifts) & HASH_MASK;
     struct bucket *bucket = &(hashtable->bucket[index]);
     ull old_count;
@@ -122,11 +115,9 @@ void put(struct hashtable *hashtable, ull address) {
     if (bucket->table != NULL) {
 
         /* This bucket was already expanded */
-        // printf("Put in hashtable; ");
         old_count = bucket->table->count;
         put(bucket->table, address);
         if (old_count != bucket->table->count) {
-            // printf("Split table; ");
             /* Change detected! Increase count */
             hashtable->count++;
         }
@@ -135,7 +126,6 @@ void put(struct hashtable *hashtable, ull address) {
 
         /* This bucket was not expanded */
         old_count = bucket->linked_list->count;
-        // printf("Put in SLL; ");
         sll_add(bucket->linked_list, address);
         if (old_count != bucket->linked_list->count) {
             /* Change detected! Increase count */
@@ -154,12 +144,15 @@ void put(struct hashtable *hashtable, ull address) {
         }
 
     }
-
-    // todo: put(struct hashtable *hashtable, struct mem_ref mem_ref)
-
-    // todo: update size
 }
 
+
+/**
+ * @brief Reduce the count of the address on the hashtable
+ * 
+ * @param hashtable 
+ * @param address 
+ */
 void delete(struct hashtable *hashtable, ull address) {
     // find appropriate bucket based on table size
     ull index = (address >> hashtable->shifts) & HASH_MASK;
@@ -202,8 +195,4 @@ void delete(struct hashtable *hashtable, ull address) {
         }
 
     }
-
-    // todo: delete(struct hashtable *hashtable, struct mem_ref mem_ref)
-
-    // todo: update size
 }
