@@ -1,3 +1,21 @@
+/**
+ * @file valws379.c
+ * @brief Prints the windowset size as input is being streamed into it
+ * 
+ * @remark define DEBUG_START "%s\n" string if you want to start printing only once
+ * "%s\n" is printed
+ * @remark define DEBUG_END "%s\n" string if you want to stop printing only once
+ * "%s\n" is printed
+ * @remark define DEBUG_SKIP_PRINT unsigned long long if you want to skip SKIP_PRINT windowset size
+ * prints once you print a windowset size. Useful for very big datasets.
+ * @remark define DEBUG_COMMENTS if you want to also want to print comments or string 
+ * inputs that start with #
+ * @remark define DEBUG_PRINT if you want to print details about the memory reference,
+ * and other debug logging features for windowset
+ * @remark define DEBUG_LIMIT unsigned long long if you want to have numeric limit for 
+ * the windowset sizes printed. It's like skipsizes but on the other end.
+ */
+
 #include <stdio.h> 
 #include <stdlib.h>
 
@@ -6,22 +24,8 @@
 
 #define BUFFER_SIZE 1000
 
-// #define DEBUG_START "# Start\n"
-// #define DEBUG_END "# End\n"
-// #define DEBUG_SKIP_PRINT 63
-
-/**
- * @brief 
- * 
- * whatever 2> asdfa.txt
- * 
- * @param argc 
- * @param argv 
- * @return int 
- */
 int main(int argc, char *argv[])
 {
-    // todo: do arguments
     ull skipsize = 0u;
     ull page_size = 0u;
     ull window_size = 0u;
@@ -38,23 +42,18 @@ int main(int argc, char *argv[])
     /* From get opt example */
     int c;
 
-    // call getopt until all options are proccessed
+    /* call getopt until all options are proccessed */
     while ((c = getopt(argc, argv, "s:h")) != -1) {
         switch (c) {
             case 's':
-                skipsize = strtoull(optarg, NULL, 10) + 1; // adjust cause non-zero start
-                // todo: put precautions of negative value
-                // printf("skipsize: %llu\n", skipsize);
-
-                // todo: additional powers of two check
-                // todo: check if less than
+                skipsize = strtoull(optarg, NULL, 10) + 1;
                 break;
 
             case 'h':
                 print_usage(argv[0]);
                 return 0;
             case '?':
-                // option not in optstring or error
+                /* option not in optstring or error */
                 break;
         }
     }
@@ -72,17 +71,16 @@ int main(int argc, char *argv[])
 
     #ifdef DEBUG_START
     bool is_start = false;
-    #endif
+    #endif /* DEBUG_START */
 
     #ifdef DEBUG_SKIP_PRINT
     ull skips = 0;
-    #endif
+    #endif /* DEBUG_SKIP_PRINT */
 
     /* from: https://stackoverflow.com/a/27607770/10024566 */
     ull mem_ref_count = 0u;
     while(fgets(str_buffer, BUFFER_SIZE, stdin) != NULL && is_empty_line(str_buffer)) {
         if (sscanf(str_buffer, "%4s %100s", char_code, str_numbers) == 2) {
-            // printf("%s %s\n", char_code, str_numbers);
 
             if (is_valid_code(char_code)) {
                 /* todo: skip references here */
@@ -95,10 +93,9 @@ int main(int argc, char *argv[])
                 if (!is_start) {
                     continue;
                 }
-                #endif 
+                #endif /* DEBUG_START */
 
                 #ifdef DEBUG_SKIP_PRINT
-
                 /* For clarity */
                 bool shouldSkip = skips != 0;
 
@@ -112,8 +109,7 @@ int main(int argc, char *argv[])
 
                     continue;
                 }
-
-                #endif
+                #endif /* DEBUG_SKIP_PRINT */
 
                 /* from: https://stackoverflow.com/a/1483218/10024566 */
                 token = strtok(str_numbers, seps);
@@ -143,19 +139,19 @@ int main(int argc, char *argv[])
             if (strcmp(char_code, "#") == 0) {
                 printf("%s", str_buffer);
             }
-            #endif
+            #endif /* DEBUG_COMMENTS */
 
             #ifdef DEBUG_START
             if (!is_start && strcmp(str_buffer, DEBUG_START) == 0) {
                 is_start = true;
             }
-            #endif
+            #endif /* DEBUG_START */
 
             #ifdef DEBUG_END
             if (strcmp(str_buffer, DEBUG_END) == 0) {
                 break;
             }
-            #endif
+            #endif /* DEBUG_END */
         }
     }
 

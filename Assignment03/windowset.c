@@ -1,3 +1,10 @@
+/**
+ * @file windowset.c
+ * @brief Windowset is a queue and hashtable that keeps track of the windowset size
+ * 
+ * @remark define DEBUG_PRINT if you want to print details about the queue
+ */
+
 #include "windowset.h"
 
 static int page_exponent = 4;
@@ -29,6 +36,11 @@ void initialize_window_set(ull page_size_, ull window_size_) {
     hashtable = new_hashtable();
 }
 
+/**
+ * @brief Breaks down a mem_ref into individual addresses and puts them into the hashtable
+ * 
+ * @param mem_ref 
+ */
 static void windowset_put(struct mem_ref mem_ref) {
     ull address = mem_ref.address;
     for (ull i = 0; i < mem_ref.page_count; ++i) {
@@ -36,6 +48,11 @@ static void windowset_put(struct mem_ref mem_ref) {
     }
 }
 
+/**
+ * @brief Breaks down a mem_ref into individual addresses and puts them into
+ * 
+ * @param mem_ref 
+ */
 static void windowset_delete(struct mem_ref mem_ref) {
     ull address = mem_ref.address;
     for (ull i = 0; i < mem_ref.page_count; ++i) {
@@ -90,12 +107,9 @@ void destroy_window_set() {
     destroy_hashtable(hashtable);
 }
 
-
-
 #ifdef DEBUG_PRINT
 /**
- * @brief todo: delete
- * 
+ * @brief Print details about the queue for debugging purposes
  */
 void window_set_debug() {
     queue_debug(queue);

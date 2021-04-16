@@ -105,4 +105,10 @@ to distinct data structures. For deletion, that's 90 accesses to distinct data s
 
 Space used by the implementation is the combination of that of the queue
 and the hashatble's. Worst case for time spent are in the hashtable where there
-may be expanding or shrinking buckets during insertion / deletion.
+may be expanding or shrinking buckets during insertion / deletion. It's worth pointing out
+that the implementation does not really work well for memory references that exceed page sizes.
+It's mostly good for random one-time acesses (what hashtables are good at), but not
+for large consecutive data (which may have better ways of handling if that's the
+majority of the data). For memory references that do span several pages, the implementation
+breaks it down and treats each page as an individual page (@see windowset_put and
+windowset_delete in windowset.c).

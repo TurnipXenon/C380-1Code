@@ -1,3 +1,11 @@
+/**
+ * @file queue.h
+ * @brief Doubly-linked list used as a queue for checking out which memory reference
+ * is already out of the windowset
+ * 
+ * @remark define DEBUG_PRINT to gain access to queue_debug()
+ */
+
 #ifndef _QUEUE_H_
 #define _QUEUE_H_
 
@@ -51,11 +59,13 @@ struct mem_ref dequeue(struct queue *queue);
  */
 void destroy_queue(struct queue *queue);
 
+#ifdef DEBUG_PRINT
 /**
- * @brief todo: delete
+ * @brief Print details about the queue for debugging purposes
  * 
  * @param queue 
  */
 void queue_debug(struct queue *queue);
+#endif /* DEBUG_PRINT */
 
 #endif /* _QUEUE_H_ */

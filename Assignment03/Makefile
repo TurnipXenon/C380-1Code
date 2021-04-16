@@ -1,6 +1,6 @@
-CC=gcc -Wall -Wextra -std=gnu99 -g $(CFLAGS)
+CC=gcc -Wall -Wextra -std=gnu99 $(CFLAGS)
 EXRANOFF=setarch `uname -m` -R
-TEST_LOC=results/test210415_1915.txt
+TEST_LOC=results/test210416_1022.txt
 VALGRIND_PREFIX=valgrind --tool=lackey --trace-mem=yes
 
 .PHONY: all
@@ -32,7 +32,7 @@ test1: valws379 lackey_test
 
 .PHONY: valgrind1
 valgrind1: valws379 lackey_test
-	 valgrind --tool=lackey --trace-mem=yes ./lackey_test 2>&1 /dev/null | $(EXRANOFF) valgrind --leak-check=full ./valws379 16 1000  > $(TEST_LOC)
+	 valgrind --tool=lackey --trace-mem=yes ./lackey_test 2>&1 /dev/null | $(EXRANOFF) valgrind --leak-check=full ./valws379 -s 212700 16 1000  > $(TEST_LOC)
 
 .PHONY: test_radixsort_full
 test_radixsort_full: results/radixsort.out valws379

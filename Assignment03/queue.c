@@ -114,9 +114,9 @@ void destroy_queue(struct queue *queue) {
     free(queue);
 }
 
-
+#ifdef DEBUG_PRINT
 /**
- * @brief todo: delete
+ * @brief Print details about the queue for debugging purposes
  * 
  * @param queue 
  */
@@ -132,3 +132,4 @@ void queue_debug(struct queue *queue) {
 
     printf("NULL\n");
 }
+#endif /* DEBUG_PRINT */
