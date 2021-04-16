@@ -45,3 +45,7 @@ valgrind1: valws379 lackey_test
 .PHONY: queue_test1
 queue_test1: queue_test
 	valgrind --leak-check=full ./queue_test
+
+.PHONY: test_heapsort25
+test_heapsort25: results/heapsort.out valws379 lackey_test
+	$(VALGRIND_PREFIX) ./results/heapsort.out 100 2>&1 /dev/null | ./valws379 4096 100000 > results/heapsort_result_25.txt

@@ -50,7 +50,7 @@ When getting the size of the windowset, we get the size of the hashtable.
 ## Queue
 
 The queue is a standard doubly-linked list. It's worst space complexity is O(n) where n is
-the window size. For enqueueing and dequeueing, the worst time complexity is O(1)
+the window size + 1. For enqueueing and dequeueing, the worst time complexity is O(1)
 since we keep a reference of what's the tail and head.
 
 ## Singly-Linked List
