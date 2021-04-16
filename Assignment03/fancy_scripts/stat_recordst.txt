@@ -1,0 +1,1040 @@
+gnuplot> stat "../quicksort/quicksort_std.txt"
+
+* FILE: 
+  Records:           9415948
+  Out of range:            0
+  Invalid:                 0
+  Column headers:          0
+  Blank:                   0
+  Data Blocks:             1
+
+* COLUMNS:
+  Mean:          5.76815e+06                  4.4037
+  Std Dev:       2.71815e+06                  1.8122
+  Sample StdDev: 2.71815e+06                  1.8122
+  Skewness:           0.0000                  3.3065
+  Kurtosis:           1.8000                 19.4734
+  Avg Dev:       2.35399e+06                  1.1679
+  Sum:           5.43126e+13             4.14646e+07
+  Sum Sq.:       3.82851e+20             2.13519e+08
+
+  Mean Err.:        885.8117                  0.0006
+  Std Dev Err.:     626.3634                  0.0004
+  Skewness Err.:      0.0008                  0.0008
+  Kurtosis Err.:      0.0016                  0.0016
+
+  Minimum:       1.06017e+06 [      0]        1.0000 [      0]
+  Maximum:       1.04761e+07 [9415947]       26.0000 [9415947]
+  Quartile:      3.41416e+06                  3.0000
+  Median:        5.76815e+06                  4.0000
+  Quartile:      8.12213e+06                  5.0000
+
+  Linear Model:       y = -2.953e-07 x + 6.107
+  Slope:              -2.953e-07 +- 1.948e-10
+  Intercept:          6.107 +- 0.001242
+  Correlation:        r = -0.443
+  Sum xy:             2.186e+14
+
+gnuplot> stat "../quicksort/quicksort_page_1.txt"
+
+* FILE: 
+  Records:           9247331
+  Out of range:            0
+  Invalid:                 0
+  Column headers:          0
+  Blank:                   0
+  Data Blocks:             1
+
+* COLUMNS:
+  Mean:          5.68451e+06                  8.3682
+  Std Dev:       2.66947e+06                  4.9114
+  Sample StdDev: 2.66947e+06                  4.9114
+  Skewness:           0.0000                  1.8177
+  Kurtosis:           1.8000                  6.4379
+  Avg Dev:       2.31183e+06                  3.6505
+  Sum:           5.25665e+13             7.73832e+07
+  Sum Sq.:       3.64712e+20             8.70620e+08
+
+  Mean Err.:        877.8445                  0.0016
+  Std Dev Err.:     620.7298                  0.0011
+  Skewness Err.:      0.0008                  0.0008
+  Kurtosis Err.:      0.0016                  0.0016
+
+  Minimum:       1.06084e+06 [      0]        1.0000 [      0]
+  Maximum:       1.03082e+07 [9247330]       37.0000 [9247330]
+  Quartile:      3.37268e+06                  5.0000
+  Median:        5.68451e+06                  6.0000
+  Quartile:      7.99634e+06                 10.0000
+
+  Linear Model:       y = -9.526e-07 x + 13.78
+  Slope:              -9.526e-07 +- 5.176e-10
+  Intercept:          13.78 +- 0.003251
+  Correlation:        r = -0.5177
+  Sum xy:             3.771e+14
+
+gnuplot> stat "../quicksort/quicksort_page_2.txt"
+
+* FILE: 
+  Records:           9150760
+  Out of range:            0
+  Invalid:                 0
+  Column headers:          0
+  Blank:                   0
+  Data Blocks:             1
+
+* COLUMNS:
+  Mean:          5.63555e+06                  6.0549
+  Std Dev:       2.64160e+06                  2.0054
+  Sample StdDev: 2.64160e+06                  2.0054
+  Skewness:           0.0000                  2.1594
+  Kurtosis:           1.8000                 11.2331
+  Avg Dev:       2.28769e+06                  1.4325
+  Sum:           5.15696e+13             5.54065e+07
+  Sum Sq.:       3.54478e+20             3.72281e+08
+
+  Mean Err.:        873.2487                  0.0007
+  Std Dev Err.:     617.4801                  0.0005
+  Skewness Err.:      0.0008                  0.0008
+  Kurtosis Err.:      0.0016                  0.0016
+
+  Minimum:       1.06017e+06 [      0]        1.0000 [      0]
+  Maximum:       1.02109e+07 [9150759]       31.0000 [9150759]
+  Quartile:      3.34786e+06                  5.0000
+  Median:        5.63555e+06                  6.0000
+  Quartile:      7.92324e+06                  7.0000
+
+  Linear Model:       y = -3.336e-07 x + 7.935
+  Slope:              -3.336e-07 +- 2.254e-10
+  Intercept:          7.935 +- 0.001403
+  Correlation:        r = -0.4394
+  Sum xy:             2.909e+14
+
+gnuplot> stat "../quicksort/quicksort_page_3.txt"
+
+* FILE: 
+  Records:           10144468
+  Out of range:             0
+  Invalid:                  0
+  Column headers:           0
+  Blank:                    0
+  Data Blocks:              1
+
+* COLUMNS:
+  Mean:          6.13241e+06                   3.7716
+  Std Dev:       2.92846e+06                   1.2229
+  Sample StdDev: 2.92846e+06                   1.2229
+  Skewness:           0.0000                   4.1041
+  Kurtosis:           1.8000                  28.1547
+  Avg Dev:       2.53612e+06                   0.7665
+  Sum:           6.22100e+13              3.82610e+07
+  Sum Sq.:       4.68495e+20              1.59476e+08
+
+  Mean Err.:        919.4413                   0.0004
+  Std Dev Err.:     650.1432                   0.0003
+  Skewness Err.:      0.0008                   0.0008
+  Kurtosis Err.:      0.0015                   0.0015
+
+  Minimum:       1.06018e+06 [       0]        1.0000 [       0]
+  Maximum:       1.12046e+07 [10144467]       16.0000 [10144467]
+  Quartile:      3.59629e+06                   3.0000
+  Median:        6.13241e+06                   4.0000
+  Quartile:      8.66853e+06                   4.0000
+
+  Linear Model:       y = -1.687e-07 x + 4.806
+  Slope:              -1.687e-07 +- 1.199e-10
+  Intercept:          4.806 +- 0.0008151
+  Correlation:        r = -0.4039
+  Sum xy:             2.2e+14
+
+gnuplot> stat "../quicksort/quicksort_page_4.txt"
+
+* FILE: 
+  Records:           9196116
+  Out of range:            0
+  Invalid:                 0
+  Column headers:          0
+  Blank:                   0
+  Data Blocks:             1
+
+* COLUMNS:
+  Mean:          5.65823e+06                  3.3530
+  Std Dev:       2.65469e+06                  0.7994
+  Sample StdDev: 2.65469e+06                  0.7994
+  Skewness:           0.0000                  4.5024
+  Kurtosis:           1.8000                 31.1089
+  Avg Dev:       2.29903e+06                  0.5197
+  Sum:           5.20338e+13             3.08348e+07
+  Sum Sq.:       3.59228e+20             1.09266e+08
+
+  Mean Err.:        875.4102                  0.0003
+  Std Dev Err.:     619.0085                  0.0002
+  Skewness Err.:      0.0008                  0.0008
+  Kurtosis Err.:      0.0016                  0.0016
+
+  Minimum:       1.06017e+06 [      0]        1.0000 [      0]
+  Maximum:       1.02563e+07 [9196115]       12.0000 [9196115]
+  Quartile:      3.35920e+06                  3.0000
+  Median:        5.65823e+06                  3.0000
+  Quartile:      7.95726e+06                  4.0000
+
+  Linear Model:       y = -9.514e-08 x + 3.891
+  Slope:              -9.514e-08 +- 9.421e-11
+  Intercept:          3.891 +- 0.0005888
+  Correlation:        r = -0.316
+  Sum xy:             1.683e+14
+
+gnuplot> stat "../quicksort/quicksort_size_1.txt"
+
+* FILE:
+  Records:           45699
+  Out of range:          0
+  Invalid:               0
+  Column headers:        0
+  Blank:                 0
+  Data Blocks:           1
+
+* COLUMNS:
+  Mean:           75044.0000               13.1407
+  Std Dev:        13192.1650                1.3583
+  Sample StdDev:  13192.3093                1.3583
+  Skewness:           0.0000                6.4773
+  Kurtosis:           1.8000               59.8938
+  Avg Dev:        11424.7500                0.3219
+  Sum:           3.42944e+09           600518.0000
+  Sum Sq.:       2.65312e+14           7.97555e+06
+
+  Mean Err.:         61.7110                0.0064
+  Std Dev Err.:      43.6363                0.0045
+  Skewness Err.:      0.0115                0.0115
+  Kurtosis Err.:      0.0229                0.0229
+
+  Minimum:        52195.0000 [    0]        1.0000 [    0]
+  Maximum:        97893.0000 [45698]       25.0000 [45698]
+  Quartile:       63619.0000               13.0000
+  Median:         75044.0000               13.0000
+  Quartile:       86469.0000               13.0000
+
+  Linear Model:       y = 2.413e-05 x + 11.33
+  Slope:              2.413e-05 +- 4.682e-07
+  Intercept:          11.33 +- 0.03568
+  Correlation:        r = 0.2343
+  Sum xy:             4.526e+10
+
+gnuplot> stat "../quicksort/quicksort_size_2.txt"
+
+* FILE: 
+  Records:           681460
+  Out of range:           0
+  Invalid:                0
+  Column headers:         0
+  Blank:                  0
+  Data Blocks:            1
+
+* COLUMNS:
+  Mean:          483998.5000                 5.2340
+  Std Dev:       196720.5572                 3.6974
+  Sample StdDev: 196720.7016                 3.6974
+  Skewness:           0.0000                 1.9474
+  Kurtosis:           1.8000                 4.9790
+  Avg Dev:       170365.0000                 2.6044
+  Sum:           3.29826e+11            3.56674e+06
+  Sum Sq.:       1.86007e+17            2.79841e+07
+
+  Mean Err.:        238.3030                 0.0045
+  Std Dev Err.:     168.5057                 0.0032
+  Skewness Err.:      0.0030                 0.0030
+  Kurtosis Err.:      0.0059                 0.0059
+
+  Minimum:       143269.0000 [     0]        1.0000 [     0]
+  Maximum:       824728.0000 [681459]       25.0000 [681459]
+  Quartile:      313633.5000                 3.0000
+  Median:        483998.5000                 4.0000
+  Quartile:      654363.5000                 4.0000
+
+  Linear Model:       y = -1.216e-05 x + 11.12
+  Slope:              -1.216e-05 +- 1.736e-08
+  Intercept:          11.12 +- 0.009072
+  Correlation:        r = -0.6468
+  Sum xy:             1.406e+12
+
+gnuplot> stat "../quicksort/quicksort_size_3.txt"
+
+* FILE: 
+  Records:           116659588
+  Out of range:              0
+  Invalid:                   0
+  Column headers:            0
+  Blank:                     0
+  Data Blocks:               1
+
+* COLUMNS:
+  Mean:          6.85585e+07                    4.6550
+  Std Dev:       3.36767e+07                    1.5109
+  Sample StdDev: 3.36767e+07                    1.5109
+  Skewness:           0.0000                    0.9488
+  Kurtosis:           1.8000                    4.3818
+  Avg Dev:       2.91649e+07                    1.2604
+  Sum:           7.99801e+15               5.43047e+08
+  Sum Sq.:       6.80638e+23               2.79417e+09
+
+  Mean Err.:       3117.9532                    0.0001
+  Std Dev Err.:    2204.7259                    0.0001
+  Skewness Err.:      0.0002                    0.0002
+  Kurtosis Err.:      0.0005                    0.0005
+
+  Minimum:       1.02287e+07 [        0]        1.0000 [        0]
+  Maximum:       1.26888e+08 [116659587]       25.0000 [116659587]
+  Quartile:      3.93936e+07                    3.0000
+  Median:        6.85585e+07                    4.0000
+  Quartile:      9.77234e+07                    6.0000
+
+  Linear Model:       y = -1.211e-08 x + 5.485
+  Slope:              -1.211e-08 +- 4e-12
+  Intercept:          5.485 +- 0.0003055
+  Correlation:        r = -0.2699
+  Sum xy:             3.563e+16
+
+gnuplot> stat "../quicksort/quicksort_size_4.txt"
+
+* FILE:
+  Records:           4207696
+  Out of range:            0
+  Invalid:                 0
+  Column headers:          0
+  Blank:                   0
+  Data Blocks:             1
+
+* COLUMNS:
+  Mean:          1.52958e+08                 35.6419
+  Std Dev:       7.65234e+07                 33.7112
+  Sample StdDev: 7.65234e+07                 33.7112
+  Skewness:           0.0000                  2.0236
+  Kurtosis:           1.8000                  7.1570
+  Avg Dev:       6.62712e+07                 25.0243
+  Sum:           6.43602e+14             1.49970e+08
+  Sum Sq.:       1.23084e+23             1.01270e+10
+
+  Mean Err.:      37305.4346                  0.0164
+  Std Dev Err.:   26378.9258                  0.0116
+  Skewness Err.:      0.0012                  0.0012
+  Kurtosis Err.:      0.0024                  0.0024
+
+  Minimum:       2.04158e+07 [      0]        1.0000 [      0]
+  Maximum:       2.85501e+08 [4207695]      188.0000 [ 422098]
+  Quartile:      8.66870e+07                 14.0000
+  Median:        1.52958e+08                 21.0000
+  Quartile:      2.19229e+08                 45.0000
+
+  Linear Model:       y = -1.966e-07 x + 65.72
+  Slope:              -1.966e-07 +- 1.922e-10
+  Intercept:          65.72 +- 0.03287
+  Correlation:        r = -0.4464
+  Sum xy:             1.809e+16
+
+gnuplot> stat "../quicksort/quicksort_window_1.txt"
+
+* FILE: 
+  Records:           9622805
+  Out of range:            0
+  Invalid:                 0
+  Column headers:          0
+  Blank:                   0
+  Data Blocks:             1
+
+* COLUMNS:
+  Mean:          5.87225e+06                  3.2128
+  Std Dev:       2.77786e+06                  0.4546
+  Sample StdDev: 2.77786e+06                  0.4546
+  Skewness:           0.0000                  6.3163
+  Kurtosis:           1.8000                179.3170
+  Avg Dev:       2.40570e+06                  0.3377
+  Sum:           5.65075e+13             3.09161e+07
+  Sum Sq.:       4.06080e+20             1.01316e+08
+
+  Mean Err.:        895.4889                  0.0001
+  Std Dev Err.:     633.2063                  0.0001
+  Skewness Err.:      0.0008                  0.0008
+  Kurtosis Err.:      0.0016                  0.0016
+
+  Minimum:       1.06084e+06 [      0]        1.0000 [      0]
+  Maximum:       1.06836e+07 [9622804]       24.0000 [9622804]
+  Quartile:      3.46654e+06                  3.0000
+  Median:        5.87225e+06                  3.0000
+  Quartile:      8.27795e+06                  3.0000
+
+  Linear Model:       y = -3.742e-08 x + 3.433
+  Slope:              -3.742e-08 +- 5.136e-11
+  Intercept:          3.433 +- 0.0003337
+  Correlation:        r = -0.2286
+  Sum xy:             1.788e+14
+
+gnuplot> stat "../quicksort/quicksort_window_2.txt"
+
+* FILE: 
+  Records:           8953683
+  Out of range:            0
+  Invalid:                 0
+  Column headers:          0
+  Blank:                   0
+  Data Blocks:             1
+
+* COLUMNS:
+  Mean:          5.53702e+06                  3.3526
+  Std Dev:       2.58471e+06                  0.6824
+  Sample StdDev: 2.58471e+06                  0.6824
+  Skewness:           0.0000                  6.2407
+  Kurtosis:           1.8000                 99.1812
+  Avg Dev:       2.23842e+06                  0.4965
+  Sum:           4.95767e+13             3.00182e+07
+  Sum Sq.:       3.34324e+20             1.04809e+08
+
+  Mean Err.:        863.7941                  0.0002
+  Std Dev Err.:     610.7947                  0.0002
+  Skewness Err.:      0.0008                  0.0008
+  Kurtosis Err.:      0.0016                  0.0016
+
+  Minimum:       1.06017e+06 [      0]        1.0000 [      0]
+  Maximum:       1.00139e+07 [8953682]       25.0000 [8953682]
+  Quartile:      3.29859e+06                  3.0000
+  Median:        5.53702e+06                  3.0000
+  Quartile:      7.77544e+06                  4.0000
+
+  Linear Model:       y = -4.484e-08 x + 3.601
+  Slope:              -4.484e-08 +- 8.695e-11
+  Intercept:          3.601 +- 0.0005313
+  Correlation:        r = -0.1698
+  Sum xy:             1.635e+14
+
+gnuplot> stat "../quicksort/quicksort_window_2.txt"
+
+* FILE: 
+  Records:           8953683
+  Out of range:            0
+  Invalid:                 0
+  Column headers:          0
+  Blank:                   0
+  Data Blocks:             1
+
+* COLUMNS:
+  Mean:          5.53702e+06                  3.3526
+  Std Dev:       2.58471e+06                  0.6824
+  Sample StdDev: 2.58471e+06                  0.6824
+  Skewness:           0.0000                  6.2407
+  Kurtosis:           1.8000                 99.1812
+  Avg Dev:       2.23842e+06                  0.4965
+  Sum:           4.95767e+13             3.00182e+07
+  Sum Sq.:       3.34324e+20             1.04809e+08
+
+  Mean Err.:        863.7941                  0.0002
+  Std Dev Err.:     610.7947                  0.0002
+  Skewness Err.:      0.0008                  0.0008
+  Kurtosis Err.:      0.0016                  0.0016
+
+  Minimum:       1.06017e+06 [      0]        1.0000 [      0]
+  Maximum:       1.00139e+07 [8953682]       25.0000 [8953682]
+  Quartile:      3.29859e+06                  3.0000
+  Median:        5.53702e+06                  3.0000
+  Quartile:      7.77544e+06                  4.0000
+
+  Linear Model:       y = -4.484e-08 x + 3.601
+  Slope:              -4.484e-08 +- 8.695e-11
+  Intercept:          3.601 +- 0.0005313
+  Correlation:        r = -0.1698
+  Sum xy:             1.635e+14
+
+gnuplot> stat "../quicksort/quicksort_window_3.txt"
+
+* FILE: 
+  Records:           9167703
+  Out of range:            0
+  Invalid:                 0
+  Column headers:          0
+  Blank:                   0
+  Data Blocks:             1
+
+* COLUMNS:
+  Mean:          5.64402e+06                  8.1425
+  Std Dev:       2.64649e+06                  4.8506
+  Sample StdDev: 2.64649e+06                  4.8506
+  Skewness:           0.0000                  1.8476
+  Kurtosis:           1.8000                  5.5653
+  Avg Dev:       2.29193e+06                  3.5579
+  Sum:           5.17427e+13             7.46480e+07
+  Sum Sq.:       3.56247e+20             8.23521e+08
+
+  Mean Err.:        874.0568                  0.0016
+  Std Dev Err.:     618.0515                  0.0011
+  Skewness Err.:      0.0008                  0.0008
+  Kurtosis Err.:      0.0016                  0.0016
+
+  Minimum:       1.06017e+06 [      0]        1.0000 [      0]
+  Maximum:       1.02279e+07 [9167702]       27.0000 [9167702]
+  Quartile:      3.35210e+06                  5.0000
+  Median:        5.64402e+06                  6.0000
+  Quartile:      7.93595e+06                  9.0000
+
+  Linear Model:       y = -1.303e-06 x + 15.5
+  Slope:              -1.303e-06 +- 4.258e-10
+  Intercept:          15.5 +- 0.002654
+  Correlation:        r = -0.7108
+  Sum xy:             3.377e+14
+
+gnuplot> stat "../quicksort/quicksort_window_4.txt"
+
+* FILE: 
+  Records:           8991211
+  Out of range:            0
+  Invalid:                 0
+  Column headers:          0
+  Blank:                   0
+  Data Blocks:             1
+
+* COLUMNS:
+  Mean:          5.55578e+06                 22.8319
+  Std Dev:       2.59554e+06                  1.0070
+  Sample StdDev: 2.59554e+06                  1.0070
+  Skewness:           0.0000                 -6.3833
+  Kurtosis:           1.8000                 48.0392
+  Avg Dev:       2.24780e+06                  0.3261
+  Sum:           4.99532e+13             2.05286e+08
+  Sum Sq.:       3.38101e+20             4.69618e+09
+
+  Mean Err.:        865.6024                  0.0003
+  Std Dev Err.:     612.0734                  0.0002
+  Skewness Err.:      0.0008                  0.0008
+  Kurtosis Err.:      0.0016                  0.0016
+
+  Minimum:       1.06018e+06 [      0]        1.0000 [      0]
+  Maximum:       1.00514e+07 [8991210]       35.0000 [8991210]
+  Quartile:      3.30798e+06                 23.0000
+  Median:        5.55578e+06                 23.0000
+  Quartile:      7.80358e+06                 23.0000
+
+  Linear Model:       y = 1.105e-07 x + 22.22
+  Slope:              1.105e-07 +- 1.24e-10
+  Intercept:          22.22 +- 0.0007606
+  Correlation:        r = 0.2849
+  Sum xy:             1.147e+15
+
+gnuplot> stat "../radixsort/radix_std.txt"
+         warning: Cannot find or open file "../radixsort/radix_std.txt"
+         warning: Can't read data file
+gnuplot> stat "../radixsort/radixsort_std.txt"
+
+* FILE: 
+  Records:           15074293
+  Out of range:             0
+  Invalid:                  0
+  Column headers:           0
+  Blank:                    0
+  Data Blocks:              1
+
+* COLUMNS:
+  Mean:          8.59824e+06                  10.6308
+  Std Dev:       4.35157e+06                   3.9378
+  Sample StdDev: 4.35157e+06                   3.9378
+  Skewness:           0.0000                  -0.1839
+  Kurtosis:           1.8000                   1.5360
+  Avg Dev:       3.76857e+06                   3.6107
+  Sum:           1.29612e+14              1.60252e+08
+  Sum Sq.:       1.39989e+21              1.93735e+09
+
+  Mean Err.:       1120.7993                   0.0010
+  Std Dev Err.:     792.5248                   0.0007
+  Skewness Err.:      0.0006                   0.0006
+  Kurtosis Err.:      0.0013                   0.0013
+
+  Minimum:       1.06110e+06 [       0]        1.0000 [       0]
+  Maximum:       1.61354e+07 [15074292]       35.0000 [15074292]
+  Quartile:      4.82967e+06                   6.0000
+  Median:        8.59824e+06                  12.0000
+  Quartile:      1.23668e+07                  14.0000
+
+  Linear Model:       y = -2.46e-07 x + 12.75
+  Slope:              -2.46e-07 +- 2.243e-10
+  Intercept:          12.75 +- 0.002161
+  Correlation:        r = -0.2719
+  Sum xy:             1.308e+15
+
+gnuplot> stat "../radixsort/radixsort_full.txt"
+
+* FILE: 
+  Records:           16135489
+  Out of range:             0
+  Invalid:                  0
+  Column headers:           0
+  Blank:                    0
+  Data Blocks:              1
+
+* COLUMNS:
+  Mean:          8.06774e+06                  10.9489
+  Std Dev:       4.65791e+06                   6.2073
+  Sample StdDev: 4.65791e+06                   6.2073
+  Skewness:           0.0000                   5.0809
+  Kurtosis:           1.8000                  46.6613
+  Avg Dev:       4.03387e+06                   3.9758
+  Sum:           1.30177e+14              1.76665e+08
+  Sum Sq.:       1.40031e+21              2.55599e+09
+
+  Mean Err.:       1159.5793                   0.0015
+  Std Dev Err.:     819.9464                   0.0011
+  Skewness Err.:      0.0006                   0.0006
+  Kurtosis Err.:      0.0012                   0.0012
+
+  Minimum:            1.0000 [       0]        1.0000 [       0]
+  Maximum:       1.61355e+07 [16135488]       70.0000 [  117583]
+  Quartile:      4.03387e+06                   7.0000
+  Median:        8.06774e+06                  11.0000
+  Quartile:      1.21016e+07                  14.0000
+
+  Linear Model:       y = -3.146e-07 x + 13.49
+  Slope:              -3.146e-07 +- 3.224e-10
+  Intercept:          13.49 +- 0.003003
+  Correlation:        r = -0.236
+  Sum xy:             1.315e+15
+
+gnuplot> stat "../radixsort/radixsort_page_1.txt"
+
+* FILE: 
+  Records:           15074260
+  Out of range:             0
+  Invalid:                  0
+  Column headers:           0
+  Blank:                    0
+  Data Blocks:              1
+
+* COLUMNS:
+  Mean:          8.59823e+06                  22.7076
+  Std Dev:       4.35156e+06                   8.0248
+  Sample StdDev: 4.35156e+06                   8.0248
+  Skewness:           0.0000                   0.1462
+  Kurtosis:           1.8000                   1.8894
+  Avg Dev:       3.76856e+06                   6.9569
+  Sum:           1.29612e+14              3.42301e+08
+  Sum Sq.:       1.39988e+21              8.74358e+09
+
+  Mean Err.:       1120.7981                   0.0021
+  Std Dev Err.:     792.5239                   0.0015
+  Skewness Err.:      0.0006                   0.0006
+  Kurtosis Err.:      0.0013                   0.0013
+
+  Minimum:       1.06110e+06 [       0]        1.0000 [       0]
+  Maximum:       1.61354e+07 [15074259]       67.0000 [15074259]
+  Quartile:      4.82966e+06                  13.0000
+  Median:        8.59823e+06                  24.0000
+  Quartile:      1.23668e+07                  28.0000
+
+  Linear Model:       y = -2.311e-07 x + 24.69
+  Slope:              -2.311e-07 +- 4.712e-10
+  Intercept:          24.69 +- 0.004541
+  Correlation:        r = -0.1253
+  Sum xy:             2.877e+15
+
+gnuplot> stat "../radixsort/radixsort_page_2.txt"
+
+* FILE: 
+  Records:           15074293
+  Out of range:             0
+  Invalid:                  0
+  Column headers:           0
+  Blank:                    0
+  Data Blocks:              1
+
+* COLUMNS:
+  Mean:          8.59757e+06                  15.1672
+  Std Dev:       4.35157e+06                   5.5371
+  Sample StdDev: 4.35157e+06                   5.5371
+  Skewness:           0.0000                  -0.1623
+  Kurtosis:           1.8000                   1.5976
+  Avg Dev:       3.76857e+06                   5.0397
+  Sum:           1.29602e+14              2.28635e+08
+  Sum Sq.:       1.39972e+21              3.92994e+09
+
+  Mean Err.:       1120.7993                   0.0014
+  Std Dev Err.:     792.5248                   0.0010
+  Skewness Err.:      0.0006                   0.0006
+  Kurtosis Err.:      0.0013                   0.0013
+
+  Minimum:       1.06043e+06 [       0]        1.0000 [       0]
+  Maximum:       1.61347e+07 [15074292]       49.0000 [15074292]
+  Quartile:      4.82900e+06                   8.0000
+  Median:        8.59757e+06                  17.0000
+  Quartile:      1.23661e+07                  20.0000
+
+  Linear Model:       y = -2.845e-07 x + 17.61
+  Slope:              -2.845e-07 +- 3.194e-10
+  Intercept:          17.61 +- 0.003078
+  Correlation:        r = -0.2236
+  Sum xy:             1.885e+15
+
+gnuplot> stat "../radixsort/radixsort_page_3.txt"
+
+* FILE: 
+  Records:           15074293
+  Out of range:             0
+  Invalid:                  0
+  Column headers:           0
+  Blank:                    0
+  Data Blocks:              1
+
+* COLUMNS:
+  Mean:          8.59757e+06                   7.4549
+  Std Dev:       4.35157e+06                   2.3674
+  Sample StdDev: 4.35157e+06                   2.3674
+  Skewness:           0.0000                  -0.1432
+  Kurtosis:           1.8000                   2.0712
+  Avg Dev:       3.76857e+06                   2.0893
+  Sum:           1.29602e+14              1.12378e+08
+  Sum Sq.:       1.39972e+21              9.22252e+08
+
+  Mean Err.:       1120.7993                   0.0006
+  Std Dev Err.:     792.5248                   0.0004
+  Skewness Err.:      0.0006                   0.0006
+  Kurtosis Err.:      0.0013                   0.0013
+
+  Minimum:       1.06043e+06 [       0]        1.0000 [       0]
+  Maximum:       1.61347e+07 [15074292]       23.0000 [15074292]
+  Quartile:      4.82900e+06                   5.0000
+  Median:        8.59757e+06                   8.0000
+  Quartile:      1.23661e+07                  10.0000
+
+  Linear Model:       y = -1.277e-07 x + 8.553
+  Slope:              -1.277e-07 +- 1.362e-10
+  Intercept:          8.553 +- 0.001312
+  Correlation:        r = -0.2348
+  Sum xy:             9.297e+14
+
+gnuplot> stat "../radixsort/radixsort_page_4.txt"
+
+* FILE: 
+  Records:           15074315
+  Out of range:             0
+  Invalid:                  0
+  Column headers:           0
+  Blank:                    0
+  Data Blocks:              1
+
+* COLUMNS:
+  Mean:          8.59759e+06                   5.6814
+  Std Dev:       4.35158e+06                   1.4850
+  Sample StdDev: 4.35158e+06                   1.4850
+  Skewness:           0.0000                  -0.1770
+  Kurtosis:           1.8000                   2.2874
+  Avg Dev:       3.76858e+06                   1.2478
+  Sum:           1.29603e+14              8.56437e+07
+  Sum Sq.:       1.39972e+21              5.19820e+08
+
+  Mean Err.:       1120.8001                   0.0004
+  Std Dev Err.:     792.5254                   0.0003
+  Skewness Err.:      0.0006                   0.0006
+  Kurtosis Err.:      0.0013                   0.0013
+
+  Minimum:       1.06043e+06 [       0]        1.0000 [       0]
+  Maximum:       1.61347e+07 [15074314]       16.0000 [15074314]
+  Quartile:      4.82901e+06                   4.0000
+  Median:        8.59759e+06                   6.0000
+  Quartile:      1.23662e+07                   7.0000
+
+  Linear Model:       y = -5.612e-08 x + 6.164
+  Slope:              -5.612e-08 +- 8.67e-11
+  Intercept:          6.164 +- 0.0008354
+  Correlation:        r = -0.1645
+  Sum xy:             7.203e+14
+
+gnuplot> stat "../radixsort/radixsort_size_1.txt"
+
+* FILE: 
+  Records:           154960
+  Out of range:           0
+  Invalid:                0
+  Column headers:         0
+  Blank:                  0
+  Data Blocks:            1
+
+* COLUMNS:
+  Mean:          129923.5000                11.4869
+  Std Dev:        44733.0989                 6.2237
+  Sample StdDev:  44733.2432                 6.2238
+  Skewness:           0.0000                -0.6122
+  Kurtosis:           1.8000                 1.4272
+  Avg Dev:        38740.0000                 5.9173
+  Sum:           2.01329e+10            1.78001e+06
+  Sum Sq.:       2.92583e+15            2.64491e+07
+
+  Mean Err.:        113.6368                 0.0158
+  Std Dev Err.:      80.3534                 0.0112
+  Skewness Err.:      0.0062                 0.0062
+  Kurtosis Err.:      0.0124                 0.0124
+
+  Minimum:        52444.0000 [     0]        1.0000 [     0]
+  Maximum:       207403.0000 [154959]       27.0000 [154959]
+  Quartile:       91183.5000                 3.0000
+  Median:        129923.5000                16.0000
+  Quartile:      168663.5000                16.0000
+
+  Linear Model:       y = -0.000111 x + 25.9
+  Slope:              -0.000111 +- 2.132e-07
+  Intercept:          25.9 +- 0.0293
+  Correlation:        r = -0.7976
+  Sum xy:             1.969e+11
+
+gnuplot> stat "../radixsort/radixsort_size_2.txt"
+
+* FILE: 
+  Records:           1511293
+  Out of range:            0
+  Invalid:                 0
+  Column headers:          0
+  Blank:                   0
+  Data Blocks:             1
+
+* COLUMNS:
+  Mean:          899834.0000                  5.8230
+  Std Dev:       436272.7102                  3.0852
+  Sample StdDev: 436272.8545                  3.0852
+  Skewness:           0.0000                  3.5101
+  Kurtosis:           1.8000                 13.4696
+  Avg Dev:       377823.2500                  1.5361
+  Sum:           1.35991e+12             8.80030e+06
+  Sum Sq.:       1.51135e+18             6.56293e+07
+
+  Mean Err.:        354.8818                  0.0025
+  Std Dev Err.:     250.9393                  0.0018
+  Skewness Err.:      0.0020                  0.0020
+  Kurtosis Err.:      0.0040                  0.0040
+
+  Minimum:       144188.0000 [      0]        1.0000 [      0]
+  Maximum:       1.65548e+06 [1511292]       29.0000 [1511292]
+  Quartile:      522011.0000                  5.0000
+  Median:        899834.0000                  5.0000
+  Quartile:      1.27766e+06                  5.0000
+
+  Linear Model:       y = -2.968e-06 x + 8.493
+  Slope:              -2.968e-06 +- 5.221e-09
+  Intercept:          8.493 +- 0.005221
+  Correlation:        r = -0.4197
+  Sum xy:             7.065e+12
+
+gnuplot> stat "../radixsort/radixsort_size_3.txt"
+
+* FILE: 
+  Records:           150704304
+  Out of range:              0
+  Invalid:                   0
+  Column headers:            0
+  Blank:                     0
+  Data Blocks:               1
+
+* COLUMNS:
+  Mean:          8.55813e+07                   10.8180
+  Std Dev:       4.35046e+07                    4.7273
+  Sample StdDev: 4.35046e+07                    4.7273
+  Skewness:      6.02298e-09                    0.0945
+  Kurtosis:           1.8000                    1.4681
+  Avg Dev:       3.76761e+07                    4.3090
+  Sum:           1.28975e+16               1.63032e+09
+  Sum Sq.:       1.38901e+24               2.10047e+10
+
+  Mean Err.:       3543.8245                    0.0004
+  Std Dev Err.:    2505.8623                    0.0003
+  Skewness Err.:      0.0002                    0.0002
+  Kurtosis Err.:      0.0004                    0.0004
+
+  Minimum:       1.02291e+07 [        0]        1.0000 [        0]
+  Maximum:       1.60933e+08 [150704303]       36.0000 [150704303]
+  Quartile:      4.79052e+07                    6.0000
+  Median:        8.55813e+07                   12.0000
+  Quartile:      1.23257e+08                   16.0000
+
+  Linear Model:       y = -2.388e-08 x + 12.86
+  Slope:              -2.388e-08 +- 8.635e-12
+  Intercept:          12.86 +- 0.000829
+  Correlation:        r = -0.2198
+  Sum xy:             1.327e+17
+
+gnuplot> stat "../radixsort/radixsort_size_4.txt"
+
+* FILE: 
+  Records:           4784198
+  Out of range:            0
+  Invalid:                 0
+  Column headers:          0
+  Blank:                   0
+  Data Blocks:             1
+
+* COLUMNS:
+  Mean:          1.71118e+08                225.3644
+  Std Dev:       8.70080e+07                 75.4125
+  Sample StdDev: 8.70080e+07                 75.4125
+  Skewness:           0.0000                  0.8379
+  Kurtosis:           1.8000                  2.9429
+  Avg Dev:       7.53511e+07                 56.9929
+  Sum:           8.18664e+14             1.07819e+09
+  Sum Sq.:       1.76307e+23             2.70193e+11
+
+  Mean Err.:      39779.0584                  0.0345
+  Std Dev Err.:   28128.0420                  0.0244
+  Skewness Err.:      0.0011                  0.0011
+  Kurtosis Err.:      0.0022                  0.0022
+
+  Minimum:       2.04162e+07 [      0]        1.0000 [      0]
+  Maximum:       3.21821e+08 [4784197]      402.0000 [4784197]
+  Quartile:      9.57673e+07                158.0000
+  Median:        1.71118e+08                216.0000
+  Quartile:      2.46470e+08                250.0000
+
+  Linear Model:       y = 3.926e-08 x + 218.6
+  Slope:              3.926e-08 +- 3.959e-10
+  Intercept:          218.6 +- 0.07599
+  Correlation:        r = 0.0453
+  Sum xy:             1.859e+17
+
+gnuplot> stat "../radixsort/radixsort_window_1.txt"
+
+* FILE: 
+  Records:           15074293
+  Out of range:             0
+  Invalid:                  0
+  Column headers:           0
+  Blank:                    0
+  Data Blocks:              1
+
+* COLUMNS:
+  Mean:          8.59824e+06                   6.2286
+  Std Dev:       4.35157e+06                   3.7065
+  Sample StdDev: 4.35157e+06                   3.7065
+  Skewness:           0.0000                   0.6606
+  Kurtosis:           1.8000                   1.6360
+  Avg Dev:       3.76857e+06                   3.4406
+  Sum:           1.29612e+14              9.38924e+07
+  Sum Sq.:       1.39989e+21              7.91914e+08
+
+  Mean Err.:       1120.7993                   0.0010
+  Std Dev Err.:     792.5248                   0.0007
+  Skewness Err.:      0.0006                   0.0006
+  Kurtosis Err.:      0.0013                   0.0013
+
+  Minimum:       1.06110e+06 [       0]        1.0000 [       0]
+  Maximum:       1.61354e+07 [15074292]       28.0000 [15074292]
+  Quartile:      4.82967e+06                   3.0000
+  Median:        8.59824e+06                   4.0000
+  Quartile:      1.23668e+07                  11.0000
+
+  Linear Model:       y = -2.025e-07 x + 7.97
+  Slope:              -2.025e-07 +- 2.131e-10
+  Intercept:          7.97 +- 0.002053
+  Correlation:        r = -0.2377
+  Sum xy:             7.495e+14
+
+gnuplot> stat "../radixsort/radixsort_window_2.txt"
+
+* FILE: 
+  Records:           15074315
+  Out of range:             0
+  Invalid:                  0
+  Column headers:           0
+  Blank:                    0
+  Data Blocks:              1
+
+* COLUMNS:
+  Mean:          8.59758e+06                   7.1323
+  Std Dev:       4.35158e+06                   4.3335
+  Sample StdDev: 4.35158e+06                   4.3335
+  Skewness:           0.0000                   0.5472
+  Kurtosis:           1.8000                   1.4539
+  Avg Dev:       3.76858e+06                   4.0575
+  Sum:           1.29603e+14              1.07515e+08
+  Sum Sq.:       1.39972e+21              1.04991e+09
+
+  Mean Err.:       1120.8001                   0.0011
+  Std Dev Err.:     792.5254                   0.0008
+  Skewness Err.:      0.0006                   0.0006
+  Kurtosis Err.:      0.0013                   0.0013
+
+  Minimum:       1.06043e+06 [       0]        1.0000 [       0]
+  Maximum:       1.61347e+07 [15074314]       29.0000 [15074314]
+  Quartile:      4.82901e+06                   4.0000
+  Median:        8.59758e+06                   5.0000
+  Quartile:      1.23662e+07                  13.0000
+
+  Linear Model:       y = -2.503e-07 x + 9.285
+  Slope:              -2.503e-07 +- 2.483e-10
+  Intercept:          9.285 +- 0.002392
+  Correlation:        r = -0.2514
+  Sum xy:             8.529e+14
+
+gnuplot> stat "../radixsort/radixsort_window_3.txt"
+
+* FILE: 
+  Records:           15074326
+  Out of range:             0
+  Invalid:                  0
+  Column headers:           0
+  Blank:                    0
+  Data Blocks:              1
+
+* COLUMNS:
+  Mean:          8.59759e+06                  22.4267
+  Std Dev:       4.35158e+06                   2.2093
+  Sample StdDev: 4.35158e+06                   2.2093
+  Skewness:           0.0000                   4.9584
+  Kurtosis:           1.8000                  28.3625
+  Avg Dev:       3.76858e+06                   0.8768
+  Sum:           1.29603e+14              3.38068e+08
+  Sum Sq.:       1.39972e+21              7.65533e+09
+
+  Mean Err.:       1120.8005                   0.0006
+  Std Dev Err.:     792.5257                   0.0004
+  Skewness Err.:      0.0006                   0.0006
+  Kurtosis Err.:      0.0013                   0.0013
+
+  Minimum:       1.06043e+06 [       0]        1.0000 [       0]
+  Maximum:       1.61348e+07 [15074325]       46.0000 [15074325]
+  Quartile:      4.82901e+06                  22.0000
+  Median:        8.59759e+06                  22.0000
+  Quartile:      1.23662e+07                  22.0000
+
+  Linear Model:       y = -1.616e-07 x + 23.82
+  Slope:              -1.616e-07 +- 1.24e-10
+  Intercept:          23.82 +- 0.001195
+  Correlation:        r = -0.3183
+  Sum xy:             2.86e+15
+
+gnuplot> stat "../radixsort/radixsort_window_4.txt"
+
+* FILE: 
+  Records:           15074293
+  Out of range:             0
+  Invalid:                  0
+  Column headers:           0
+  Blank:                    0
+  Data Blocks:              1
+
+* COLUMNS:
+  Mean:          8.59758e+06                  30.2008
+  Std Dev:       4.35157e+06                   6.2203
+  Sample StdDev: 4.35157e+06                   6.2203
+  Skewness:           0.0000                  -0.5485
+  Kurtosis:           1.8000                   1.3476
+  Avg Dev:       3.76857e+06                   5.9854
+  Sum:           1.29602e+14              4.55256e+08
+  Sum Sq.:       1.39972e+21              1.43323e+10
+
+  Mean Err.:       1120.7993                   0.0016
+  Std Dev Err.:     792.5248                   0.0011
+  Skewness Err.:      0.0006                   0.0006
+  Kurtosis Err.:      0.0013                   0.0013
+
+  Minimum:       1.06043e+06 [       0]        1.0000 [       0]
+  Maximum:       1.61347e+07 [15074292]       46.0000 [15074292]
+  Quartile:      4.82900e+06                  22.0000
+  Median:        8.59758e+06                  35.0000
+  Quartile:      1.23661e+07                  35.0000
+
+  Linear Model:       y = -9.921e-07 x + 38.73
+  Slope:              -9.921e-07 +- 2.651e-10
+  Intercept:          38.73 +- 0.002554
+  Correlation:        r = -0.6941
+  Sum xy:             3.631e+15
+
+gnuplot> 

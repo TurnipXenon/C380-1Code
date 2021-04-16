@@ -1,0 +1,1 @@
+tar -cvf submission/1570093_a3.tar.gz *.c *.h Makefile DESIGN.md REPORT.pdf
