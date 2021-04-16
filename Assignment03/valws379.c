@@ -12,6 +12,7 @@
 
 #define DEBUG_START "# Start\n"
 #define DEBUG_END "# End\n"
+#define DEBUG_SKIP_PRINT 63
 
 /**
  * @brief 
@@ -127,6 +128,10 @@ int main(int argc, char *argv[])
     bool is_start = false;
     #endif
 
+    #ifdef DEBUG_SKIP_PRINT
+    ull skips = 0;
+    #endif
+
     /* from: https://stackoverflow.com/a/27607770/10024566 */
     ull mem_ref_count = 0u;
     while(fgets(str_buffer, BUFFER_SIZE, stdin) != NULL && is_empty_line(str_buffer)) {
@@ -145,6 +150,24 @@ int main(int argc, char *argv[])
                     continue;
                 }
                 #endif 
+
+                #ifdef DEBUG_SKIP_PRINT
+
+                /* For clarity */
+                bool shouldSkip = skips != 0;
+
+                ++skips;
+
+                if (shouldSkip) {
+
+                    if (skips >= DEBUG_SKIP_PRINT) {
+                        skips = 0; // reset
+                    }
+
+                    continue;
+                }
+
+                #endif
 
                 /* from: https://stackoverflow.com/a/1483218/10024566 */
                 token = strtok(str_numbers, seps);

@@ -262,3 +262,16 @@ test_radixsort_size_2: results/radixsort.out valws379
 .PHONY: test_radixsort1
 test_radixsort1: results/radixsort.out valws379
 	$(VALGRIND_PREFIX) ./results/radixsort.out 100000 2>&1 /dev/null | ./valws379 4096 100000 > results/radixsort01.txt
+
+
+.PHONY: test_radixsort_biggest
+test_radixsort_biggest: results/radixsort.out valws379
+	$(VALGRIND_PREFIX) ./results/radixsort.out 200000 2>&1 /dev/null | ./valws379 4096 100000 > results/radixsort_biggest.txt
+
+.PHONY: test_quicksort_biggest
+test_quicksort_biggest: results/quicksort.out valws379
+	$(VALGRIND_PREFIX) ./results/quicksort.out 200000 2>&1 /dev/null | ./valws379 4096 100000 > results/quicksort_biggest.txt
+
+.PHONY: test_heapsort_biggest
+test_heapsort_biggest: results/heapsort.out valws379
+	$(VALGRIND_PREFIX) ./results/heapsort.out 200000 2>&1 /dev/null | ./valws379 4096 10

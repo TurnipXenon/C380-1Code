@@ -38,8 +38,6 @@ clean:
 test1: valws379 lackey_test
 	 valgrind --tool=lackey --trace-mem=yes ./lackey_test 2>&1 /dev/null | $(EXRANOFF) ./valws379 128 1000 > $(TEST_LOC)
 
-# CFLAGS='-D NOTAPP_TIME'
-
 .PHONY: valgrind1
 valgrind1: valws379 lackey_test
 	 valgrind --tool=lackey --trace-mem=yes ./lackey_test 2>&1 /dev/null | $(EXRANOFF) valgrind --leak-check=full ./valws379 16 1000  > $(TEST_LOC)
@@ -47,7 +45,3 @@ valgrind1: valws379 lackey_test
 .PHONY: queue_test1
 queue_test1: queue_test
 	valgrind --leak-check=full ./queue_test
-
-.PHONY: all_sorts
-all_sorts:
-	make results/heapsort.out && make results/quicksort.out && make results/radixsort.out
