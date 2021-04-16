@@ -1,14 +1,17 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <unistd.h> // getopt
-#include <libgen.h> // basename
+#include <unistd.h> /* for getopt */
+#include <libgen.h> /* for basename */
 #include <ctype.h> /* for isspace */
 #include <stdbool.h>
 
 #include "windowset.h"
 
 #define BUFFER_SIZE 1000
+
+#define DEBUG_START "# Start\n"
+#define DEBUG_END "# End\n"
 
 /**
  * @brief 
@@ -92,7 +95,7 @@ int main(int argc, char *argv[])
     while ((c = getopt(argc, argv, "s:h")) != -1) {
         switch (c) {
             case 's':
-                skipsize = strtoull(optarg, NULL, 10);
+                skipsize = strtoull(optarg, NULL, 10) + 1; // adjust cause non-zero start
                 // todo: put precautions of negative value
                 // printf("skipsize: %llu\n", skipsize);
 
@@ -120,61 +123,74 @@ int main(int argc, char *argv[])
 
     initialize_window_set(page_size, window_size);
 
-    // /* Start read once you see I in char[0] */
+    #ifdef DEBUG_START
+    bool is_start = false;
+    #endif
+
     /* from: https://stackoverflow.com/a/27607770/10024566 */
     ull mem_ref_count = 0u;
-    int num = 0; /* todo: delete */
     while(fgets(str_buffer, BUFFER_SIZE, stdin) != NULL && is_empty_line(str_buffer)) {
         if (sscanf(str_buffer, "%4s %100s", char_code, str_numbers) == 2) {
             // printf("%s %s\n", char_code, str_numbers);
 
             if (is_valid_code(char_code)) {
                 /* todo: skip references here */
+                ++mem_ref_count;
                 if (mem_ref_count < skipsize) {
-                    ++mem_ref_count;
                     continue;
                 }
 
-                /* 
-                Assume that if we get the correct code, we have the correct format after
-                from: https://stackoverflow.com/a/1483218/10024566
-                comma separation here */
-                
+                #ifdef DEBUG_START
+                if (!is_start) {
+                    continue;
+                }
+                #endif 
+
+                /* from: https://stackoverflow.com/a/1483218/10024566 */
                 token = strtok(str_numbers, seps);
                 ref_address = strtoull(token, NULL, 16);
                 token = strtok(NULL, seps);
                 sscanf(token, "%llu", &ref_page_size);
                 
-                /* todo: insert stuff here */
+                #ifdef DEBUG_PRINT
+                printf("\n\n%s, %llX, %llu, %llu\n", char_code, ref_address, ref_page_size, get_window_set_size());
+                #endif /* DEBUG_PRINT */
+
                 window_set_insert(ref_address, ref_page_size);
 
-                // printf("Address: %llX  ;  Page size: %llu\n", ref_address, ref_page_size);
-                printf("%llu\n", get_window_set_size());
-                // printf("%s, %llX, %llu, %llu\n", char_code, ref_address, ref_page_size, get_window_set_size());
-                // window_set_debug();
+                printf("%llu, %llu\n", mem_ref_count, get_window_set_size());
+                #ifdef DEBUG_PRINT
+                window_set_debug();
+                #endif /* DEBUG_PRINT */
                 
-                // if (num > 1000) {
-                //     break;
-                // }
-
-                // ++num;
+                #ifdef DEBUG_LIMIT
+                if (mem_ref_count > DEBUG_LIMIT) {
+                    break;
+                }
+                #endif /* DEBUG_LIMIT */
             }
 
+            #ifdef DEBUG_COMMENTS
+            if (strcmp(char_code, "#") == 0) {
+                printf("%s", str_buffer);
+            }
+            #endif
+
+            #ifdef DEBUG_START
+            if (!is_start && strcmp(str_buffer, DEBUG_START) == 0) {
+                is_start = true;
+            }
+            #endif
+
+            #ifdef DEBUG_END
+            if (strcmp(str_buffer, DEBUG_END) == 0) {
+                break;
+            }
+            #endif
         }
     }
 
     destroy_window_set();
-
-
-
-    // read_result = fgets(str_buffer, BUFFER_SIZE, stdin);
-    // printf("Result: %s\n", str_buffer);
-    // read(pipefds[0], str_line, 4);
-    // scanf("%40s", str_line);
-
-    /* Skip skipsize memory references */
-
-    /* End reading when you see = */
 
     return 0;
 }

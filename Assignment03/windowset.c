@@ -32,16 +32,14 @@ void initialize_window_set(ull page_size_, ull window_size_) {
 static void windowset_put(struct mem_ref mem_ref) {
     ull address = mem_ref.address;
     for (ull i = 0; i < mem_ref.page_count; ++i) {
-        // printf("put: ");
-        put(hashtable, address);
-        // prinft("\n");
+        put(hashtable, address + i);
     }
 }
 
 static void windowset_delete(struct mem_ref mem_ref) {
     ull address = mem_ref.address;
     for (ull i = 0; i < mem_ref.page_count; ++i) {
-        delete(hashtable, address);
+        delete(hashtable, address + i);
     }
 }
 
@@ -58,24 +56,20 @@ void window_set_insert(ull address, ull page_size) {
 
     /* Simplify address and page size */
     ull lower_address = address >> page_exponent;
+
     /* Reduce by 1 to count own position too */
     ull upper_address = (address + page_size - 1) >> page_exponent; 
     ull page_count = (upper_address - lower_address) + 1;
-    // printf("Processed: %llX, %llu\n", lower_address, page_count);
 
     mem_ref.address = lower_address;
     mem_ref.page_count = page_count;
 
-    enqueue(queue, mem_ref);
-
-    // /* todo: hashset */
-    windowset_put(mem_ref);
+    enqueue(queue, mem_ref); // sliding window doubly-linked list
+    windowset_put(mem_ref); // put in hashtable
 
     if (queue->size > window_size) {
-        mem_ref = dequeue(queue);
-
-        // todo: remove mem_ref from hashset
-        windowset_delete(mem_ref);
+        mem_ref = dequeue(queue); // queue
+        windowset_delete(mem_ref); // hashtable
     }
 }
 
@@ -92,18 +86,18 @@ ull get_window_set_size() {
  * @brief Destroy windowset
  */
 void destroy_window_set() {
-    // todo: clean up
-
     destroy_queue(queue);
     destroy_hashtable(hashtable);
 }
 
 
+
+#ifdef DEBUG_PRINT
 /**
  * @brief todo: delete
  * 
  */
 void window_set_debug() {
-    // printf("Queue size: %llu\n", queue->size);
     queue_debug(queue);
 }
+#endif /* DEBUG_PRINT */

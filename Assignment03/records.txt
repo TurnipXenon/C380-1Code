@@ -1,0 +1,264 @@
+.PHONY: test_heapsort1
+test_heapsort1: results/heapsort.out
+	$(VALGRIND_PREFIX) ./results/heapsort.out 100000 2>&1 /dev/null | ./valws379 1024 100000 > results/heapsort_result_01.txt
+
+.PHONY: test_heapsort2
+test_heapsort2: results/heapsort.out
+	$(VALGRIND_PREFIX) ./results/heapsort.out 100000 2>&1 /dev/null | ./valws379 2048 100000 > results/heapsort_result_02.txt
+
+.PHONY: test_heapsort3
+test_heapsort3: results/heapsort.out
+	$(VALGRIND_PREFIX) ./results/heapsort.out 100000 2>&1 /dev/null | ./valws379 4096 100000 > results/heapsort_result_03.txt
+
+.PHONY: test_heapsort4
+test_heapsort3: results/heapsort.out
+	$(VALGRIND_PREFIX) ./results/heapsort.out 100000 2>&1 /dev/null | ./valws379 8192 100000 > results/heapsort_result_04.txt
+
+.PHONY: test_heapsort5
+test_heapsort1: results/heapsort.out
+	$(VALGRIND_PREFIX) ./results/heapsort.out 100000 2>&1 /dev/null | ./valws379 4096 1000 > results/heapsort_result_05.txt
+
+.PHONY: test_heapsort6
+test_heapsort2: results/heapsort.out
+	$(VALGRIND_PREFIX) ./results/heapsort.out 100000 2>&1 /dev/null | ./valws379 4096 10000 > results/heapsort_result_06.txt
+
+.PHONY: test_heapsort7
+test_heapsort3: results/heapsort.out
+	$(VALGRIND_PREFIX) ./results/heapsort.out 100000 2>&1 /dev/null | ./valws379 4096 100000 > results/heapsort_result_07.txt
+
+.PHONY: test_heapsort8
+test_heapsort4: results/heapsort.out
+	$(VALGRIND_PREFIX) ./results/heapsort.out 100000 2>&1 /dev/null | ./valws379 4096 1000000 > results/heapsort_result_08.txt
+
+# investigate skip size
+
+.PHONY: test_heapsort10
+test_heapsort9: results/heapsort.out
+	$(VALGRIND_PREFIX) ./results/heapsort.out 10 2>&1 /dev/null | ./valws379 4096 100000 > results/heapsort_result_9.txt
+
+>> start 32 389; 44 676; end 47 928
+
+.PHONY: test_heapsort10
+test_heapsort9: results/heapsort.out
+	$(VALGRIND_PREFIX) ./results/heapsort.out 100 2>&1 /dev/null | ./valws379 4096 100000 > results/heapsort_result_10.txt
+
+>> start 32 407; 75 088; end 128 751
+
+.PHONY: test_heapsort11
+test_heapsort11: results/heapsort.out
+	$(VALGRIND_PREFIX) ./results/heapsort.out 1000 2>&1 /dev/null | ./valws379 4096 100000 > results/heapsort_result_11.txt
+
+>> start 32 511; 492 668; end 1 360 533
+
+.PHONY: test_heapsort12
+test_heapsort11: results/heapsort.out
+	$(VALGRIND_PREFIX) ./results/heapsort.out 10000 2>&1 /dev/null | ./valws379 -s 32511 4096 100000 > results/heapsort_result_11.txt
+
+>> start 32 575; 5 733 046; end 18 047 086
+
+set terminal png size 1200,400
+set output "heapsort10.png"
+
+
+
+
+
+# testing out new features
+
+.PHONY: test_heapsort13
+test_heapsort13: results/heapsort.out valws379 lackey_test
+	$(VALGRIND_PREFIX) ./results/heapsort.out 10000 2>&1 /dev/null | ./valws379 4096 100000 > results/heapsort_result_13.txt
+
+>> has no filter
+
+.PHONY: test_heapsort14
+test_heapsort14: results/heapsort.out valws379 lackey_test
+	$(VALGRIND_PREFIX) ./results/heapsort.out 10000 2>&1 /dev/null | ./valws379 4096 100000 > results/heapsort_result_14.txt
+
+>> filter start to end
+
+.PHONY: test_heapsort15
+test_heapsort15: results/heapsort.out valws379 lackey_test
+	$(VALGRIND_PREFIX) ./results/heapsort.out 10000 2>&1 /dev/null | ./valws379 4096 100000 > results/heapsort_result_15.txt
+
+# filter start to mid
+
+.PHONY: test_heapsort16
+test_heapsort16: results/heapsort.out valws379 lackey_test
+	$(VALGRIND_PREFIX) ./results/heapsort.out 10000 2>&1 /dev/null | ./valws379 4096 100000 > results/heapsort_result_16.txt
+
+#define DEBUG_START "# End Heapify / Start Heapsort\n"
+#define DEBUG_END "# End Heapsort\n"
+
+# adjust page size
+
+.PHONY: test_heapsort17
+test_heapsort17: results/heapsort.out valws379 lackey_test
+	$(VALGRIND_PREFIX) ./results/heapsort.out 10000 2>&1 /dev/null | ./valws379 1024 100000 > results/heapsort_result_17.txt
+
+.PHONY: test_heapsort18
+test_heapsort18: results/heapsort.out valws379 lackey_test
+	$(VALGRIND_PREFIX) ./results/heapsort.out 10000 2>&1 /dev/null | ./valws379 2048 100000 > results/heapsort_result_18.txt
+
+.PHONY: test_heapsort19
+test_heapsort19: results/heapsort.out valws379 lackey_test
+	$(VALGRIND_PREFIX) ./results/heapsort.out 10000 2>&1 /dev/null | ./valws379 8192 100000 > results/heapsort_result_19.txt
+
+.PHONY: test_heapsort20
+test_heapsort20: results/heapsort.out valws379 lackey_test
+	$(VALGRIND_PREFIX) ./results/heapsort.out 10000 2>&1 /dev/null | ./valws379 16384 100000 > results/heapsort_result_20.txt
+
+# adjust window size
+
+.PHONY: test_heapsort21
+test_heapsort21: results/heapsort.out valws379 lackey_test
+	$(VALGRIND_PREFIX) ./results/heapsort.out 10000 2>&1 /dev/null | ./valws379 4096 1000 > results/heapsort_result_21.txt
+
+.PHONY: test_heapsort22
+test_heapsort22: results/heapsort.out valws379 lackey_test
+	$(VALGRIND_PREFIX) ./results/heapsort.out 10000 2>&1 /dev/null | ./valws379 4096 10000 > results/heapsort_result_22.txt
+
+.PHONY: test_heapsort23
+test_heapsort23: results/heapsort.out valws379 lackey_test
+	$(VALGRIND_PREFIX) ./results/heapsort.out 10000 2>&1 /dev/null | ./valws379 4096 1000000 > results/heapsort_result_23.txt
+
+.PHONY: test_heapsort24
+test_heapsort24: results/heapsort.out valws379 lackey_test
+	$(VALGRIND_PREFIX) ./results/heapsort.out 10000 2>&1 /dev/null | ./valws379 16384 10000000 > results/heapsort_result_24.txt
+
+# data change
+
+.PHONY: test_heapsort25
+test_heapsort25: results/heapsort.out valws379 lackey_test
+	$(VALGRIND_PREFIX) ./results/heapsort.out 100 2>&1 /dev/null | ./valws379 4096 100000 > results/heapsort_result_25.txt
+
+.PHONY: test_heapsort26
+test_heapsort26: results/heapsort.out valws379 lackey_test
+	$(VALGRIND_PREFIX) ./results/heapsort.out 1000 2>&1 /dev/null | ./valws379 4096 100000 > results/heapsort_result_26.txt
+
+# very big num
+.PHONY: test_heapsort27
+test_heapsort27: results/heapsort.out valws379 lackey_test
+	$(VALGRIND_PREFIX) ./results/heapsort.out 100000 2>&1 /dev/null | ./valws379 4096 100000 > results/heapsort_result_25.txt
+
+
+# quicksort
+.PHONY: test_quicksort1
+test_quicksort1: results/quicksort.out valws379 lackey_test
+	$(VALGRIND_PREFIX) ./results/quicksort.out 100000 2>&1 /dev/null | ./valws379 4096 100000 > results/heapsort01.txt
+
+# full
+.PHONY: test_quicksort_full
+test_quicksort_full: results/quicksort.out valws379 lackey_test
+	$(VALGRIND_PREFIX) ./results/quicksort.out 10000 2>&1 /dev/null | ./valws379 4096 100000 > results/quicksort_full.txt
+
+# filtered
+.PHONY: test_quicksort_std
+test_quicksort_std: results/quicksort.out valws379 lackey_test
+	$(VALGRIND_PREFIX) ./results/quicksort.out 10000 2>&1 /dev/null | ./valws379 4096 100000 > results/quicksort_std.txt
+
+# page size
+
+.PHONY: test_quicksort_page_1
+test_quicksort_page_1: results/quicksort.out valws379 lackey_test
+	$(VALGRIND_PREFIX) ./results/quicksort.out 10000 2>&1 /dev/null | ./valws379 1024 100000 > results/quicksort_page_1.txt
+
+.PHONY: test_quicksort_page_2
+test_quicksort_page_2: results/quicksort.out valws379 lackey_test
+	$(VALGRIND_PREFIX) ./results/quicksort.out 10000 2>&1 /dev/null | ./valws379 2048 100000 > results/quicksort_page_2.txt
+
+.PHONY: test_quicksort_page_3
+test_quicksort_page_3: results/quicksort.out valws379 lackey_test
+	$(VALGRIND_PREFIX) ./results/quicksort.out 10000 2>&1 /dev/null | ./valws379 8192 100000 > results/quicksort_page_3.txt
+
+.PHONY: test_quicksort_page_4
+test_quicksort_page_4: results/quicksort.out valws379 lackey_test
+	$(VALGRIND_PREFIX) ./results/quicksort.out 10000 2>&1 /dev/null | ./valws379 16384 100000 > results/quicksort_page_4.txt
+
+# window size
+
+.PHONY: test_quicksort_window_1
+test_quicksort_window_1: results/quicksort.out valws379 lackey_test
+	$(VALGRIND_PREFIX) ./results/quicksort.out 10000 2>&1 /dev/null | ./valws379 4096 1000 > results/quicksort_window_1.txt
+
+.PHONY: test_quicksort_window_2
+test_quicksort_window_2: results/quicksort.out valws379 lackey_test
+	$(VALGRIND_PREFIX) ./results/quicksort.out 10000 2>&1 /dev/null | ./valws379 4096 10000 > results/quicksort_window_2.txt
+
+.PHONY: test_quicksort_window_3
+test_quicksort_window_3: results/quicksort.out valws379 lackey_test
+	$(VALGRIND_PREFIX) ./results/quicksort.out 10000 2>&1 /dev/null | ./valws379 4096 1000000 > results/quicksort_window_3.txt
+
+.PHONY: test_quicksort_window_4
+test_quicksort_window_4: results/quicksort.out valws379 lackey_test
+	$(VALGRIND_PREFIX) ./results/quicksort.out 10000 2>&1 /dev/null | ./valws379 4096 10000000 > results/quicksort_window_4.txt
+
+# data size
+
+.PHONY: test_quicksort_size_1
+test_quicksort_size_1: results/quicksort.out valws379 lackey_test
+	$(VALGRIND_PREFIX) ./results/quicksort.out 100 2>&1 /dev/null | ./valws379 4096 100000 > results/quicksort_size_1.txt
+
+.PHONY: test_quicksort_size_2
+test_quicksort_size_1: results/quicksort.out valws379 lackey_test
+	$(VALGRIND_PREFIX) ./results/quicksort.out 1000 2>&1 /dev/null | ./valws379 4096 100000 > results/quicksort_size_2.txt
+
+
+# radixsort
+
+# full
+.PHONY: test_radixsort_full
+test_radixsort_full: results/radixsort.out valws379
+	$(VALGRIND_PREFIX) ./results/radixsort.out 10000 2>&1 /dev/null | ./valws379 4096 100000 > results/radixsort_full.txt
+
+# filtered
+.PHONY: test_radixsort_std
+test_radixsort_std: results/radixsort.out valws379
+	$(VALGRIND_PREFIX) ./results/radixsort.out 10000 2>&1 /dev/null | ./valws379 4096 100000 > results/radixsort_std.txt
+
+# page size
+.PHONY: test_radixsort_page_1
+test_radixsort_page_1: results/radixsort.out valws379
+	$(VALGRIND_PREFIX) ./results/radixsort.out 10000 2>&1 /dev/null | ./valws379 1024 100000 > results/radixsort_page_1.txt
+
+.PHONY: test_radixsort_page_2
+test_radixsort_page_2: results/radixsort.out valws379
+	$(VALGRIND_PREFIX) ./results/radixsort.out 10000 2>&1 /dev/null | ./valws379 2048 100000 > results/radixsort_page_2.txt
+
+.PHONY: test_radixsort_page_3
+test_radixsort_page_3: results/radixsort.out valws379
+	$(VALGRIND_PREFIX) ./results/radixsort.out 10000 2>&1 /dev/null | ./valws379 8192 100000 > results/radixsort_page_3.txt
+
+.PHONY: test_radixsort_page_4
+test_radixsort_page_4: results/radixsort.out valws379
+	$(VALGRIND_PREFIX) ./results/radixsort.out 10000 2>&1 /dev/null | ./valws379 16384 100000 > results/radixsort_page_4.txt
+
+# window size
+.PHONY: test_radixsort_window_1
+test_radixsort_window_1: results/radixsort.out valws379
+	$(VALGRIND_PREFIX) ./results/radixsort.out 10000 2>&1 /dev/null | ./valws379 4096 1000 > results/radixsort_window_1.txt
+
+.PHONY: test_radixsort_window_2
+test_radixsort_window_2: results/radixsort.out valws379
+	$(VALGRIND_PREFIX) ./results/radixsort.out 10000 2>&1 /dev/null | ./valws379 4096 10000 > results/radixsort_window_2.txt
+
+.PHONY: test_radixsort_window_3
+test_radixsort_window_3: results/radixsort.out valws379
+	$(VALGRIND_PREFIX) ./results/radixsort.out 10000 2>&1 /dev/null | ./valws379 4096 1000000 > results/radixsort_window_3.txt
+
+.PHONY: test_radixsort_window_4
+test_radixsort_window_4: results/radixsort.out valws379
+	$(VALGRIND_PREFIX) ./results/radixsort.out 10000 2>&1 /dev/null | ./valws379 4096 10000000 > results/radixsort_window_4.txt
+
+# data size
+.PHONY: test_radixsort_size_1
+test_radixsort_size_1: results/radixsort.out valws379
+	$(VALGRIND_PREFIX) ./results/radixsort.out 100 2>&1 /dev/null | ./valws379 4096 100000 > results/radixsort_size_1.txt
+
+.PHONY: test_radixsort_size_2
+test_radixsort_size_2: results/radixsort.out valws379
+	$(VALGRIND_PREFIX) ./results/radixsort.out 1000 2>&1 /dev/null | ./valws379 4096 100000 > results/radixsort_size_2.txt
+
+.PHONY: test_radixsort1
+test_radixsort1: results/radixsort.out valws379
+	$(VALGRIND_PREFIX) ./results/radixsort.out 100000 2>&1 /dev/null | ./valws379 4096 100000 > results/radixsort01.txt

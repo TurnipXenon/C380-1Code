@@ -1,12 +1,20 @@
 CC=gcc -Wall -Wextra -std=gnu99 -g $(CFLAGS)
 EXRANOFF=setarch `uname -m` -R
-TEST_LOC=results/test210410_0008.txt
+TEST_LOC=results/test210415_1915.txt
+VALGRIND_PREFIX=valgrind --tool=lackey --trace-mem=yes
+CFLAGS=-D DEBUG_COMMENTS
+# todo cleanup
 
 .PHONY: all
 all: valws379
 
 %.o: %.c %.h
 	$(CC) -c -o $@ $<
+
+# for testing purposes
+# from https://stackoverflow.com/questions/3283021/compile-a-standalone-static-executable
+%.out: %.c
+	$(CC) -static -static-libgcc -static-libstdc++ -o $@ $^
 
 valws379: valws379_base.o queue.o windowset.o hashtable.o linkedlist.o valws379.c
 	$(CC) -o $@ $^
@@ -24,19 +32,22 @@ lackey_test: lab9/lackey.c
 clean:
 	rm -f *.o valws379
 
-.PHONY: argtest1
-argtest1: valws379
-	./valws379 -s 32
+# Tests below
 
 .PHONY: test1
 test1: valws379 lackey_test
-	 valgrind --tool=lackey --trace-mem=yes ./lackey_test 2>&1 /dev/null | $(EXRANOFF) ./valws379 -s 3 16 20 > $(TEST_LOC)
-	
+	 valgrind --tool=lackey --trace-mem=yes ./lackey_test 2>&1 /dev/null | $(EXRANOFF) ./valws379 128 1000 > $(TEST_LOC)
+
+# CFLAGS='-D NOTAPP_TIME'
 
 .PHONY: valgrind1
 valgrind1: valws379 lackey_test
-	 valgrind --tool=lackey --trace-mem=yes ./lackey_test 2>&1 /dev/null | $(EXRANOFF) valgrind --leak-check=full ./valws379 -s 0 16 100  > $(TEST_LOC)
+	 valgrind --tool=lackey --trace-mem=yes ./lackey_test 2>&1 /dev/null | $(EXRANOFF) valgrind --leak-check=full ./valws379 16 1000  > $(TEST_LOC)
 
 .PHONY: queue_test1
 queue_test1: queue_test
 	valgrind --leak-check=full ./queue_test
+
+.PHONY: all_sorts
+all_sorts:
+	make results/heapsort.out && make results/quicksort.out && make results/radixsort.out

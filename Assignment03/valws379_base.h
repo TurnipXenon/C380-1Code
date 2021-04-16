@@ -6,10 +6,10 @@
 #include <stdlib.h> /* for malloc */
 #include <stdbool.h>
 
-#define TABLE_SIZE 32
+#define TABLE_SIZE 16
 #define HASH_MASK (TABLE_SIZE - 1)
-#define SPLIT_SIZE 20
-#define MERGE_SIZE 12
+#define SPLIT_SIZE 15
+#define MERGE_SIZE 6
 
 typedef unsigned long long ull;
 

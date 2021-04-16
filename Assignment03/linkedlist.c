@@ -48,7 +48,9 @@ void sll_put_key_value(struct linked_list *linked_list, struct key_value key_val
 }
 
 static void sll_insert(struct linked_list *linked_list, ull key) {
-    // printf("Add (%llX): %u\n", key, 1u);
+    #ifdef DEBUG_PRINT
+    printf("Add (%llX): %u\n", key, 1u);
+    #endif /* DEBUG_PRINT */
     struct key_value key_value;
     key_value.key = key;
     key_value.value = 1u;
@@ -60,7 +62,9 @@ void sll_add(struct linked_list *linked_list, ull key) {
 
     if (node != NULL) {
         node->key_value.value++;
-        // printf("Add (%llX): %llu\n", node->key_value.key, node->key_value.value);
+        #ifdef DEBUG_PRINT
+        printf("Add (%llX): %llu\n", node->key_value.key, node->key_value.value);
+        #endif /* DEBUG_PRINT */
     } else {
         sll_insert(linked_list, key);
     }
@@ -90,13 +94,13 @@ void sll_remove(struct linked_list *linked_list, ull key) {
 
             // printf("Delete before (%llX): %llu\n", node->key_value.key, node->key_value.value);
             node->key_value.value--;
-            // printf("Delete after (%llX): %llu\n", node->key_value.key, node->key_value.value);
-            
+            #ifdef DEBUG_PRINT
+            printf("Delete after (%llX): %llu\n", node->key_value.key, node->key_value.value);
+            #endif /* DEBUG_PRINT */
+
             if (node->key_value.value == 0) {
                 sll_delete(linked_list, node, previous);
-            }
-
-            /* Else: Don't do anything */
+            } /* Else: Don't do anything else */
 
             break;
         }
