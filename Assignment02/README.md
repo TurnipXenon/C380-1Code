@@ -1,4 +1,4 @@
-by Allan Manuba
+by 
 
 Limitations:
 - Server threads that interact with observer clients and user clients don't terminate
